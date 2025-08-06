@@ -1262,7 +1262,78 @@ export default function CRM() {
                       </Select>
                       <ErrorMessage error={errors.dealStatus} />
                     </div>
-
+                    <div>
+                      <Label htmlFor="statusDescription"
+                      className="mb-2 text-slate-700 dark:text-slate-300">
+                        Status Description
+                      </Label>
+                      <textarea
+                      id="statusDescription"
+                        type="text"
+                        value={formData.statusDescription}
+                        onChange={(e) =>
+                          updateFormData("dealAmount", e.target.value)
+                        }
+                        className={`bg-white/50 dark:bg-slate-800/50 w-full pl-1 border-white dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                          errors.statusDescription ? "border-red-500" : ""
+                        }`}
+                        placeholder="Enter the insights gathered during this stage"/>
+                    </div>
+                    <div>
+                      <Label  htmlFor="dealType"
+                        className="mb-2 text-slate-700 dark:text-slate-300">
+                          Deal Type
+                      </Label>
+                      <Select
+                        value={formData.dealType}
+                        onValueChange={(value) =>
+                          updateFormData("dealType", value)
+                        }
+                        className={errors.dealType ? "border-red-500" : ""}
+                      >
+                        <SelectTrigger
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
+                            errors.dealStatus ? "border-red-500" : ""
+                          }`}
+                        >
+                          <SelectValue placeholder="Select Deal Type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="new">New</SelectItem>
+                          <SelectItem value="existing">
+                           Existing
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <ErrorMessage error={errors.dealType} />
+                    </div>
+                     <div>
+                      <Label  htmlFor="dealType"
+                        className="mb-2 text-slate-700 dark:text-slate-300">
+                          Deal Priority
+                      </Label>
+                      <Select
+                        value={formData.dealPriority}
+                        onValueChange={(value) =>
+                          updateFormData("dealPriority", value)
+                        }
+                        className={errors.dealPriority ? "border-red-500" : ""}
+                      >
+                        <SelectTrigger
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
+                            errors.dealStatus ? "border-red-500" : ""
+                          }`}
+                        >
+                          <SelectValue placeholder="Select Deal Priority" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="low">Low</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <ErrorMessage error={errors.dealPriority} />
+                    </div>
                     <div>
                       <Label
                         htmlFor="dealAmount"
