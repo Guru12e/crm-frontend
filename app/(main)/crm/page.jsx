@@ -42,6 +42,7 @@ import {
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { toast } from "react-toastify";
+import { Textarea } from "@/components/ui/textarea";
 
 const summaryStats = {
   customers: { total: 1247, new: 89, growth: 12 },
@@ -1059,6 +1060,54 @@ export default function CRM() {
                     </div>
                     <div>
                       <Label
+                        htmlFor="source"
+                        className="mb-2 text-slate-700 dark:text-slate-300"
+                      >
+                        Lead Source
+                      </Label>
+                      <Select
+                        value={formData.source}
+                        onValueChange={(value) =>
+                          updateFormData("source", value)
+                        }
+                        className={errors.source ? "border-red-500" : ""}
+                      >
+                        <SelectTrigger
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
+                            errors.source ? "border-red-500" : ""
+                          }`}
+                        >
+                          <SelectValue placeholder="Select Lead Source" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="advertisement">
+                            Advertisement
+                          </SelectItem>
+                          <SelectItem value="cold call">Cold call</SelectItem>
+                          <SelectItem value="employee referral">
+                            Employee referral
+                          </SelectItem>
+                          <SelectItem value="external referral">
+                            External referral
+                          </SelectItem>
+                          <SelectItem value="sales email alias">
+                            Sales email alias
+                          </SelectItem>
+                          <SelectItem value="chat">Chat</SelectItem>
+                          <SelectItem value="facebook">Facebook</SelectItem>
+                          <SelectItem value="web research">
+                            Web Research
+                          </SelectItem>
+                          <SelectItem value="twitter">X(Twitter)</SelectItem>
+                          <SelectItem value="public realtions">
+                            Public relations
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <ErrorMessage error={errors.source} />
+                    </div>
+                    <div>
+                      <Label
                         htmlFor="address"
                         className="mb-2 text-slate-700 dark:text-slate-300"
                       >
@@ -1085,7 +1134,7 @@ export default function CRM() {
                       >
                         Description
                       </Label>
-                      <Input
+                      <Textarea
                         id="description"
                         value={formData.description}
                         onChange={(e) =>
@@ -1096,7 +1145,7 @@ export default function CRM() {
                         }`}
                         placeholder="Lead description"
                       />
-                      <ErrorMessage error={errors.income} />
+                      <ErrorMessage error={errors.description} />
                     </div>
                   </div>
                   <div
