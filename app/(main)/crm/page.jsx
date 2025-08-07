@@ -379,8 +379,8 @@ export default function CRM() {
   );
 
   const LeadCard = ({ lead }) => (
-    <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
-      <CardContent className="p-4 sm:p-6">
+    <Card className="backdrop-blur-sm bg-white/70 h-[25vh] dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
+      <CardContent className="p-4 sm:p-6 ">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
             <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
@@ -401,10 +401,10 @@ export default function CRM() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-2 text-sm text-slate-500 dark:text-slate-400 gap-1 sm:gap-0">
                 <div className="flex items-center">
                   <Building2 className="h-4 w-4 mr-1 flex-shrink-0" />
-                  <span className="break-words">{lead.industry}</span>
+                  <span className="text-xs">{lead.industry}</span>
                 </div>
                 <div className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
+                  <MapPin className="h-3 w-4 mr-1 flex-shrink-0" />
                   <span className="break-words">{lead.location}</span>
                 </div>
               </div>
@@ -1263,12 +1263,14 @@ export default function CRM() {
                       <ErrorMessage error={errors.dealStatus} />
                     </div>
                     <div>
-                      <Label htmlFor="statusDescription"
-                      className="mb-2 text-slate-700 dark:text-slate-300">
+                      <Label
+                        htmlFor="statusDescription"
+                        className="mb-2 text-slate-700 dark:text-slate-300"
+                      >
                         Status Description
                       </Label>
                       <textarea
-                      id="statusDescription"
+                        id="statusDescription"
                         type="text"
                         value={formData.statusDescription}
                         onChange={(e) =>
@@ -1277,12 +1279,15 @@ export default function CRM() {
                         className={`bg-white/50 dark:bg-slate-800/50 w-full pl-1 border-white dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.statusDescription ? "border-red-500" : ""
                         }`}
-                        placeholder="Enter the insights gathered during this stage"/>
+                        placeholder="Enter the insights gathered during this stage"
+                      />
                     </div>
                     <div>
-                      <Label  htmlFor="dealType"
-                        className="mb-2 text-slate-700 dark:text-slate-300">
-                          Deal Type
+                      <Label
+                        htmlFor="dealType"
+                        className="mb-2 text-slate-700 dark:text-slate-300"
+                      >
+                        Deal Type
                       </Label>
                       <Select
                         value={formData.dealType}
@@ -1300,17 +1305,17 @@ export default function CRM() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="new">New</SelectItem>
-                          <SelectItem value="existing">
-                           Existing
-                          </SelectItem>
+                          <SelectItem value="existing">Existing</SelectItem>
                         </SelectContent>
                       </Select>
                       <ErrorMessage error={errors.dealType} />
                     </div>
-                     <div>
-                      <Label  htmlFor="dealType"
-                        className="mb-2 text-slate-700 dark:text-slate-300">
-                          Deal Priority
+                    <div>
+                      <Label
+                        htmlFor="dealType"
+                        className="mb-2 text-slate-700 dark:text-slate-300"
+                      >
+                        Deal Priority
                       </Label>
                       <Select
                         value={formData.dealPriority}
@@ -1516,10 +1521,13 @@ export default function CRM() {
         </TabsContent>
 
         <TabsContent value="Leads" className="space-y-6">
-          <div className="grid grid-cols-1 gap-6">
-            {mockLeads.map((lead) => (
-              <LeadCard key={lead.id} lead={lead} />
-            ))}
+          <div className=" bg-white dark:bg-slate-900 gap-4 p-3 rounded-2xl">
+            <Label>In Progress</Label>
+            <div className="grid grid-cols-3 w-[86vw] gap-6 mt-3">
+              {mockLeads.map((lead) => (
+                <LeadCard key={lead.id} lead={lead} />
+              ))}
+            </div>
           </div>
         </TabsContent>
 
