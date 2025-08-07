@@ -50,6 +50,24 @@ const summaryStats = {
   deals: { total: 189, won: 67, growth: 15, value: 2340000 },
 };
 
+const leadStatus=[
+  "New",
+  "In progress",
+  "Contact Attempted",
+  "Contacted",
+  "Meeting Booked",
+  "Qualified",
+  "Unqualified"
+]
+const dealStatus=[
+  "New",
+  "Proposal Sent",
+  "Negotiation",
+  "Closed-won",
+  "Closed-lost",
+  "On-hold",
+  "Abandoned"
+]
 const mockCustomers = [
   {
     id: 1,
@@ -105,7 +123,7 @@ const mockLeads = [
     location: "Seattle, WA",
     industry: "Technology",
     score: 85,
-    status: "Qualified",
+    status: "New",
     source: "LinkedIn",
     created: "3 days ago",
     lastActivity: "1 day ago",
@@ -119,11 +137,193 @@ const mockLeads = [
     location: "Chicago, IL",
     industry: "Finance",
     score: 92,
-    status: "Hot",
+    status: "In progress",
     source: "Referral",
     created: "1 day ago",
     lastActivity: "2 hours ago",
   },
+  {
+    id: 3,
+    name: "Dragon Ventures",
+    contact: "Dwayne Thompson",
+    email: "d.thompson@dragon.vc",
+    phone: "+1 (555) 456-7890",
+    location: "Los Angeles, CA",
+    industry: "Education",
+    score: 78,
+    status: "Contact Attempted",
+    source: "Referral",
+    created: "3 days ago",
+    lastActivity: "1 hour ago",
+  },
+  {
+    id: 4,
+    name: "Snake Ventures",
+    contact: "Morris Morkel",
+    email: "m.morkel@snake.vc",
+    phone: "+1 (555) 567-1234",
+    location: "Denver, CO",
+    industry: "Logistics",
+    score: 80,
+    status: "Meeting Booked",
+    source: "Twitter",
+    created: "2 days ago",
+    lastActivity: "1 hour ago",
+  },
+  {
+    id: 5,
+    name: "NeuralTech",
+    contact: "Jenna Park",
+    email: "jenna@neuraltech.ai",
+    phone: "+1 (555) 123-4567",
+    location: "Boston, MA",
+    industry: "AI",
+    score: 91,
+    status: "Contacted",
+    source: "Event",
+    created: "4 days ago",
+    lastActivity: "Yesterday",
+  },
+  {
+    id: 6,
+    name: "OceanNet",
+    contact: "Carl Nguyen",
+    email: "carl@oceannet.io",
+    phone: "+1 (555) 789-4561",
+    location: "Miami, FL",
+    industry: "Telecom",
+    score: 74,
+    status: "Qualified",
+    source: "Cold Email",
+    created: "5 days ago",
+    lastActivity: "2 days ago",
+  },
+  {
+    id: 7,
+    name: "BrightWare",
+    contact: "Priya Desai",
+    email: "p.desai@brightware.com",
+    phone: "+1 (555) 222-3344",
+    location: "San Diego, CA",
+    industry: "Software",
+    score: 68,
+    status: "Unqualified",
+    source: "Website",
+    created: "6 days ago",
+    lastActivity: "5 days ago",
+  },
+  {
+    id: 8,
+    name: "GreenMatrix",
+    contact: "Tom Richards",
+    email: "tom.r@greenmatrix.org",
+    phone: "+1 (555) 321-4567",
+    location: "Portland, OR",
+    industry: "Sustainability",
+    score: 88,
+    status: "New",
+    source: "Campaign",
+    created: "2 days ago",
+    lastActivity: "Today",
+  },
+  {
+    id: 9,
+    name: "Finverse",
+    contact: "Rita Singh",
+    email: "r.singh@finverse.com",
+    phone: "+1 (555) 908-7654",
+    location: "Atlanta, GA",
+    industry: "Finance",
+    score: 82,
+    status: "In progress",
+    source: "LinkedIn",
+    created: "1 week ago",
+    lastActivity: "Yesterday",
+  },
+  {
+    id: 10,
+    name: "Aether Solutions",
+    contact: "Ali Bashir",
+    email: "a.bashir@aethersol.io",
+    phone: "+1 (555) 901-2345",
+    location: "Detroit, MI",
+    industry: "Engineering",
+    score: 89,
+    status: "Qualified",
+    source: "Cold Call",
+    created: "5 days ago",
+    lastActivity: "3 days ago",
+  },
+  {
+    id: 11,
+    name: "ZeroBit",
+    contact: "Megan Wu",
+    email: "megan@zerobit.tech",
+    phone: "+1 (555) 876-4321",
+    location: "Austin, TX",
+    industry: "Cybersecurity",
+    score: 90,
+    status: "Meeting Booked",
+    source: "Conference",
+    created: "2 days ago",
+    lastActivity: "1 hour ago",
+  },
+  {
+    id: 12,
+    name: "EvoLabs",
+    contact: "Samir Patel",
+    email: "samir@evolabs.org",
+    phone: "+1 (555) 741-8529",
+    location: "Phoenix, AZ",
+    industry: "Biotech",
+    score: 83,
+    status: "Contacted",
+    source: "Referral",
+    created: "4 days ago",
+    lastActivity: "Yesterday",
+  },
+  {
+    id: 13,
+    name: "BlockNet",
+    contact: "Karla Gomez",
+    email: "k.gomez@blocknet.io",
+    phone: "+1 (555) 963-8527",
+    location: "Dallas, TX",
+    industry: "Blockchain",
+    score: 76,
+    status: "Contact Attempted",
+    source: "Website",
+    created: "6 days ago",
+    lastActivity: "Today",
+  },
+  {
+    id: 14,
+    name: "FusionEdge",
+    contact: "Ryan Burke",
+    email: "r.burke@fusionedge.ai",
+    phone: "+1 (555) 147-2583",
+    location: "Las Vegas, NV",
+    industry: "AI",
+    score: 87,
+    status: "In progress",
+    source: "Cold Email",
+    created: "3 days ago",
+    lastActivity: "Yesterday",
+  },
+  {
+    id: 15,
+    name: "ClearCompute",
+    contact: "Isabella Cruz",
+    email: "i.cruz@clearcompute.com",
+    phone: "+1 (555) 369-2587",
+    location: "Charlotte, NC",
+    industry: "Cloud",
+    score: 84,
+    status: "Qualified",
+    source: "Partner",
+    created: "5 days ago",
+    lastActivity: "Today",
+  }
 ];
 
 const mockDeals = [
@@ -144,13 +344,169 @@ const mockDeals = [
     name: "Annual Subscription - DataDrive",
     company: "DataDrive Solutions",
     value: "$156,000",
-    stage: "Proposal",
+    stage: "Proposal Sent",
     probability: 60,
     closeDate: "2024-12-30",
     owner: "Michael Chen",
     source: "Website",
     lastActivity: "3 hours ago",
   },
+  {
+    id: 3,
+    name: "Basic Plan - GrowthCorp",
+    company: "GrowthCorp",
+    value: "$25,000",
+    stage: "New",
+    probability: 25,
+    closeDate: "2024-10-05",
+    owner: "Emily Rodriguez",
+    source: "Campaign",
+    lastActivity: "2 days ago",
+  },
+  {
+    id: 4,
+    name: "Startup Bundle - InnovateLab",
+    company: "InnovateLab",
+    value: "$40,000",
+    stage: "On-hold",
+    probability: 35,
+    closeDate: "2024-11-20",
+    owner: "David Kim",
+    source: "LinkedIn",
+    lastActivity: "3 days ago",
+  },
+  {
+    id: 5,
+    name: "Growth Plan - ScaleUp",
+    company: "ScaleUp Ventures",
+    value: "$110,000",
+    stage: "Negotiation",
+    probability: 70,
+    closeDate: "2024-12-05",
+    owner: "Lisa Thompson",
+    source: "Referral",
+    lastActivity: "Yesterday",
+  },
+  {
+    id: 6,
+    name: "Corporate Deal - OceanNet",
+    company: "OceanNet",
+    value: "$95,000",
+    stage: "Proposal Sent",
+    probability: 65,
+    closeDate: "2024-10-25",
+    owner: "Carl Nguyen",
+    source: "Cold Email",
+    lastActivity: "1 hour ago",
+  },
+  {
+    id: 7,
+    name: "Subscription - GreenMatrix",
+    company: "GreenMatrix",
+    value: "$78,000",
+    stage: "Closed-won",
+    probability: 100,
+    closeDate: "2024-08-01",
+    owner: "Tom Richards",
+    source: "Campaign",
+    lastActivity: "Today",
+  },
+  {
+    id: 8,
+    name: "Premium Plan - BrightWare",
+    company: "BrightWare",
+    value: "$60,000",
+    stage: "Closed-lost",
+    probability: 0,
+    closeDate: "2024-07-15",
+    owner: "Priya Desai",
+    source: "Website",
+    lastActivity: "Last week",
+  },
+  {
+    id: 9,
+    name: "Elite Tier - FusionEdge",
+    company: "FusionEdge",
+    value: "$142,000",
+    stage: "Abandoned",
+    probability: 0,
+    closeDate: "2024-09-30",
+    owner: "Ryan Burke",
+    source: "Cold Email",
+    lastActivity: "2 days ago",
+  },
+  {
+    id: 10,
+    name: "AI Services - NeuralTech",
+    company: "NeuralTech",
+    value: "$130,000",
+    stage: "Negotiation",
+    probability: 80,
+    closeDate: "2024-11-10",
+    owner: "Jenna Park",
+    source: "Event",
+    lastActivity: "Today",
+  },
+  {
+    id: 11,
+    name: "Security Suite - ZeroBit",
+    company: "ZeroBit",
+    value: "$105,000",
+    stage: "Proposal Sent",
+    probability: 55,
+    closeDate: "2024-10-22",
+    owner: "Megan Wu",
+    source: "Conference",
+    lastActivity: "Yesterday",
+  },
+  {
+    id: 12,
+    name: "Enterprise AI - ClearCompute",
+    company: "ClearCompute",
+    value: "$125,000",
+    stage: "New",
+    probability: 35,
+    closeDate: "2024-09-18",
+    owner: "Isabella Cruz",
+    source: "Partner",
+    lastActivity: "Today",
+  },
+  {
+    id: 13,
+    name: "Full Package - BlockNet",
+    company: "BlockNet",
+    value: "$88,000",
+    stage: "Negotiation",
+    probability: 77,
+    closeDate: "2024-12-05",
+    owner: "Karla Gomez",
+    source: "Website",
+    lastActivity: "Today",
+  },
+  {
+    id: 14,
+    name: "Biotech Plan - EvoLabs",
+    company: "EvoLabs",
+    value: "$93,000",
+    stage: "On-hold",
+    probability: 45,
+    closeDate: "2024-11-01",
+    owner: "Samir Patel",
+    source: "Referral",
+    lastActivity: "2 days ago",
+  },
+  {
+    id: 15,
+    name: "Team Plan - Aether Solutions",
+    company: "Aether Solutions",
+    value: "$68,000",
+    stage: "Closed-lost",
+    probability: 0,
+    closeDate: "2024-08-18",
+    owner: "Ali Bashir",
+    source: "Cold Call",
+    lastActivity: "Last week",
+  }
 ];
 
 export default function CRM() {
@@ -1521,20 +1877,55 @@ export default function CRM() {
         </TabsContent>
 
         <TabsContent value="Leads" className="space-y-6">
-          <div className=" bg-white dark:bg-slate-900 gap-4 p-3 rounded-2xl">
-            <Label>In Progress</Label>
-            <div className="grid grid-cols-3 w-[86vw] gap-6 mt-3">
-              {mockLeads.map((lead) => (
-                <LeadCard key={lead.id} lead={lead} />
-              ))}
-            </div>
+          <div className="overflow-y-hidden">
+            {leadStatus.map((leadState) => (
+              <Card key={leadState} className="mt-4 h-[35vh] relative overflow-hidden">
+                <CardContent className="flex h-full p-0">
+                  {/* Sticky Left Label */}
+                  <div className="w-[15%] bg-gray-300 dark:bg-slate-800 flex items-center justify-center text-2xl font-bold text-slate-800 dark:text-white absolute text-center left-0 top-0 bottom-0 z-10">
+                    {leadState}
+                  </div>
+
+                  {/* Scrollable Right Content */}
+                  <div className="ml-[15%] w-[85%] overflow-y-scroll p-4">
+                    <div className="grid grid-cols-2 gap-6 min-w-fit">
+                      {mockLeads
+                       .filter((lead) => lead.status === leadState)
+                       .map((lead) => (
+                        <LeadCard key={lead.id} lead={lead}  />
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
+
+
         </TabsContent>
 
         <TabsContent value="Deals" className="space-y-6">
-          <div className="grid grid-cols-1 gap-6">
-            {mockDeals.map((deal) => (
-              <DealCard key={deal.id} deal={deal} />
+          <div className="overflow-y-hidden">
+            {dealStatus.map((dealState) => (
+              <Card key={dealState} className="mt-4 h-[35vh] relative overflow-hidden">
+                <CardContent className="flex h-full p-0">
+                  {/* Sticky Left Label */}
+                  <div className="w-[15%] bg-gray-300 dark:bg-slate-800 flex items-center justify-center text-2xl font-bold text-slate-800 dark:text-white absolute text-center left-0 top-0 bottom-0 z-10">
+                    {dealState}
+                  </div>
+
+                  {/* Scrollable Right Content */}
+                  <div className="ml-[15%] w-[85%] overflow-y-scroll p-4">
+                    <div className="grid grid-cols-2 gap-6 min-w-fit">
+                      {mockDeals
+                       .filter((deal) => deal.stage === dealState)
+                       .map((deal) => (
+                        <DealCard key={deal.id} deal={deal}  />
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </TabsContent>
