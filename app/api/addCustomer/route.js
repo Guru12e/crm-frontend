@@ -21,7 +21,7 @@ export async function POST(request) {
     const data = new Date();
 
     const user = await supabase
-      .from("Companies")
+      .from("Users")
       .select("id", "email")
       .eq("email", formData.session.user.email);
 
@@ -41,7 +41,6 @@ export async function POST(request) {
           price: formData.price || null,
           customFields: formData.customFields || [],
           created_at: formData.created_at || data.toTimeString(),
-          companyKey: user.data[0].id,
         })
         .select();
       if (companyError) {
