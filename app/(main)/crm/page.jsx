@@ -43,6 +43,12 @@ import {
 import { Label } from "@/components/ui/label";
 import { toast } from "react-toastify";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenuContent,
+} from "@radix-ui/react-dropdown-menu";
 
 const summaryStats = {
   customers: { total: 1247, new: 89, growth: 12 },
@@ -50,24 +56,24 @@ const summaryStats = {
   deals: { total: 189, won: 67, growth: 15, value: 2340000 },
 };
 
-const leadStatus=[
+const leadStatus = [
   "New",
   "In progress",
   "Contact Attempted",
   "Contacted",
   "Meeting Booked",
   "Qualified",
-  "Unqualified"
-]
-const dealStatus=[
+  "Unqualified",
+];
+const dealStatus = [
   "New",
   "Proposal Sent",
   "Negotiation",
   "Closed-won",
   "Closed-lost",
   "On-hold",
-  "Abandoned"
-]
+  "Abandoned",
+];
 const mockCustomers = [
   {
     id: 1,
@@ -113,7 +119,7 @@ const mockCustomers = [
   },
 ];
 
-const mockLeads = [
+let mockLeadsData = [
   {
     id: 1,
     name: "InnovateLab",
@@ -323,10 +329,10 @@ const mockLeads = [
     source: "Partner",
     created: "5 days ago",
     lastActivity: "Today",
-  }
+  },
 ];
 
-const mockDeals = [
+let mockDeals = [
   {
     id: 1,
     name: "Enterprise Package - TechFlow",
@@ -506,7 +512,7 @@ const mockDeals = [
     owner: "Ali Bashir",
     source: "Cold Call",
     lastActivity: "Last week",
-  }
+  },
 ];
 
 export default function CRM() {
@@ -528,6 +534,7 @@ export default function CRM() {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [mockLeads, setMockLeads] = useState(mockLeadsData);
 
   const ErrorMessage = ({ error }) =>
     error && (
@@ -733,9 +740,10 @@ export default function CRM() {
       </CardContent>
     </Card>
   );
+  // const [id, setId] = useState(0);
 
-  const LeadCard = ({ lead }) => (
-    <Card className="backdrop-blur-sm bg-white/70 h-[25vh] dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
+  const LeadCard = ({ key, lead }) => (
+    <Card className="backdrop-blur-sm bg-white/70 h-[25vh] z-0 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
       <CardContent className="p-4 sm:p-6 ">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
@@ -788,7 +796,7 @@ export default function CRM() {
             </div>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-100">
           <div className="flex flex-wrap gap-2">
             <Button
               size="sm"
@@ -806,12 +814,48 @@ export default function CRM() {
               <Phone className="h-4 w-4 mr-1" />
               Call
             </Button>
-            <Button
-              size="sm"
-              className="bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none"
-            >
-              Convert
-            </Button>
+            <DropdownMenu className="relative">
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  className={`bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none cursor-pointer ${
+                    lead.status === "Unqualified" || lead.status === "Qualified"
+                      ? "hidden"
+                      : "block"
+                  } `}
+                  onClick={() => setId(lead.id)}
+                >
+                  Update Status
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48 absolute top-[100%] bg-gray-700 text-white transform translate-x-[-50%] translate-y-[-120%] rounded-lg p-2 mt-2">
+                {leadStatus
+                  .slice(leadStatus.indexOf(lead.status) + 1)
+                  .map((statu) => (
+                    <DropdownMenuItem
+                      className="cursor-pointer border-b border-gray-300"
+                      key={statu}
+                      onClick={() => {
+                        {
+                          console.log(lead.id);
+                          const leadItem = mockLeads.find(
+                            (l) => l.id === lead.id
+                          );
+                          const updateLeads = mockLeads.map((l) => {
+                            if (l.id === leadItem.id) {
+                              return { ...l, status: statu };
+                            }
+                            return l;
+                          });
+                          setMockLeads(updateLeads);
+                        }
+                      }}
+                    >
+                      {statu}
+                    </DropdownMenuItem>
+                  ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <div className="flex space-x-2 justify-center sm:justify-end">
             <Button size="sm" variant="ghost" className="p-2">
@@ -868,12 +912,18 @@ export default function CRM() {
             ></div>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-100  transition-opacity">
           <div className="flex flex-wrap gap-2">
             <Button
               size="sm"
               variant="outline"
-              className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
+              className={`bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none ${
+                deal.stage === "Closed-won" ||
+                deal.stage === "Closed-lost" ||
+                deal.stage === "Abandoned"
+                  ? "hidden"
+                  : "block"
+              }`}
             >
               Update Stage
             </Button>
@@ -1879,7 +1929,10 @@ export default function CRM() {
         <TabsContent value="Leads" className="space-y-6">
           <div className="overflow-y-hidden">
             {leadStatus.map((leadState) => (
-              <Card key={leadState} className="mt-4 h-[35vh] relative overflow-hidden">
+              <Card
+                key={leadState}
+                className="mt-4 h-[35vh] relative overflow-hidden"
+              >
                 <CardContent className="flex h-full p-0">
                   {/* Sticky Left Label */}
                   <div className="w-[15%] bg-gray-300 dark:bg-slate-800 flex items-center justify-center text-2xl font-bold text-slate-800 dark:text-white absolute text-center left-0 top-0 bottom-0 z-10">
@@ -1890,24 +1943,25 @@ export default function CRM() {
                   <div className="ml-[15%] w-[85%] overflow-y-scroll p-4">
                     <div className="grid grid-cols-2 gap-6 min-w-fit">
                       {mockLeads
-                       .filter((lead) => lead.status === leadState)
-                       .map((lead) => (
-                        <LeadCard key={lead.id} lead={lead}  />
-                      ))}
+                        .filter((lead) => lead.status === leadState)
+                        .map((l) => (
+                          <LeadCard key={l.id} lead={l} />
+                        ))}
                     </div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
-
-
         </TabsContent>
 
         <TabsContent value="Deals" className="space-y-6">
           <div className="overflow-y-hidden">
             {dealStatus.map((dealState) => (
-              <Card key={dealState} className="mt-4 h-[35vh] relative overflow-hidden">
+              <Card
+                key={dealState}
+                className="mt-4 h-[35vh] relative overflow-hidden"
+              >
                 <CardContent className="flex h-full p-0">
                   {/* Sticky Left Label */}
                   <div className="w-[15%] bg-gray-300 dark:bg-slate-800 flex items-center justify-center text-2xl font-bold text-slate-800 dark:text-white absolute text-center left-0 top-0 bottom-0 z-10">
@@ -1918,10 +1972,10 @@ export default function CRM() {
                   <div className="ml-[15%] w-[85%] overflow-y-scroll p-4">
                     <div className="grid grid-cols-2 gap-6 min-w-fit">
                       {mockDeals
-                       .filter((deal) => deal.stage === dealState)
-                       .map((deal) => (
-                        <DealCard key={deal.id} deal={deal}  />
-                      ))}
+                        .filter((deal) => deal.stage === dealState)
+                        .map((deal) => (
+                          <DealCard key={deal.id} deal={deal} />
+                        ))}
                     </div>
                   </div>
                 </CardContent>
