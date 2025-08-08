@@ -15,13 +15,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   Users,
   TrendingUp,
@@ -522,7 +522,7 @@ export default function CRM() {
   const [sourceFilter, setSourceFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
   const today = new Date();
-  const [formData, setFormData] = useState({
+  const [customerFormData, setCustomerFormData] = useState({
     name: "",
     phone: "",
     email: "",
@@ -532,6 +532,24 @@ export default function CRM() {
     jobRole: "",
     status: "",
     created_at: today,
+  });
+  const [leadsFormData, setLeadsFormData] = useState({
+    name: "", //req
+    email: "",
+    phone: "", //req
+    age: 18,
+    linkedIn: "",
+    industry: "",
+    company: "",
+    income: 0,
+    website: "",
+    status: "", //req
+    source: "",
+    address: "",
+    description: "",
+  });
+  const [dealFormData, setDealFormData] = useState({
+    name: "", //req
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -546,8 +564,8 @@ export default function CRM() {
       </div>
     );
 
-  const updateFormData = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const updateCustomerFormData = (field, value) => {
+    setCustomerFormData((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
@@ -555,34 +573,34 @@ export default function CRM() {
     e.preventDefault();
     setLoading(true);
     let isValid = true;
-    if (!formData.name) {
+    if (!customerFormData.name) {
       errors.name = "Name is required";
       isValid = false;
     } else {
       errors.name = "";
     }
 
-    if (!formData.number) {
+    if (!customerFormData.number) {
       errors.number = "Number is Required";
       isValid = false;
     } else {
       errors.number = "";
     }
 
-    if (!formData.status) {
+    if (!customerFormData.status) {
       errors.status = "Status is Required";
       isValid = false;
     } else {
       errors.status = "";
     }
-    if (!formData.created_at) {
-      formData.created_at = today;
+    if (!customerFormData.created_at) {
+      customerFormData.created_at = today;
       errors.created_at = "";
       isValid = true;
     }
 
-    if (formData.linkedIn) {
-      if (!formData.linkedIn.includes("https://www.linkedin.com/")) {
+    if (customerFormData.linkedIn) {
+      if (!customerFormData.linkedIn.includes("https://www.linkedin.com/")) {
         errors.linkedIn = "Linked Url Required";
         isValid = false;
       } else {
@@ -599,7 +617,7 @@ export default function CRM() {
       const req = await fetch("/api/addCustomer", {
         method: "POST",
         body: JSON.stringify({
-          ...formData,
+          ...customerFormData,
           session: JSON.parse(session),
         }),
       });
@@ -609,7 +627,7 @@ export default function CRM() {
           autoClose: 3000,
           position: "top-right",
         });
-        setFormData({
+        setCustomerFormData({
           name: "",
           phone: "",
           email: "",
@@ -991,16 +1009,16 @@ export default function CRM() {
           </p>
         </div>
 
-        <Dialog>
-          <DialogTrigger>
+        <Sheet>
+          <SheetTrigger>
             <div className="bg-gradient-to-r px-3 py-2 rounded-xl from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white w-full sm:w-auto">
               Add New {activeTab}
             </div>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New {activeTab}</DialogTitle>
-              <DialogDescription>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Add New {activeTab}</SheetTitle>
+              <SheetDescription>
                 <>
                   <div
                     className={`${
@@ -1016,8 +1034,10 @@ export default function CRM() {
                       </Label>
                       <Input
                         id="name"
-                        value={formData.name}
-                        onChange={(e) => updateFormData("name", e.target.value)}
+                        value={customerFormData.name}
+                        onChange={(e) =>
+                          updateCustomerFormData("name", e.target.value)
+                        }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.name ? "border-red-500" : ""
                         }`}
@@ -1035,9 +1055,9 @@ export default function CRM() {
                       <Input
                         id="email"
                         type="email"
-                        value={formData.email}
+                        value={customerFormData.email}
                         onChange={(e) =>
-                          updateFormData("email", e.target.value)
+                          updateCustomerFormData("email", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.email ? "border-red-500" : ""
@@ -1056,9 +1076,9 @@ export default function CRM() {
                       <Input
                         id="number"
                         type="text"
-                        value={formData.number}
+                        value={customerFormData.number}
                         onChange={(e) =>
-                          updateFormData("number", e.target.value)
+                          updateCustomerFormData("number", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.number ? "border-red-500" : ""
@@ -1077,9 +1097,9 @@ export default function CRM() {
                       <Input
                         id="linkedIn"
                         type="url"
-                        value={formData.linkedIn}
+                        value={customerFormData.linkedIn}
                         onChange={(e) =>
-                          updateFormData("linkedIn", e.target.value)
+                          updateCustomerFormData("linkedIn", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.linkedIn ? "border-red-500" : ""
@@ -1096,8 +1116,10 @@ export default function CRM() {
                         Industry
                       </Label>
                       <Select
-                        value={formData.job}
-                        onValueChange={(value) => updateFormData("job", value)}
+                        value={customerFormData.job}
+                        onValueChange={(value) =>
+                          updateCustomerFormData("job", value)
+                        }
                         className={errors.job ? "border-red-500" : ""}
                       >
                         <SelectTrigger
@@ -1131,9 +1153,9 @@ export default function CRM() {
                       <Input
                         id="companyWebsite"
                         type="url"
-                        value={formData.jobRole}
+                        value={customerFormData.jobRole}
                         onChange={(e) =>
-                          updateFormData("jobRole", e.target.value)
+                          updateCustomerFormData("jobRole", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.jobRole ? "border-red-500" : ""
@@ -1152,9 +1174,9 @@ export default function CRM() {
                       <Input
                         id="address"
                         type="url"
-                        value={formData.address}
+                        value={customerFormData.address}
                         onChange={(e) =>
-                          updateFormData("address", e.target.value)
+                          updateCustomerFormData("address", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.address ? "border-red-500" : ""
@@ -1171,9 +1193,9 @@ export default function CRM() {
                         Customer Status
                       </Label>
                       <Select
-                        value={formData.status}
+                        value={customerFormData.status}
                         onValueChange={(value) =>
-                          updateFormData("status", value)
+                          updateCustomerFormData("status", value)
                         }
                         className={errors.status ? "border-red-500" : ""}
                       >
@@ -1202,9 +1224,9 @@ export default function CRM() {
                       <Input
                         id="price"
                         type="url"
-                        value={formData.price}
+                        value={customerFormData.price}
                         onChange={(e) =>
-                          updateFormData("price", e.target.value)
+                          updateCustomerFormData("price", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.price ? "border-red-500" : ""
@@ -1223,9 +1245,9 @@ export default function CRM() {
                       <Input
                         id="price"
                         type="text"
-                        value={formData.issue}
+                        value={customerFormData.issue}
                         onChange={(e) =>
-                          updateFormData("issue", e.target.value)
+                          updateCustomerFormData("issue", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.issue ? "border-red-500" : ""
@@ -1244,9 +1266,9 @@ export default function CRM() {
                       <Input
                         id="onboarded-date"
                         type="date"
-                        value={formData.created_at}
+                        value={customerFormData.created_at}
                         onChange={(e) =>
-                          updateFormData("created_at", e.target.value)
+                          updateCustomerFormData("created_at", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.created_at ? "border-red-500" : ""
@@ -1270,8 +1292,10 @@ export default function CRM() {
                       </Label>
                       <Input
                         id="name"
-                        value={formData.name}
-                        onChange={(e) => updateFormData("name", e.target.value)}
+                        value={FormData.name}
+                        onChange={(e) =>
+                          updateLeadFormData("name", e.target.value)
+                        }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.name ? "border-red-500" : ""
                         }`}
@@ -1837,10 +1861,10 @@ export default function CRM() {
                     Add {activeTab}
                   </Button>
                 </div>
-              </DialogDescription>
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
+              </SheetDescription>
+            </SheetHeader>
+          </SheetContent>
+        </Sheet>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
