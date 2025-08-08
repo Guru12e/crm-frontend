@@ -1,5 +1,5 @@
-import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
+import { createClient } from "@/utils/supabase/server";
 
 export async function POST(req) {
     const data = await req.json();
@@ -7,17 +7,20 @@ export async function POST(req) {
     const supabase = await createClient();
 
     try{
-        const {data: user, error} = await supabase.from("Users").insert({
+        const {data: lead, error} = await supabase.from("Leads").insert({
 "name" : data.name,
   "email":  data.email,
-  "role" : data.role,
-  "companyName" : data.companyName,
-  "companyWebsite" : data.companyWebsite,
+  "number" : data.number,
+  "age" : data.age,
+  "linkedIn" : data.companyWebsite,
   "industry" : data.industry,
-  "companySize" : data.companySize,
-  "products" : data.products,
-  "companyDescription" : data.companyDescription,
-  "phone" : data.phone
+  "company" : data.company,
+  "income" : data.income,
+  "companyWebsite" : data.companyWebsite,
+  "leadStatus" : data.leadStatus,
+  "leadSource" : data.leadSource,
+  "address" : data.address,
+  "description" : data.description,
     })
 
     if(error) {
@@ -29,3 +32,4 @@ export async function POST(req) {
     return new NextResponse("success" , {status : 200})
     }
 }
+
