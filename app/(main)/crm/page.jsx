@@ -593,6 +593,9 @@ export default function CRM() {
     setLoading(true);
     let isValid = true;
     if (activeTab === "Customers") {
+      e.preventDefault();
+      setLoading(true);
+      let isValid = true;
       if (!customerFormData.name) {
         errors.name = "Name is required";
         isValid = false;
@@ -668,6 +671,9 @@ export default function CRM() {
       }
     }
     if (activeTab === "Leads") {
+      e.preventDefault();
+      setLoading(true);
+      let isValid = true;
       if (!leadsFormData.name) {
         errors.leadName = "Name is required";
         isValid = false;
@@ -727,6 +733,9 @@ export default function CRM() {
       }
     }
     if (activeTab === "Deals") {
+      e.preventDefault();
+      setLoading(true);
+      let isValid = true;
       if (!dealFormData.name) {
         errors.dealName = "Name is required";
         isValid = false;
