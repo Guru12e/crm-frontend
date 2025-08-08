@@ -43,12 +43,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { toast } from "react-toastify";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-  DropdownMenuContent,
-} from "@radix-ui/react-dropdown-menu";
 
 const summaryStats = {
   customers: { total: 1247, new: 89, growth: 12 },
@@ -119,7 +113,7 @@ const mockCustomers = [
   },
 ];
 
-let mockLeadsData = [
+const mockLeads = [
   {
     id: 1,
     name: "InnovateLab",
@@ -332,7 +326,7 @@ let mockLeadsData = [
   },
 ];
 
-let mockDealsData = [
+const mockDeals = [
   {
     id: 1,
     name: "Enterprise Package - TechFlow",
@@ -516,13 +510,13 @@ let mockDealsData = [
 ];
 
 export default function CRM() {
+  const today = new Date();
   const [activeTab, setActiveTab] = useState("Customers");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [sourceFilter, setSourceFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
-  const today = new Date();
-  const [customerFormData, setCustomerFormData] = useState({
+  const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
@@ -533,28 +527,9 @@ export default function CRM() {
     status: "",
     created_at: today,
   });
-  const [leadsFormData, setLeadsFormData] = useState({
-    name: "", //req
-    email: "",
-    phone: "", //req
-    age: 18,
-    linkedIn: "",
-    industry: "",
-    company: "",
-    income: 0,
-    website: "",
-    status: "", //req
-    source: "",
-    address: "",
-    description: "",
-  });
-  const [dealFormData, setDealFormData] = useState({
-    name: "", //req
-  });
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [mockLeads, setMockLeads] = useState(mockLeadsData);
-  const [mockDeals, setMockDeals] = useState(mockDealsData);
 
   const ErrorMessage = ({ error }) =>
     error && (
@@ -564,8 +539,8 @@ export default function CRM() {
       </div>
     );
 
-  const updateCustomerFormData = (field, value) => {
-    setCustomerFormData((prev) => ({ ...prev, [field]: value }));
+  const updateFormData = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
@@ -573,34 +548,32 @@ export default function CRM() {
     e.preventDefault();
     setLoading(true);
     let isValid = true;
-    if (!customerFormData.name) {
+    if (!formData.name) {
       errors.name = "Name is required";
       isValid = false;
     } else {
       errors.name = "";
     }
 
-    if (!customerFormData.number) {
+    if (!formData.number) {
       errors.number = "Number is Required";
       isValid = false;
     } else {
       errors.number = "";
     }
 
-    if (!customerFormData.status) {
+    if (!formData.status) {
       errors.status = "Status is Required";
       isValid = false;
     } else {
       errors.status = "";
     }
-    if (!customerFormData.created_at) {
-      customerFormData.created_at = today;
-      errors.created_at = "";
-      isValid = true;
+    if (!formData.created_at) {
+      formData.created_at = today;
     }
 
-    if (customerFormData.linkedIn) {
-      if (!customerFormData.linkedIn.includes("https://www.linkedin.com/")) {
+    if (formData.linkedIn) {
+      if (!formData.linkedIn.includes("https://www.linkedin.com/")) {
         errors.linkedIn = "Linked Url Required";
         isValid = false;
       } else {
@@ -617,7 +590,7 @@ export default function CRM() {
       const req = await fetch("/api/addCustomer", {
         method: "POST",
         body: JSON.stringify({
-          ...customerFormData,
+          ...formData,
           session: JSON.parse(session),
         }),
       });
@@ -627,7 +600,7 @@ export default function CRM() {
           autoClose: 3000,
           position: "top-right",
         });
-        setCustomerFormData({
+        setFormData({
           name: "",
           phone: "",
           email: "",
@@ -766,8 +739,8 @@ export default function CRM() {
     </Card>
   );
 
-  const LeadCard = ({ key, lead }) => (
-    <Card className="backdrop-blur-sm bg-white/70 h-[25vh] z-0 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
+  const LeadCard = ({ lead }) => (
+    <Card className="backdrop-blur-sm bg-white/70 h-[25vh] dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
       <CardContent className="p-4 sm:p-6 ">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
@@ -820,7 +793,7 @@ export default function CRM() {
             </div>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           <div className="flex flex-wrap gap-2">
             <Button
               size="sm"
@@ -838,48 +811,12 @@ export default function CRM() {
               <Phone className="h-4 w-4 mr-1" />
               Call
             </Button>
-            <DropdownMenu className="relative">
-              <DropdownMenuTrigger asChild>
-                <Button
-                  size="sm"
-                  className={`bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none cursor-pointer ${
-                    lead.status === "Unqualified" || lead.status === "Qualified"
-                      ? "hidden"
-                      : "block"
-                  } `}
-                  onClick={() => setId(lead.id)}
-                >
-                  Update Status
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-48 absolute top-[100%] bg-gray-700 text-white transform translate-x-[-50%] translate-y-[-120%] rounded-lg p-2 mt-2">
-                {leadStatus
-                  .slice(leadStatus.indexOf(lead.status) + 1)
-                  .map((statu) => (
-                    <DropdownMenuItem
-                      className="cursor-pointer border-b border-gray-300"
-                      key={statu}
-                      onClick={() => {
-                        {
-                          console.log(lead.id);
-                          const leadItem = mockLeads.find(
-                            (l) => l.id === lead.id
-                          );
-                          const updateLeads = mockLeads.map((l) => {
-                            if (l.id === leadItem.id) {
-                              return { ...l, status: statu };
-                            }
-                            return l;
-                          });
-                          setMockLeads(updateLeads);
-                        }
-                      }}
-                    >
-                      {statu}
-                    </DropdownMenuItem>
-                  ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button
+              size="sm"
+              className="bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none"
+            >
+              Convert
+            </Button>
           </div>
           <div className="flex space-x-2 justify-center sm:justify-end">
             <Button size="sm" variant="ghost" className="p-2">
@@ -936,46 +873,15 @@ export default function CRM() {
             ></div>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-100  transition-opacity">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           <div className="flex flex-wrap gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  size="sm"
-                  className={`bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none cursor-pointer`}
-                >
-                  Update Status
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-48 absolute top-[100%] bg-gray-700 text-white transform translate-x-[-50%] translate-y-[-120%] rounded-lg p-2 mt-2">
-                {dealStatus
-                  .slice(dealStatus.indexOf(deal.stage) + 1)
-                  .map((stage) => (
-                    <DropdownMenuItem
-                      className="cursor-pointer border-b border-gray-300"
-                      key={stage}
-                      onClick={() => {
-                        const updatedDeals = mockDeals.map((d) => {
-                          if (d.id === deal.id && stage === "Closed-won") {
-                            return { ...d, stage: stage, probability: 100 };
-                          } else if (
-                            (d.id === deal.id && stage === "Closed-lost") ||
-                            stage === "Abandoned"
-                          ) {
-                            return { ...d, stage: stage, probability: 0 };
-                          } else if (d.id === deal.id) {
-                            return { ...d, stage: stage };
-                          }
-                          return d;
-                        });
-                        setMockDeals(updatedDeals);
-                      }}
-                    >
-                      {stage}
-                    </DropdownMenuItem>
-                  ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button
+              size="sm"
+              variant="outline"
+              className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
+            >
+              Update Stage
+            </Button>
             <Button
               size="sm"
               variant="outline"
@@ -1034,10 +940,8 @@ export default function CRM() {
                       </Label>
                       <Input
                         id="name"
-                        value={customerFormData.name}
-                        onChange={(e) =>
-                          updateCustomerFormData("name", e.target.value)
-                        }
+                        value={formData.name}
+                        onChange={(e) => updateFormData("name", e.target.value)}
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.name ? "border-red-500" : ""
                         }`}
@@ -1055,9 +959,9 @@ export default function CRM() {
                       <Input
                         id="email"
                         type="email"
-                        value={customerFormData.email}
+                        value={formData.email}
                         onChange={(e) =>
-                          updateCustomerFormData("email", e.target.value)
+                          updateFormData("email", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.email ? "border-red-500" : ""
@@ -1076,9 +980,9 @@ export default function CRM() {
                       <Input
                         id="number"
                         type="text"
-                        value={customerFormData.number}
+                        value={formData.number}
                         onChange={(e) =>
-                          updateCustomerFormData("number", e.target.value)
+                          updateFormData("number", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.number ? "border-red-500" : ""
@@ -1097,9 +1001,9 @@ export default function CRM() {
                       <Input
                         id="linkedIn"
                         type="url"
-                        value={customerFormData.linkedIn}
+                        value={formData.linkedIn}
                         onChange={(e) =>
-                          updateCustomerFormData("linkedIn", e.target.value)
+                          updateFormData("linkedIn", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.linkedIn ? "border-red-500" : ""
@@ -1116,10 +1020,8 @@ export default function CRM() {
                         Industry
                       </Label>
                       <Select
-                        value={customerFormData.job}
-                        onValueChange={(value) =>
-                          updateCustomerFormData("job", value)
-                        }
+                        value={formData.job}
+                        onValueChange={(value) => updateFormData("job", value)}
                         className={errors.job ? "border-red-500" : ""}
                       >
                         <SelectTrigger
@@ -1153,9 +1055,9 @@ export default function CRM() {
                       <Input
                         id="companyWebsite"
                         type="url"
-                        value={customerFormData.jobRole}
+                        value={formData.jobRole}
                         onChange={(e) =>
-                          updateCustomerFormData("jobRole", e.target.value)
+                          updateFormData("jobRole", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.jobRole ? "border-red-500" : ""
@@ -1174,9 +1076,9 @@ export default function CRM() {
                       <Input
                         id="address"
                         type="url"
-                        value={customerFormData.address}
+                        value={formData.address}
                         onChange={(e) =>
-                          updateCustomerFormData("address", e.target.value)
+                          updateFormData("address", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.address ? "border-red-500" : ""
@@ -1193,9 +1095,9 @@ export default function CRM() {
                         Customer Status
                       </Label>
                       <Select
-                        value={customerFormData.status}
+                        value={formData.status}
                         onValueChange={(value) =>
-                          updateCustomerFormData("status", value)
+                          updateFormData("status", value)
                         }
                         className={errors.status ? "border-red-500" : ""}
                       >
@@ -1224,9 +1126,9 @@ export default function CRM() {
                       <Input
                         id="price"
                         type="url"
-                        value={customerFormData.price}
+                        value={formData.price}
                         onChange={(e) =>
-                          updateCustomerFormData("price", e.target.value)
+                          updateFormData("price", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.price ? "border-red-500" : ""
@@ -1245,9 +1147,9 @@ export default function CRM() {
                       <Input
                         id="price"
                         type="text"
-                        value={customerFormData.issue}
+                        value={formData.issue}
                         onChange={(e) =>
-                          updateCustomerFormData("issue", e.target.value)
+                          updateFormData("issue", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.issue ? "border-red-500" : ""
@@ -1258,7 +1160,7 @@ export default function CRM() {
                     </div>
                     <div>
                       <Label
-                        htmlFor="issue"
+                        htmlFor="date"
                         className="mb-2 text-slate-700 dark:text-slate-300"
                       >
                         Customer On-boarded Date
@@ -1266,9 +1168,9 @@ export default function CRM() {
                       <Input
                         id="onboarded-date"
                         type="date"
-                        value={customerFormData.created_at}
+                        value={formData.created_at}
                         onChange={(e) =>
-                          updateCustomerFormData("created_at", e.target.value)
+                          updateFormData("created_at", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.created_at ? "border-red-500" : ""
@@ -1292,10 +1194,8 @@ export default function CRM() {
                       </Label>
                       <Input
                         id="name"
-                        value={FormData.name}
-                        onChange={(e) =>
-                          updateLeadFormData("name", e.target.value)
-                        }
+                        value={formData.name}
+                        onChange={(e) => updateFormData("name", e.target.value)}
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.name ? "border-red-500" : ""
                         }`}
@@ -1999,8 +1899,8 @@ export default function CRM() {
                     <div className="grid grid-cols-2 gap-6 min-w-fit">
                       {mockLeads
                         .filter((lead) => lead.status === leadState)
-                        .map((l) => (
-                          <LeadCard key={l.id} lead={l} />
+                        .map((lead) => (
+                          <LeadCard key={lead.id} lead={lead} />
                         ))}
                     </div>
                   </div>
