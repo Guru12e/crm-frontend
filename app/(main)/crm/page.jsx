@@ -521,6 +521,7 @@ export default function CRM() {
   const [statusFilter, setStatusFilter] = useState("");
   const [sourceFilter, setSourceFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
+  const today = new Date();
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -530,7 +531,7 @@ export default function CRM() {
     job: "",
     jobRole: "",
     status: "",
-    created_at: "",
+    created_at: today,
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -573,6 +574,11 @@ export default function CRM() {
       isValid = false;
     } else {
       errors.status = "";
+    }
+    if (!formData.created_at) {
+      formData.created_at = today;
+      errors.created_at = "";
+      isValid = true;
     }
 
     if (formData.linkedIn) {
