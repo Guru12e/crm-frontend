@@ -556,7 +556,7 @@ export default function CRM() {
     company: "",
     value: 0, //req
     status: "", //req
-    priority: "Low", //req
+    priority: "Low",
     closeDate: today,
     owner: "",
     source: "",
@@ -626,7 +626,58 @@ export default function CRM() {
         errors.linkedIn = "";
       }
     }
-
+    if (!leadsFormData.name) {
+      errors.leadName = "Name is required";
+      isValid = false;
+    } else {
+      errors.leadName = "";
+    }
+    if (!leadsFormData.phone) {
+      errors.leadPhone = "Phone is required";
+      isValid = false;
+    } else {
+      errors.leadPhone = "";
+    }
+    if (!leadsFormData.status) {
+      errors.leadStatus = "Status is required";
+      isValid = false;
+    } else {
+      errors.leadStatus = "";
+    }
+    if (!dealFormData.name) {
+      errors.dealName = "Name is required";
+      isValid = false;
+    } else {
+      errors.dealName = "";
+    }
+    if (!dealFormData.phone) {
+      errors.dealPhone = "Phone is required";
+      isValid = false;
+    } else {
+      errors.dealPhone = "";
+    }
+    if (!dealFormData.title) {
+      errors.dealTitle = "Title is required";
+      isValid = false;
+    } else {
+      errors.dealTitle = "";
+    }
+    if (!dealFormData.value) {
+      errors.dealValue = "Value is required";
+      isValid = false;
+    } else {
+      errors.dealValue = "";
+    }
+    if (!dealFormData.status) {
+      errors.dealStatus = "Status is required";
+      isValid = false;
+    } else {
+      errors.dealStatus = "";
+    }
+    if (!dealFormData.closeDate) {
+      dealFormData.closeDate = today;
+      errors.closeDate = "";
+    }
     if (!isValid) {
       setLoading(false);
       setErrors(errors);
