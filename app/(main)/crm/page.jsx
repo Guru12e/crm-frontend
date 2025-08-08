@@ -15,13 +15,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   Users,
   TrendingUp,
@@ -338,7 +338,7 @@ let mockDealsData = [
     name: "Enterprise Package - TechFlow",
     company: "TechFlow Inc",
     value: "$89,000",
-    stage: "Negotiation",
+    status: "Negotiation",
     probability: 75,
     closeDate: "2024-12-15",
     owner: "Sarah Johnson",
@@ -350,7 +350,7 @@ let mockDealsData = [
     name: "Annual Subscription - DataDrive",
     company: "DataDrive Solutions",
     value: "$156,000",
-    stage: "Proposal Sent",
+    status: "Proposal Sent",
     probability: 60,
     closeDate: "2024-12-30",
     owner: "Michael Chen",
@@ -362,7 +362,7 @@ let mockDealsData = [
     name: "Basic Plan - GrowthCorp",
     company: "GrowthCorp",
     value: "$25,000",
-    stage: "New",
+    status: "New",
     probability: 25,
     closeDate: "2024-10-05",
     owner: "Emily Rodriguez",
@@ -374,7 +374,7 @@ let mockDealsData = [
     name: "Startup Bundle - InnovateLab",
     company: "InnovateLab",
     value: "$40,000",
-    stage: "On-hold",
+    status: "On-hold",
     probability: 35,
     closeDate: "2024-11-20",
     owner: "David Kim",
@@ -386,7 +386,7 @@ let mockDealsData = [
     name: "Growth Plan - ScaleUp",
     company: "ScaleUp Ventures",
     value: "$110,000",
-    stage: "Negotiation",
+    status: "Negotiation",
     probability: 70,
     closeDate: "2024-12-05",
     owner: "Lisa Thompson",
@@ -398,7 +398,7 @@ let mockDealsData = [
     name: "Corporate Deal - OceanNet",
     company: "OceanNet",
     value: "$95,000",
-    stage: "Proposal Sent",
+    status: "Proposal Sent",
     probability: 65,
     closeDate: "2024-10-25",
     owner: "Carl Nguyen",
@@ -410,7 +410,7 @@ let mockDealsData = [
     name: "Subscription - GreenMatrix",
     company: "GreenMatrix",
     value: "$78,000",
-    stage: "Closed-won",
+    status: "Closed-won",
     probability: 100,
     closeDate: "2024-08-01",
     owner: "Tom Richards",
@@ -422,7 +422,7 @@ let mockDealsData = [
     name: "Premium Plan - BrightWare",
     company: "BrightWare",
     value: "$60,000",
-    stage: "Closed-lost",
+    status: "Closed-lost",
     probability: 0,
     closeDate: "2024-07-15",
     owner: "Priya Desai",
@@ -434,7 +434,7 @@ let mockDealsData = [
     name: "Elite Tier - FusionEdge",
     company: "FusionEdge",
     value: "$142,000",
-    stage: "Abandoned",
+    status: "Abandoned",
     probability: 0,
     closeDate: "2024-09-30",
     owner: "Ryan Burke",
@@ -446,7 +446,7 @@ let mockDealsData = [
     name: "AI Services - NeuralTech",
     company: "NeuralTech",
     value: "$130,000",
-    stage: "Negotiation",
+    status: "Negotiation",
     probability: 80,
     closeDate: "2024-11-10",
     owner: "Jenna Park",
@@ -458,7 +458,7 @@ let mockDealsData = [
     name: "Security Suite - ZeroBit",
     company: "ZeroBit",
     value: "$105,000",
-    stage: "Proposal Sent",
+    status: "Proposal Sent",
     probability: 55,
     closeDate: "2024-10-22",
     owner: "Megan Wu",
@@ -470,7 +470,7 @@ let mockDealsData = [
     name: "Enterprise AI - ClearCompute",
     company: "ClearCompute",
     value: "$125,000",
-    stage: "New",
+    status: "New",
     probability: 35,
     closeDate: "2024-09-18",
     owner: "Isabella Cruz",
@@ -482,7 +482,7 @@ let mockDealsData = [
     name: "Full Package - BlockNet",
     company: "BlockNet",
     value: "$88,000",
-    stage: "Negotiation",
+    status: "Negotiation",
     probability: 77,
     closeDate: "2024-12-05",
     owner: "Karla Gomez",
@@ -494,7 +494,7 @@ let mockDealsData = [
     name: "Biotech Plan - EvoLabs",
     company: "EvoLabs",
     value: "$93,000",
-    stage: "On-hold",
+    status: "On-hold",
     probability: 45,
     closeDate: "2024-11-01",
     owner: "Samir Patel",
@@ -506,7 +506,7 @@ let mockDealsData = [
     name: "Team Plan - Aether Solutions",
     company: "Aether Solutions",
     value: "$68,000",
-    stage: "Closed-lost",
+    status: "Closed-lost",
     probability: 0,
     closeDate: "2024-08-18",
     owner: "Ali Bashir",
@@ -550,6 +550,17 @@ export default function CRM() {
   });
   const [dealFormData, setDealFormData] = useState({
     name: "", //req
+    email: "",
+    title: "", //req
+    phone: "", //req
+    company: "",
+    value: 0, //req
+    status: "", //req
+    priority: "Low", //req
+    closeDate: today,
+    owner: "",
+    source: "",
+    description: "",
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -566,6 +577,14 @@ export default function CRM() {
 
   const updateCustomerFormData = (field, value) => {
     setCustomerFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: "" }));
+  };
+  const updateLeadsFormData = (field, value) => {
+    setLeadsFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: "" }));
+  };
+  const updateDealFormData = (field, value) => {
+    setDealFormData((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
@@ -766,7 +785,7 @@ export default function CRM() {
     </Card>
   );
 
-  const LeadCard = ({ key, lead }) => (
+  const LeadCard = ({ lead }) => (
     <Card className="backdrop-blur-sm bg-white/70 h-[25vh] z-0 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
       <CardContent className="p-4 sm:p-6 ">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -915,7 +934,7 @@ export default function CRM() {
               <div className="text-lg sm:text-xl font-bold text-green-600">
                 {deal.value}
               </div>
-              <Badge variant="outline">{deal.stage}</Badge>
+              <Badge variant="outline">{deal.status}</Badge>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 break-words">
                 Close: {deal.closeDate}
               </p>
@@ -949,29 +968,29 @@ export default function CRM() {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-48 absolute top-[100%] bg-gray-700 text-white transform translate-x-[-50%] translate-y-[-120%] rounded-lg p-2 mt-2">
                 {dealStatus
-                  .slice(dealStatus.indexOf(deal.stage) + 1)
-                  .map((stage) => (
+                  .slice(dealStatus.indexOf(deal.status) + 1)
+                  .map((status) => (
                     <DropdownMenuItem
                       className="cursor-pointer border-b border-gray-300"
-                      key={stage}
+                      key={status}
                       onClick={() => {
                         const updatedDeals = mockDeals.map((d) => {
-                          if (d.id === deal.id && stage === "Closed-won") {
-                            return { ...d, stage: stage, probability: 100 };
+                          if (d.id === deal.id && status === "Closed-won") {
+                            return { ...d, status: status, probability: 100 };
                           } else if (
-                            (d.id === deal.id && stage === "Closed-lost") ||
-                            stage === "Abandoned"
+                            (d.id === deal.id && status === "Closed-lost") ||
+                            status === "Abandoned"
                           ) {
-                            return { ...d, stage: stage, probability: 0 };
+                            return { ...d, status: status, probability: 0 };
                           } else if (d.id === deal.id) {
-                            return { ...d, stage: stage };
+                            return { ...d, status: status };
                           }
                           return d;
                         });
                         setMockDeals(updatedDeals);
                       }}
                     >
-                      {stage}
+                      {status}
                     </DropdownMenuItem>
                   ))}
               </DropdownMenuContent>
@@ -1009,16 +1028,16 @@ export default function CRM() {
           </p>
         </div>
 
-        <Dialog>
-          <DialogTrigger>
+        <Sheet>
+          <SheetTrigger>
             <div className="bg-gradient-to-r px-3 py-2 rounded-xl from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white w-full sm:w-auto">
               Add New {activeTab}
             </div>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New {activeTab}</DialogTitle>
-              <DialogDescription>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Add New {activeTab}</SheetTitle>
+              <SheetDescription>
                 <>
                   <div
                     className={`${
@@ -1279,314 +1298,324 @@ export default function CRM() {
                     </div>
                   </div>
                   <div
-                    className={`${
-                      activeTab == "Leads" ? "grid" : "hidden"
-                    } p-3 grid-cols-1 md:grid-cols-2 gap-4`}
+                    className={`${activeTab == "Leads" ? "block" : "hidden"}`}
                   >
-                    <div>
-                      <Label
-                        htmlFor="name"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Name
-                      </Label>
-                      <Input
-                        id="name"
-                        value={FormData.name}
-                        onChange={(e) =>
-                          updateLeadFormData("name", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.name ? "border-red-500" : ""
-                        }`}
-                        placeholder="Lead's full name"
-                      />
-                      <ErrorMessage error={errors.name} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="email"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Email
-                      </Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) =>
-                          updateFormData("email", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.email ? "border-red-500" : ""
-                        }`}
-                        placeholder="lead@email.com"
-                      />
-                      <ErrorMessage error={errors.email} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="number"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Number
-                      </Label>
-                      <Input
-                        id="number"
-                        type="text"
-                        value={formData.number}
-                        onChange={(e) =>
-                          updateFormData("number", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.number ? "border-red-500" : ""
-                        }`}
-                        placeholder="+91 12345 67890"
-                      />
-                      <ErrorMessage error={errors.number} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="age"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Age
-                      </Label>
-                      <Input
-                        id="age"
-                        value={formData.age}
-                        onChange={(e) => updateFormData("age", e.target.value)}
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.age ? "border-red-500" : ""
-                        }`}
-                        placeholder="Lead's age"
-                      />
-                      <ErrorMessage error={errors.age} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="linkedIn"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        LinkedIn Profile
-                      </Label>
-                      <Input
-                        id="linkedIn"
-                        type="url"
-                        value={formData.linkedIn}
-                        onChange={(e) =>
-                          updateFormData("linkedIn", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.linkedIn ? "border-red-500" : ""
-                        }`}
-                        placeholder="LinkedIn profile URL"
-                      />
-                      <ErrorMessage error={errors.linkedIn} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="industry"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Industry
-                      </Label>
-                      <Select
-                        value={formData.job}
-                        onValueChange={(value) => updateFormData("job", value)}
-                        className={errors.job ? "border-red-500" : ""}
-                      >
-                        <SelectTrigger
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                            errors.job ? "border-red-500" : ""
-                          }`}
+                    <div
+                      className={`grid p-3 grid-cols-1 md:grid-cols-2 gap-4`}
+                    >
+                      <div>
+                        <Label
+                          htmlFor="name"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
                         >
-                          <SelectValue placeholder="Select industry" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="technology">Technology</SelectItem>
-                          <SelectItem value="healthcare">Healthcare</SelectItem>
-                          <SelectItem value="finance">Finance</SelectItem>
-                          <SelectItem value="retail">Retail</SelectItem>
-                          <SelectItem value="manufacturing">
-                            Manufacturing
-                          </SelectItem>
-                          <SelectItem value="education">Education</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <ErrorMessage error={errors.job} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="company"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Company
-                      </Label>
-                      <Input
-                        id="company"
-                        value={formData.company}
-                        onChange={(e) =>
-                          updateFormData("company", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.income ? "border-red-500" : ""
-                        }`}
-                        placeholder="Lead Company"
-                      />
-                      <ErrorMessage error={errors.income} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="income"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Income
-                      </Label>
-                      <Input
-                        id="income"
-                        value={formData.income}
-                        onChange={(e) =>
-                          updateFormData("income", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.income ? "border-red-500" : ""
-                        }`}
-                        placeholder="Lead's income"
-                      />
-                      <ErrorMessage error={errors.income} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="jobRole"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Company Website
-                      </Label>
-                      <Input
-                        id="companyWebsite"
-                        type="url"
-                        value={formData.jobRole}
-                        onChange={(e) =>
-                          updateFormData("jobRole", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.jobRole ? "border-red-500" : ""
-                        }`}
-                        placeholder="https://yourcompany.com"
-                      />
-                      <ErrorMessage error={errors.jobRole} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="status"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Lead Status
-                      </Label>
-                      <Select
-                        value={formData.status}
-                        onValueChange={(value) =>
-                          updateFormData("status", value)
-                        }
-                        className={errors.status ? "border-red-500" : ""}
-                      >
-                        <SelectTrigger
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                            errors.status ? "border-red-500" : ""
+                          Name
+                        </Label>
+                        <Input
+                          id="name"
+                          value={leadsFormData.name}
+                          onChange={(e) =>
+                            updateLeadsFormData("name", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.name ? "border-red-500" : ""
                           }`}
+                          placeholder="Lead's full name"
+                        />
+                        <ErrorMessage error={errors.name} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="email"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
                         >
-                          <SelectValue placeholder="Select Lead Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="new">New</SelectItem>
-                          <SelectItem value="in-progress">
-                            In progress
-                          </SelectItem>
-                          <SelectItem value="contact attempted">
-                            Contact attempted
-                          </SelectItem>
-                          <SelectItem value="contacted">Contacted</SelectItem>
-                          <SelectItem value="qualified">Qualified</SelectItem>
-                          <SelectItem value="unqualified">
-                            Unqualified
-                          </SelectItem>
-                          <SelectItem value="meeting booked">
-                            Meeting booked
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <ErrorMessage error={errors.status} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="source"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Lead Source
-                      </Label>
-                      <Select
-                        value={formData.source}
-                        onValueChange={(value) =>
-                          updateFormData("source", value)
-                        }
-                        className={errors.source ? "border-red-500" : ""}
-                      >
-                        <SelectTrigger
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                            errors.source ? "border-red-500" : ""
+                          Email
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={leadsFormData.email}
+                          onChange={(e) =>
+                            updateLeadsFormData("email", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.email ? "border-red-500" : ""
                           }`}
+                          placeholder="lead@email.com"
+                        />
+                        <ErrorMessage error={errors.email} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="number"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
                         >
-                          <SelectValue placeholder="Select Lead Source" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="advertisement">
-                            Advertisement
-                          </SelectItem>
-                          <SelectItem value="cold call">Cold call</SelectItem>
-                          <SelectItem value="employee referral">
-                            Employee referral
-                          </SelectItem>
-                          <SelectItem value="external referral">
-                            External referral
-                          </SelectItem>
-                          <SelectItem value="sales email alias">
-                            Sales email alias
-                          </SelectItem>
-                          <SelectItem value="chat">Chat</SelectItem>
-                          <SelectItem value="facebook">Facebook</SelectItem>
-                          <SelectItem value="web research">
-                            Web Research
-                          </SelectItem>
-                          <SelectItem value="twitter">X(Twitter)</SelectItem>
-                          <SelectItem value="public realtions">
-                            Public relations
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <ErrorMessage error={errors.source} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="address"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Address
-                      </Label>
-                      <Input
-                        id="address"
-                        type="url"
-                        value={formData.address}
-                        onChange={(e) =>
-                          updateFormData("address", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.address ? "border-red-500" : ""
-                        }`}
-                        placeholder="Lead's Address"
-                      />
-                      <ErrorMessage error={errors.address} />
+                          Number
+                        </Label>
+                        <Input
+                          id="number"
+                          type="text"
+                          value={leadsFormData.number}
+                          onChange={(e) =>
+                            updateLeadsFormData("number", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.number ? "border-red-500" : ""
+                          }`}
+                          placeholder="+91 12345 67890"
+                        />
+                        <ErrorMessage error={errors.number} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="age"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Age
+                        </Label>
+                        <Input
+                          id="age"
+                          value={leadsFormData.age}
+                          onChange={(e) =>
+                            updateLeadsFormData("age", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.age ? "border-red-500" : ""
+                          }`}
+                          placeholder="Lead's age"
+                        />
+                        <ErrorMessage error={errors.age} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="linkedIn"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          LinkedIn Profile
+                        </Label>
+                        <Input
+                          id="linkedIn"
+                          type="url"
+                          value={leadsFormData.linkedIn}
+                          onChange={(e) =>
+                            updateLeadsFormData("linkedIn", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.linkedIn ? "border-red-500" : ""
+                          }`}
+                          placeholder="LinkedIn profile URL"
+                        />
+                        <ErrorMessage error={errors.linkedIn} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="industry"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Industry
+                        </Label>
+                        <Select
+                          value={leadsFormData.industry}
+                          onValueChange={(value) =>
+                            updateLeadsFormData("industry", value)
+                          }
+                          className={errors.industry ? "border-red-500" : ""}
+                        >
+                          <SelectTrigger
+                            className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
+                              errors.industry ? "border-red-500" : ""
+                            }`}
+                          >
+                            <SelectValue placeholder="Select industry" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="technology">
+                              Technology
+                            </SelectItem>
+                            <SelectItem value="healthcare">
+                              Healthcare
+                            </SelectItem>
+                            <SelectItem value="finance">Finance</SelectItem>
+                            <SelectItem value="retail">Retail</SelectItem>
+                            <SelectItem value="manufacturing">
+                              Manufacturing
+                            </SelectItem>
+                            <SelectItem value="education">Education</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <ErrorMessage error={errors.job} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="company"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Company
+                        </Label>
+                        <Input
+                          id="company"
+                          value={leadsFormData.company}
+                          onChange={(e) =>
+                            updateLeadsFormData("company", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.company ? "border-red-500" : ""
+                          }`}
+                          placeholder="Lead Company"
+                        />
+                        <ErrorMessage error={errors.company} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="income"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Income
+                        </Label>
+                        <Input
+                          id="income"
+                          value={leadsFormData.income}
+                          onChange={(e) =>
+                            updateLeadsFormData("income", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.income ? "border-red-500" : ""
+                          }`}
+                          placeholder="Lead's income"
+                        />
+                        <ErrorMessage error={errors.income} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="website"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Company Website
+                        </Label>
+                        <Input
+                          id="companyWebsite"
+                          type="url"
+                          value={leadsFormData.website}
+                          onChange={(e) =>
+                            updateLeadsFormData("website", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.website ? "border-red-500" : ""
+                          }`}
+                          placeholder="https://yourcompany.com"
+                        />
+                        <ErrorMessage error={errors.website} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="status"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Lead Status
+                        </Label>
+                        <Select
+                          value={leadsFormData.status}
+                          onValueChange={(value) =>
+                            updateLeadsFormData("status", value)
+                          }
+                          className={errors.status ? "border-red-500" : ""}
+                        >
+                          <SelectTrigger
+                            className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
+                              errors.status ? "border-red-500" : ""
+                            }`}
+                          >
+                            <SelectValue placeholder="Select Lead Status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="new">New</SelectItem>
+                            <SelectItem value="in-progress">
+                              In progress
+                            </SelectItem>
+                            <SelectItem value="contact attempted">
+                              Contact attempted
+                            </SelectItem>
+                            <SelectItem value="contacted">Contacted</SelectItem>
+                            <SelectItem value="qualified">Qualified</SelectItem>
+                            <SelectItem value="unqualified">
+                              Unqualified
+                            </SelectItem>
+                            <SelectItem value="meeting booked">
+                              Meeting booked
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <ErrorMessage error={errors.status} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="source"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Lead Source
+                        </Label>
+                        <Select
+                          value={leadsFormData.source}
+                          onValueChange={(value) =>
+                            updateLeadsFormData("source", value)
+                          }
+                          className={errors.source ? "border-red-500" : ""}
+                        >
+                          <SelectTrigger
+                            className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
+                              errors.source ? "border-red-500" : ""
+                            }`}
+                          >
+                            <SelectValue placeholder="Select Lead Source" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="advertisement">
+                              Advertisement
+                            </SelectItem>
+                            <SelectItem value="cold call">Cold call</SelectItem>
+                            <SelectItem value="employee referral">
+                              Employee referral
+                            </SelectItem>
+                            <SelectItem value="external referral">
+                              External referral
+                            </SelectItem>
+                            <SelectItem value="sales email alias">
+                              Sales email alias
+                            </SelectItem>
+                            <SelectItem value="chat">Chat</SelectItem>
+                            <SelectItem value="facebook">Facebook</SelectItem>
+                            <SelectItem value="web research">
+                              Web Research
+                            </SelectItem>
+                            <SelectItem value="twitter">X(Twitter)</SelectItem>
+                            <SelectItem value="public realtions">
+                              Public relations
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <ErrorMessage error={errors.source} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="address"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Address
+                        </Label>
+                        <Input
+                          id="address"
+                          type="url"
+                          value={leadsFormData.address}
+                          onChange={(e) =>
+                            updateLeadsFormData("address", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.address ? "border-red-500" : ""
+                          }`}
+                          placeholder="Lead's Address"
+                        />
+                        <ErrorMessage error={errors.address} />
+                      </div>
                     </div>
                     <div>
                       <Label
@@ -1597,9 +1626,9 @@ export default function CRM() {
                       </Label>
                       <Textarea
                         id="description"
-                        value={formData.description}
+                        value={leadsFormData.description}
                         onChange={(e) =>
-                          updateFormData("description", e.target.value)
+                          updateLeadsFormData("description", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                           errors.income ? "border-red-500" : ""
@@ -1610,238 +1639,274 @@ export default function CRM() {
                     </div>
                   </div>
                   <div
-                    className={`${
-                      activeTab == "Deals" ? "grid" : "hidden"
-                    } p-3 grid-cols-1 md:grid-cols-2 gap-4`}
+                    className={`${activeTab == "Deals" ? "block" : "hidden"}`}
                   >
-                    <div>
-                      <Label
-                        htmlFor="dealName"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Deal Name
-                      </Label>
-                      <Input
-                        id="dealName"
-                        value={formData.dealName}
-                        onChange={(e) =>
-                          updateFormData("dealName", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.dealName ? "border-red-500" : ""
-                        }`}
-                        placeholder="Full name of the deal"
-                      />
-                      <ErrorMessage error={errors.dealName} />
-                    </div>
-
-                    <div>
-                      <Label
-                        htmlFor="dealPhone"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Phone Number
-                      </Label>
-                      <Input
-                        id="dealPhone"
-                        type="text"
-                        value={formData.dealPhone}
-                        onChange={(e) =>
-                          updateFormData("dealPhone", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.dealPhone ? "border-red-500" : ""
-                        }`}
-                        placeholder="+91 98765 43210"
-                      />
-                      <ErrorMessage error={errors.dealPhone} />
-                    </div>
-
-                    <div>
-                      <Label
-                        htmlFor="dealTitle"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Deal Title
-                      </Label>
-                      <Input
-                        id="dealTitle"
-                        type="text"
-                        value={formData.dealTitle}
-                        onChange={(e) =>
-                          updateFormData("dealTitle", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.dealTitle ? "border-red-500" : ""
-                        }`}
-                        placeholder="e.g., CRM Subscription - 1 Year"
-                      />
-                      <ErrorMessage error={errors.dealTitle} />
-                    </div>
-
-                    <div>
-                      <Label
-                        htmlFor="dealStatus"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Deal Status
-                      </Label>
-                      <Select
-                        value={formData.dealStatus}
-                        onValueChange={(value) =>
-                          updateFormData("dealStatus", value)
-                        }
-                        className={errors.dealStatus ? "border-red-500" : ""}
-                      >
-                        <SelectTrigger
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                            errors.dealStatus ? "border-red-500" : ""
-                          }`}
+                    <div
+                      className={`grid p-3 grid-cols-1 md:grid-cols-2 gap-4`}
+                    >
+                      <div>
+                        <Label
+                          htmlFor="title"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
                         >
-                          <SelectValue placeholder="Select Deal Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="new">New</SelectItem>
-                          <SelectItem value="proposal_sent">
-                            Proposal Sent
-                          </SelectItem>
-                          <SelectItem value="negotiation">
-                            Negotiation
-                          </SelectItem>
-                          <SelectItem value="contract_sent">
-                            Contract Sent
-                          </SelectItem>
-                          <SelectItem value="closed_won">
-                            Closed - Won
-                          </SelectItem>
-                          <SelectItem value="closed_lost">
-                            Closed - Lost
-                          </SelectItem>
-                          <SelectItem value="on_hold">On Hold</SelectItem>
-                          <SelectItem value="abandoned">Abandoned</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <ErrorMessage error={errors.dealStatus} />
+                          Deal Title
+                        </Label>
+                        <Input
+                          id="title"
+                          type="text"
+                          value={dealFormData.title}
+                          onChange={(e) =>
+                            updateDealFormData("title", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.title ? "border-red-500" : ""
+                          }`}
+                          placeholder="e.g., CRM Subscription - 1 Year"
+                        />
+                        <ErrorMessage error={errors.title} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="name"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Deal Name / Company
+                        </Label>
+                        <Input
+                          id="name"
+                          value={dealFormData.name}
+                          onChange={(e) =>
+                            updateDealFormData("name", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.name ? "border-red-500" : ""
+                          }`}
+                          placeholder="Full name of the deal"
+                        />
+                        <ErrorMessage error={errors.name} />
+                      </div>
+
+                      <div>
+                        <Label
+                          htmlFor="phone"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Phone Number
+                        </Label>
+                        <Input
+                          id="phone"
+                          type="text"
+                          value={dealFormData.phone}
+                          onChange={(e) =>
+                            updateDealFormData("phone", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.phone ? "border-red-500" : ""
+                          }`}
+                          placeholder="+91 98765 43210"
+                        />
+                        <ErrorMessage error={errors.phone} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="owner"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Deal Owner
+                        </Label>
+                        <Input
+                          id="owner"
+                          type="text"
+                          value={dealFormData.owner}
+                          onChange={(e) =>
+                            updateDealFormData("owner", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.dealOwner ? "border-red-500" : ""
+                          }`}
+                          placeholder="e.g., John Doe"
+                        />
+                        <ErrorMessage error={errors.owner} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="source"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Deal Source
+                        </Label>
+                        <Input
+                          id="source"
+                          type="text"
+                          value={dealFormData.source}
+                          onChange={(e) =>
+                            updateDealFormData("source", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.source ? "border-red-500" : ""
+                          }`}
+                          placeholder="e.g., CRM Subscription - 1 Year"
+                        />
+                        <ErrorMessage error={errors.source} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="status"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Deal Status
+                        </Label>
+                        <Select
+                          value={dealFormData.status}
+                          onValueChange={(value) =>
+                            updateDealFormData("status", value)
+                          }
+                          className={errors.status ? "border-red-500" : ""}
+                        >
+                          <SelectTrigger
+                            className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
+                              errors.status ? "border-red-500" : ""
+                            }`}
+                          >
+                            <SelectValue placeholder="Select Deal Status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="new">New</SelectItem>
+                            <SelectItem value="proposal_sent">
+                              Proposal Sent
+                            </SelectItem>
+                            <SelectItem value="negotiation">
+                              Negotiation
+                            </SelectItem>
+                            <SelectItem value="contract_sent">
+                              Contract Sent
+                            </SelectItem>
+                            <SelectItem value="closed_won">
+                              Closed - Won
+                            </SelectItem>
+                            <SelectItem value="closed_lost">
+                              Closed - Lost
+                            </SelectItem>
+                            <SelectItem value="on_hold">On Hold</SelectItem>
+                            <SelectItem value="abandoned">Abandoned</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <ErrorMessage error={errors.dealStatus} />
+                      </div>
+
+                      <div>
+                        <Label
+                          htmlFor="email"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Email
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={dealFormData.email}
+                          onChange={(e) =>
+                            updateDealFormData("email", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.dealEmail ? "border-red-500" : ""
+                          }`}
+                          placeholder="Enter email"
+                        />
+                        <ErrorMessage error={errors.dealEmail} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="priority"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Deal Priority
+                        </Label>
+                        <Select
+                          value={dealFormData.priority}
+                          onValueChange={(value) =>
+                            updateDealFormData("priority", value)
+                          }
+                          className={errors.priority ? "border-red-500" : ""}
+                        >
+                          <SelectTrigger
+                            className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
+                              errors.priority ? "border-red-500" : ""
+                            }`}
+                          >
+                            <SelectValue placeholder="Select Deal Priority" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="high">High</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="low">Low</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <ErrorMessage error={errors.priority} />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="value"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Deal Amount / Value
+                        </Label>
+                        <Input
+                          id="value"
+                          type="number"
+                          value={dealFormData.value}
+                          onChange={(e) =>
+                            updateDealFormData("value", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.value ? "border-red-500" : ""
+                          }`}
+                          placeholder="₹50000"
+                        />
+                        <ErrorMessage error={errors.value} />
+                      </div>
+
+                      <div>
+                        <Label
+                          htmlFor="closeDate"
+                          className="mb-2 text-slate-700 dark:text-slate-300"
+                        >
+                          Expected Close Date
+                        </Label>
+                        <Input
+                          id="closeDate"
+                          type="date"
+                          value={dealFormData.closeDate}
+                          onChange={(e) =>
+                            updateDealFormData("closeDate", e.target.value)
+                          }
+                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
+                            errors.closeDate ? "border-red-500" : ""
+                          }`}
+                          placeholder="YYYY-MM-DD"
+                        />
+                        <ErrorMessage error={errors.closeDate} />
+                      </div>
                     </div>
                     <div>
                       <Label
-                        htmlFor="statusDescription"
+                        htmlFor="description"
                         className="mb-2 text-slate-700 dark:text-slate-300"
                       >
                         Status Description
                       </Label>
                       <textarea
-                        id="statusDescription"
+                        id="description"
                         type="text"
-                        value={formData.statusDescription}
+                        value={dealFormData.description}
                         onChange={(e) =>
-                          updateFormData("dealAmount", e.target.value)
+                          updateDealFormData("description", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 w-full pl-1 border-white dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.statusDescription ? "border-red-500" : ""
+                          errors.description ? "border-red-500" : ""
                         }`}
-                        placeholder="Enter the insights gathered during this stage"
+                        placeholder="Enter the insights gathered during this status"
                       />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="dealType"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Deal Type
-                      </Label>
-                      <Select
-                        value={formData.dealType}
-                        onValueChange={(value) =>
-                          updateFormData("dealType", value)
-                        }
-                        className={errors.dealType ? "border-red-500" : ""}
-                      >
-                        <SelectTrigger
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                            errors.dealStatus ? "border-red-500" : ""
-                          }`}
-                        >
-                          <SelectValue placeholder="Select Deal Type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="new">New</SelectItem>
-                          <SelectItem value="existing">Existing</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <ErrorMessage error={errors.dealType} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="dealType"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Deal Priority
-                      </Label>
-                      <Select
-                        value={formData.dealPriority}
-                        onValueChange={(value) =>
-                          updateFormData("dealPriority", value)
-                        }
-                        className={errors.dealPriority ? "border-red-500" : ""}
-                      >
-                        <SelectTrigger
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                            errors.dealStatus ? "border-red-500" : ""
-                          }`}
-                        >
-                          <SelectValue placeholder="Select Deal Priority" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="high">High</SelectItem>
-                          <SelectItem value="medium">Medium</SelectItem>
-                          <SelectItem value="low">Low</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <ErrorMessage error={errors.dealPriority} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="dealAmount"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Deal Amount / Value
-                      </Label>
-                      <Input
-                        id="dealAmount"
-                        type="number"
-                        value={formData.dealAmount}
-                        onChange={(e) =>
-                          updateFormData("dealAmount", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.dealAmount ? "border-red-500" : ""
-                        }`}
-                        placeholder="₹50000"
-                      />
-                      <ErrorMessage error={errors.dealAmount} />
-                    </div>
-
-                    <div>
-                      <Label
-                        htmlFor="expectedCloseDate"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Expected Close Date
-                      </Label>
-                      <Input
-                        id="expectedCloseDate"
-                        type="date"
-                        value={formData.expectedCloseDate}
-                        onChange={(e) =>
-                          updateFormData("expectedCloseDate", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.expectedCloseDate ? "border-red-500" : ""
-                        }`}
-                        placeholder="YYYY-MM-DD"
-                      />
-                      <ErrorMessage error={errors.expectedCloseDate} />
                     </div>
                   </div>
                 </>
@@ -1861,10 +1926,10 @@ export default function CRM() {
                     Add {activeTab}
                   </Button>
                 </div>
-              </DialogDescription>
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
+              </SheetDescription>
+            </SheetHeader>
+          </SheetContent>
+        </Sheet>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -2027,7 +2092,7 @@ export default function CRM() {
                   <div className="ml-[15%] w-[85%] overflow-y-scroll p-4">
                     <div className="grid grid-cols-2 gap-6 min-w-fit">
                       {mockDeals
-                        .filter((deal) => deal.stage === dealState)
+                        .filter((deal) => deal.status === dealState)
                         .map((deal) => (
                           <DealCard key={deal.id} deal={deal} />
                         ))}
