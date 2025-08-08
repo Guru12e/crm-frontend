@@ -592,9 +592,11 @@ export default function CRM() {
     e.preventDefault();
     setLoading(true);
     let isValid = true;
-    if (!customerFormData.name) {
-      errors.name = "Name is required";
-      isValid = false;
+    if (activeTab === "Customers") {
+      if (!customerFormData.name) {
+        errors.name = "Name is required";
+        isValid = false;
+      }
     } else {
       errors.name = "";
     }
@@ -625,97 +627,179 @@ export default function CRM() {
       } else {
         errors.linkedIn = "";
       }
-    }
-    if (!leadsFormData.name) {
-      errors.leadName = "Name is required";
-      isValid = false;
-    } else {
-      errors.leadName = "";
-    }
-    if (!leadsFormData.phone) {
-      errors.leadPhone = "Phone is required";
-      isValid = false;
-    } else {
-      errors.leadPhone = "";
-    }
-    if (!leadsFormData.status) {
-      errors.leadStatus = "Status is required";
-      isValid = false;
-    } else {
-      errors.leadStatus = "";
-    }
-    if (!dealFormData.name) {
-      errors.dealName = "Name is required";
-      isValid = false;
-    } else {
-      errors.dealName = "";
-    }
-    if (!dealFormData.phone) {
-      errors.dealPhone = "Phone is required";
-      isValid = false;
-    } else {
-      errors.dealPhone = "";
-    }
-    if (!dealFormData.title) {
-      errors.dealTitle = "Title is required";
-      isValid = false;
-    } else {
-      errors.dealTitle = "";
-    }
-    if (!dealFormData.value) {
-      errors.dealValue = "Value is required";
-      isValid = false;
-    } else {
-      errors.dealValue = "";
-    }
-    if (!dealFormData.status) {
-      errors.dealStatus = "Status is required";
-      isValid = false;
-    } else {
-      errors.dealStatus = "";
-    }
-    if (!dealFormData.closeDate) {
-      dealFormData.closeDate = today;
-      errors.closeDate = "";
-    }
-    if (!isValid) {
-      setLoading(false);
-      setErrors(errors);
-      return;
-    } else {
-      const session = localStorage.getItem("session");
-      const req = await fetch("/api/addCustomer", {
-        method: "POST",
-        body: JSON.stringify({
-          ...customerFormData,
-          session: JSON.parse(session),
-        }),
-      });
-
-      if (req.status == 200) {
-        toast.success("Customer Added", {
-          autoClose: 3000,
-          position: "top-right",
-        });
-        setCustomerFormData({
-          name: "",
-          phone: "",
-          email: "",
-          linkedIn: "",
-          location: "",
-          job: "",
-          jobRole: "",
-          status: "",
-          created_at: "",
-        });
+      if (!isValid) {
+        setLoading(false);
+        setErrors(errors);
+        return;
       } else {
-        toast.error("Error in Adding Customer", {
-          position: "top-right",
-          autoClose: 3000,
+        const session = localStorage.getItem("session");
+        const req = await fetch("/api/addCustomer", {
+          method: "POST",
+          body: JSON.stringify({
+            ...customerFormData,
+            session: JSON.parse(session),
+          }),
         });
-      }
 
-      setLoading(false);
+        if (req.status == 200) {
+          toast.success("Customer Added", {
+            autoClose: 3000,
+            position: "top-right",
+          });
+          setCustomerFormData({
+            name: "",
+            phone: "",
+            email: "",
+            linkedIn: "",
+            location: "",
+            job: "",
+            jobRole: "",
+            status: "",
+            created_at: "",
+          });
+        } else {
+          toast.error("Error in Adding Customer", {
+            position: "top-right",
+            autoClose: 3000,
+          });
+        }
+
+        setLoading(false);
+      }
+    }
+    if (activeTab === "Leads") {
+      if (!leadsFormData.name) {
+        errors.leadName = "Name is required";
+        isValid = false;
+      } else {
+        errors.leadName = "";
+      }
+      if (!leadsFormData.phone) {
+        errors.leadPhone = "Phone is required";
+        isValid = false;
+      } else {
+        errors.leadPhone = "";
+      }
+      if (!leadsFormData.status) {
+        errors.leadStatus = "Status is required";
+        isValid = false;
+      } else {
+        errors.leadStatus = "";
+      }
+      if (!isValid) {
+        setLoading(false);
+        setErrors(errors);
+        return;
+      } else {
+        const session = localStorage.getItem("session");
+        const req = await fetch("/api/addLeads", {
+          method: "POST",
+          body: JSON.stringify({
+            ...leadsFormData,
+            session: JSON.parse(session),
+          }),
+        });
+
+        if (req.status == 200) {
+          toast.success("Lead Added", {
+            autoClose: 3000,
+            position: "top-right",
+          });
+          setLeadsFormData({
+            name: "",
+            phone: "",
+            email: "",
+            linkedIn: "",
+            location: "",
+            job: "",
+            jobRole: "",
+            status: "",
+            created_at: "",
+          });
+        } else {
+          toast.error("Error in Adding Leads", {
+            position: "top-right",
+            autoClose: 3000,
+          });
+        }
+
+        setLoading(false);
+      }
+    }
+    if (activeTab === "Deals") {
+      if (!dealFormData.name) {
+        errors.dealName = "Name is required";
+        isValid = false;
+      } else {
+        errors.dealName = "";
+      }
+      if (!dealFormData.phone) {
+        errors.dealPhone = "Phone is required";
+        isValid = false;
+      } else {
+        errors.dealPhone = "";
+      }
+      if (!dealFormData.title) {
+        errors.dealTitle = "Title is required";
+        isValid = false;
+      } else {
+        errors.dealTitle = "";
+      }
+      if (!dealFormData.value) {
+        errors.dealValue = "Value is required";
+        isValid = false;
+      } else {
+        errors.dealValue = "";
+      }
+      if (!dealFormData.status) {
+        errors.dealStatus = "Status is required";
+        isValid = false;
+      } else {
+        errors.dealStatus = "";
+      }
+      if (!dealFormData.closeDate) {
+        dealFormData.closeDate = today;
+        errors.closeDate = "";
+      }
+      if (!isValid) {
+        setLoading(false);
+        setErrors(errors);
+        return;
+      } else {
+        const session = localStorage.getItem("session");
+        const req = await fetch("/api/addDeals", {
+          method: "POST",
+          body: JSON.stringify({
+            ...dealFormData,
+            session: JSON.parse(session),
+          }),
+        });
+
+        if (req.status == 200) {
+          toast.success("Deal Added", {
+            autoClose: 3000,
+            position: "top-right",
+          });
+          setDealFormData({
+            name: "",
+            phone: "",
+            email: "",
+            linkedIn: "",
+            location: "",
+            job: "",
+            jobRole: "",
+            status: "",
+            created_at: "",
+          });
+        } else {
+          toast.error("Error in Adding Deal", {
+            position: "top-right",
+            autoClose: 3000,
+          });
+        }
+
+        setLoading(false);
+      }
     }
   };
 
