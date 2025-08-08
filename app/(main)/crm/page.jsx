@@ -332,7 +332,7 @@ let mockLeadsData = [
   },
 ];
 
-let mockDeals = [
+let mockDealsData = [
   {
     id: 1,
     name: "Enterprise Package - TechFlow",
@@ -535,6 +535,7 @@ export default function CRM() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [mockLeads, setMockLeads] = useState(mockLeadsData);
+  const [mockDeals, setMockDeals] = useState(mockDealsData);
 
   const ErrorMessage = ({ error }) =>
     error && (
@@ -740,7 +741,6 @@ export default function CRM() {
       </CardContent>
     </Card>
   );
-  // const [id, setId] = useState(0);
 
   const LeadCard = ({ key, lead }) => (
     <Card className="backdrop-blur-sm bg-white/70 h-[25vh] z-0 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
@@ -914,19 +914,44 @@ export default function CRM() {
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-100  transition-opacity">
           <div className="flex flex-wrap gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              className={`bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none ${
-                deal.stage === "Closed-won" ||
-                deal.stage === "Closed-lost" ||
-                deal.stage === "Abandoned"
-                  ? "hidden"
-                  : "block"
-              }`}
-            >
-              Update Stage
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  className={`bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none cursor-pointer`}
+                >
+                  Update Status
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48 absolute top-[100%] bg-gray-700 text-white transform translate-x-[-50%] translate-y-[-120%] rounded-lg p-2 mt-2">
+                {dealStatus
+                  .slice(dealStatus.indexOf(deal.stage) + 1)
+                  .map((stage) => (
+                    <DropdownMenuItem
+                      className="cursor-pointer border-b border-gray-300"
+                      key={stage}
+                      onClick={() => {
+                        const updatedDeals = mockDeals.map((d) => {
+                          if (d.id === deal.id && stage === "Closed-won") {
+                            return { ...d, stage: stage, probability: 100 };
+                          } else if (
+                            (d.id === deal.id && stage === "Closed-lost") ||
+                            stage === "Abandoned"
+                          ) {
+                            return { ...d, stage: stage, probability: 0 };
+                          } else if (d.id === deal.id) {
+                            return { ...d, stage: stage };
+                          }
+                          return d;
+                        });
+                        setMockDeals(updatedDeals);
+                      }}
+                    >
+                      {stage}
+                    </DropdownMenuItem>
+                  ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button
               size="sm"
               variant="outline"
