@@ -16,7 +16,7 @@ export async function POST(req) {
   "value" : data.value,
   "status" : data.status,
   "closeDate" : data.closeDate,
-  "source" : data.sourceource,
+  "source" : data.source,
   "priority" : data.priority,
     })
 
