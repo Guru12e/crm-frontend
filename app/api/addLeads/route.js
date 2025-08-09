@@ -10,7 +10,7 @@ export async function POST(req) {
         const {data: lead, error} = await supabase.from("Leads").insert({
 "name" : data.name,
   "email":  data.email,
-  "number" : data.number,
+  "number" : data.phone,
   "age" : data.age,
   "linkedIn" : data.linkedIn,
   "industry" : data.industry,
