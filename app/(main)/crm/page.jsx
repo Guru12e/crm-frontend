@@ -563,7 +563,9 @@ export default function CRM() {
     description: "",
   });
   const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [customerLoading, setCustomerLoading] = useState(false);
+  const [leadsLoading, setLeadsLoading] = useState(false);
+  const [dealsLoading, setDealsLoading] = useState(false);
   const [mockLeads, setMockLeads] = useState(mockLeadsData);
   const [mockDeals, setMockDeals] = useState(mockDealsData);
 
@@ -588,9 +590,9 @@ export default function CRM() {
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleCustomerSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setCustomerLoading(true);
     let isValid = true;
     if (!customerFormData.name) {
       errors.name = "Name is required";
@@ -626,6 +628,52 @@ export default function CRM() {
         errors.linkedIn = "";
       }
     }
+    if (!isValid) {
+      setCustomerLoading(false);
+      setErrors(errors);
+      return;
+    } else {
+      console.log(customerFormData);
+      const session = localStorage.getItem("session");
+      const req = await fetch("/api/addCustomer", {
+        method: "POST",
+        body: JSON.stringify({
+          ...customerFormData,
+          session: JSON.parse(session),
+        }),
+      });
+
+      if (req.status == 200) {
+        toast.success("Customer Added", {
+          autoClose: 3000,
+          position: "top-right",
+        });
+        setCustomerFormData({
+          name: "",
+          phone: "",
+          email: "",
+          linkedIn: "",
+          location: "",
+          job: "",
+          jobRole: "",
+          status: "",
+          created_at: "",
+        });
+      } else {
+        toast.error("Error in Adding Customer", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+
+      setCustomerLoading(false);
+    }
+  };
+  const handleLeadsSubmit = async (e) => {
+    e.preventDefault();
+    setLeadsLoading(true);
+    let isValid = true;
+    console.log(leadsFormData);
     if (!leadsFormData.name) {
       errors.leadName = "Name is required";
       isValid = false;
@@ -644,6 +692,54 @@ export default function CRM() {
     } else {
       errors.leadStatus = "";
     }
+
+    if (!isValid) {
+      console.log("From if");
+      setLeadsLoading(false);
+      setErrors(errors);
+      return;
+    } else {
+      console.log("From else");
+      const session = localStorage.getItem("session");
+      const req = await fetch("/api/addLeads", {
+        method: "POST",
+        body: JSON.stringify({
+          ...leadsFormData,
+          session: JSON.parse(session),
+        }),
+      });
+
+      if (req.status == 200) {
+        toast.success("Lead Added", {
+          autoClose: 3000,
+          position: "top-right",
+        });
+        setLeadsFormData({
+          name: "",
+          phone: "",
+          email: "",
+          linkedIn: "",
+          location: "",
+          job: "",
+          jobRole: "",
+          status: "",
+          created_at: "",
+        });
+      } else {
+        toast.error("Error in Adding Leads", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+
+      setLeadsLoading(false);
+    }
+  };
+
+  const handleDealsSubmit = async (e) => {
+    e.preventDefault();
+    setDealsLoading(true);
+    let isValid = true;
     if (!dealFormData.name) {
       errors.dealName = "Name is required";
       isValid = false;
@@ -679,25 +775,26 @@ export default function CRM() {
       errors.closeDate = "";
     }
     if (!isValid) {
-      setLoading(false);
+      setDealsLoading(false);
       setErrors(errors);
       return;
     } else {
+      console.log(dealFormData);
       const session = localStorage.getItem("session");
-      const req = await fetch("/api/addCustomer", {
+      const req = await fetch("/api/addDeals", {
         method: "POST",
         body: JSON.stringify({
-          ...customerFormData,
+          ...dealFormData,
           session: JSON.parse(session),
         }),
       });
 
       if (req.status == 200) {
-        toast.success("Customer Added", {
+        toast.success("Deal Added", {
           autoClose: 3000,
           position: "top-right",
         });
-        setCustomerFormData({
+        setDealFormData({
           name: "",
           phone: "",
           email: "",
@@ -709,16 +806,15 @@ export default function CRM() {
           created_at: "",
         });
       } else {
-        toast.error("Error in Adding Customer", {
+        toast.error("Error in Adding Deal", {
           position: "top-right",
           autoClose: 3000,
         });
       }
 
-      setLoading(false);
+      setDealsLoading(false);
     }
   };
-
   const SummaryCard = ({ title, total, subtitle, growth, icon: Icon }) => (
     <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
       <CardContent className="p-6">
@@ -1347,6 +1443,20 @@ export default function CRM() {
                       />
                       <ErrorMessage error={errors.created_at} />
                     </div>
+                    <Button
+                      disabled={customerLoading}
+                      onClick={handleCustomerSubmit}
+                      className={`${
+                        customerLoading
+                          ? "bg-gray-400 hover:bg-gray-500"
+                          : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                      }  cursor-pointer text-white`}
+                    >
+                      {customerLoading && (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      )}
+                      Add Customers
+                    </Button>
                   </div>
                   <div
                     className={`${activeTab == "Leads" ? "block" : "hidden"}`}
@@ -1400,21 +1510,21 @@ export default function CRM() {
                           htmlFor="number"
                           className="mb-2 text-slate-700 dark:text-slate-300"
                         >
-                          Number
+                          Phone
                         </Label>
                         <Input
-                          id="number"
+                          id="phone"
                           type="text"
-                          value={leadsFormData.number}
+                          value={leadsFormData.phone}
                           onChange={(e) =>
-                            updateLeadsFormData("number", e.target.value)
+                            updateLeadsFormData("phone", e.target.value)
                           }
                           className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.number ? "border-red-500" : ""
+                            errors.phone ? "border-red-500" : ""
                           }`}
                           placeholder="+91 12345 67890"
                         />
-                        <ErrorMessage error={errors.number} />
+                        <ErrorMessage error={errors.phone} />
                       </div>
                       <div>
                         <Label
@@ -1687,6 +1797,20 @@ export default function CRM() {
                         placeholder="Lead description"
                       />
                       <ErrorMessage error={errors.description} />
+                      <Button
+                        disabled={leadsLoading}
+                        onClick={handleLeadsSubmit}
+                        className={`${
+                          leadsLoading
+                            ? "bg-gray-400 hover:bg-gray-500"
+                            : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                        }  cursor-pointer text-white`}
+                      >
+                        {leadsLoading && (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        )}
+                        Add Leads
+                      </Button>
                     </div>
                   </div>
                   <div
@@ -1958,25 +2082,23 @@ export default function CRM() {
                         }`}
                         placeholder="Enter the insights gathered during this status"
                       />
+                      <Button
+                        disabled={dealsLoading}
+                        onClick={handleDealsSubmit}
+                        className={`${
+                          dealsLoading
+                            ? "bg-gray-400 hover:bg-gray-500"
+                            : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                        }  cursor-pointer text-white`}
+                      >
+                        {dealsLoading && (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        )}
+                        Add Deals
+                      </Button>
                     </div>
                   </div>
                 </>
-                <div className="flex justify-between pt-6">
-                  <Button
-                    disabled={loading}
-                    onClick={handleSubmit}
-                    className={`${
-                      loading
-                        ? "bg-gray-400 hover:bg-gray-500"
-                        : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
-                    }  cursor-pointer text-white`}
-                  >
-                    {loading && (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    )}
-                    Add {activeTab}
-                  </Button>
-                </div>
               </SheetDescription>
             </SheetHeader>
           </SheetContent>
