@@ -39,6 +39,7 @@ import {
   MoreHorizontal,
   Loader2,
   AlertCircle,
+  User,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { toast } from "react-toastify";
@@ -137,6 +138,7 @@ export default function CRM() {
     source: "",
     address: "",
     description: "",
+    user_email: userEmail,
   });
   const [dealFormData, setDealFormData] = useState({
     name: "", //req
@@ -151,6 +153,7 @@ export default function CRM() {
     owner: "",
     source: "",
     description: "",
+    user_email: userEmail,
   });
   const [errors, setErrors] = useState({});
   const [customerLoading, setCustomerLoading] = useState(false);
@@ -315,6 +318,7 @@ export default function CRM() {
           jobRole: "",
           status: "",
           created_at: "",
+          user_email: userEmail,
         });
         window.location.reload(); // refresh once right now
       } else {
@@ -400,6 +404,7 @@ export default function CRM() {
           status: "",
           created_at: "",
           closeDate: "",
+          user_email: userEmail,
         });
         window.location.reload(); // refresh once right now
       } else {
@@ -1833,7 +1838,7 @@ export default function CRM() {
                   {/* Scrollable Right Content */}
                   <div className="ml-[15%] w-[85%] overflow-y-scroll p-4">
                     <div className="grid grid-cols-2 gap-6 min-w-fit">
-                      {leadsData
+                      {leads
                         .filter((lead) => lead.status === leadState)
                         .map((l) => (
                           <LeadCard key={l.id} lead={l} />
@@ -1862,7 +1867,7 @@ export default function CRM() {
                   {/* Scrollable Right Content */}
                   <div className="ml-[15%] w-[85%] overflow-y-scroll p-4">
                     <div className="grid grid-cols-2 gap-6 min-w-fit">
-                      {dealsData
+                      {deals
                         .filter((deal) => deal.status === dealState)
                         .map((deal) => (
                           <DealCard key={deal.id} deal={deal} />

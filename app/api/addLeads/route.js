@@ -21,6 +21,7 @@ export async function POST(request) {
                             "source" : data.source,
                             "address" : data.address,
                             "description" : data.description,
+                            "user_email" : data.user_email
     })
 
     if(error) {

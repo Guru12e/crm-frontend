@@ -18,6 +18,7 @@ export async function POST(req) {
     "closeDate" : data.closeDate,
     "source" : data.source,
     "priority" : data.priority,
+    "user_email" : data.user_email
 
     })
 
