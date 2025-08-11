@@ -869,15 +869,15 @@ export default function CRM() {
                           <SelectValue placeholder="Select industry" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="technology">Technology</SelectItem>
-                          <SelectItem value="healthcare">Healthcare</SelectItem>
-                          <SelectItem value="finance">Finance</SelectItem>
-                          <SelectItem value="retail">Retail</SelectItem>
-                          <SelectItem value="manufacturing">
+                          <SelectItem value="Technology">Technology</SelectItem>
+                          <SelectItem value="Healthcare">Healthcare</SelectItem>
+                          <SelectItem value="Finance">Finance</SelectItem>
+                          <SelectItem value="Retail">Retail</SelectItem>
+                          <SelectItem value="Manufacturing">
                             Manufacturing
                           </SelectItem>
-                          <SelectItem value="education">Education</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
+                          <SelectItem value="Education">Education</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
                         </SelectContent>
                       </Select>
                       <ErrorMessage error={errors.industry} />
@@ -946,9 +946,9 @@ export default function CRM() {
                           <SelectValue placeholder="Select Customer Status" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="active">Active</SelectItem>
-                          <SelectItem value="inactive">Inactive</SelectItem>
-                          <SelectItem value="at-risk">At Risk</SelectItem>
+                          <SelectItem value="Active">Active</SelectItem>
+                          <SelectItem value="Inactive">Inactive</SelectItem>
+                          <SelectItem value="At Risk">At Risk</SelectItem>
                         </SelectContent>
                       </Select>
                       <ErrorMessage error={errors.status} />
@@ -1162,19 +1162,19 @@ export default function CRM() {
                             <SelectValue placeholder="Select industry" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="technology">
+                            <SelectItem value="Technology">
                               Technology
                             </SelectItem>
-                            <SelectItem value="healthcare">
+                            <SelectItem value="Healthcare">
                               Healthcare
                             </SelectItem>
-                            <SelectItem value="finance">Finance</SelectItem>
-                            <SelectItem value="retail">Retail</SelectItem>
-                            <SelectItem value="manufacturing">
+                            <SelectItem value="Finance">Finance</SelectItem>
+                            <SelectItem value="Retail">Retail</SelectItem>
+                            <SelectItem value="Manufacturing">
                               Manufacturing
                             </SelectItem>
-                            <SelectItem value="education">Education</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
+                            <SelectItem value="Education">Education</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
                           </SelectContent>
                         </Select>
                         <ErrorMessage error={errors.industry} />
@@ -1303,26 +1303,28 @@ export default function CRM() {
                             <SelectValue placeholder="Select Lead Source" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="advertisement">
+                            <SelectItem value="Advertisement">
                               Advertisement
                             </SelectItem>
-                            <SelectItem value="cold call">Cold call</SelectItem>
-                            <SelectItem value="employee referral">
+                            <SelectItem value="Cold call">Cold call</SelectItem>
+                            <SelectItem value="Employee referral">
                               Employee referral
                             </SelectItem>
-                            <SelectItem value="external referral">
+                            <SelectItem value="External referral">
                               External referral
                             </SelectItem>
-                            <SelectItem value="sales email alias">
+                            <SelectItem value="Sales email alias">
                               Sales email alias
                             </SelectItem>
-                            <SelectItem value="chat">Chat</SelectItem>
-                            <SelectItem value="facebook">Facebook</SelectItem>
-                            <SelectItem value="web research">
+                            <SelectItem value="Chat">Chat</SelectItem>
+                            <SelectItem value="Facebook">Facebook</SelectItem>
+                            <SelectItem value="Web Research">
                               Web Research
                             </SelectItem>
-                            <SelectItem value="twitter">X(Twitter)</SelectItem>
-                            <SelectItem value="public realtions">
+                            <SelectItem value="X(Twitter)">
+                              X(Twitter)
+                            </SelectItem>
+                            <SelectItem value="Public relations">
                               Public relations
                             </SelectItem>
                           </SelectContent>
@@ -1585,9 +1587,9 @@ export default function CRM() {
                             <SelectValue placeholder="Select Deal Priority" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="high">High</SelectItem>
-                            <SelectItem value="medium">Medium</SelectItem>
-                            <SelectItem value="low">Low</SelectItem>
+                            <SelectItem value="High">High</SelectItem>
+                            <SelectItem value="Medium">Medium</SelectItem>
+                            <SelectItem value="Low">Low</SelectItem>
                           </SelectContent>
                         </Select>
                         <ErrorMessage error={errors.priority} />
@@ -1744,7 +1746,7 @@ export default function CRM() {
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all-statuses">All statuses</SelectItem>
+                  <SelectItem value="All statuses">All statuses</SelectItem>
                   <SelectItem value="Active">Active</SelectItem>
                   <SelectItem value="Inactive">Inactive</SelectItem>
                   <SelectItem value="At Risk">At Risk</SelectItem>
@@ -1755,7 +1757,7 @@ export default function CRM() {
                   <SelectValue placeholder="Filter by source" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all-sources">All sources</SelectItem>
+                  <SelectItem value="All sources">All sources</SelectItem>
                   <SelectItem value="Website">Website</SelectItem>
                   <SelectItem value="Referral">Referral</SelectItem>
                   <SelectItem value="Campaign">Campaign</SelectItem>
@@ -1767,7 +1769,7 @@ export default function CRM() {
                   <SelectValue placeholder="Filter by month" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all-time">All time</SelectItem>
+                  <SelectItem value="All time">All time</SelectItem>
                   <SelectItem value="2024-12">December 2024</SelectItem>
                   <SelectItem value="2024-11">November 2024</SelectItem>
                   <SelectItem value="2024-10">October 2024</SelectItem>
