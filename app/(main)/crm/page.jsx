@@ -75,14 +75,29 @@ const dealStatus = [
   "On-hold",
   "Abandoned",
 ];
+const userEmail = FormData.session.user.email;
+if (!userEmail) {
+  <>
+    <h1> You need to login to check CRM data.</h1>
+  </>;
+} else {
+  const { data: customers } = await supabase
+    .from("Customers")
+    .select("*")
+    .eq("user_email", userEmail);
 
-const { data: mockCustomers } = await supabase.from("Customers").select("*");
+  const { data: leads } = await supabase
+    .from("Leads")
+    .select("*")
+    .eq("user_email", userEmail);
 
-const { data: mockLeads } = await supabase.from("Leads").select("*");
+  const { data: deals } = await supabase
+    .from("Deals")
+    .select("*")
+    .eq("user_email", userEmail);
+}
 
-const { data: mockDeals } = await supabase.from("Deals").select("*");
-
-console.log(mockCustomers, mockLeads, mockDeals);
+console.log(customers, leads, deals);
 
 export default function CRM() {
   const [activeTab, setActiveTab] = useState("Customers");
@@ -135,8 +150,8 @@ export default function CRM() {
   const [customerLoading, setCustomerLoading] = useState(false);
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [dealsLoading, setDealsLoading] = useState(false);
-  // const [mockLeads, setMockLeads] = useState(mockLeadsData);
-  // const [mockDeals, setMockDeals] = useState(mockDealsData);
+  // const [leads, setleads] = useState(leadsData);
+  // const [deals, setdeals] = useState(dealsData);
 
   const ErrorMessage = ({ error }) =>
     error && (
@@ -434,7 +449,7 @@ export default function CRM() {
                 {customer.name}
               </h3>
               <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 break-words">
-                {customer.contact}
+                {customer.email}
               </p>
               <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-2 text-sm text-slate-500 dark:text-slate-400 gap-1 sm:gap-0">
                 <div className="flex items-center">
@@ -443,7 +458,7 @@ export default function CRM() {
                 </div>
                 <div className="flex items-center">
                   <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
-                  <span className="break-words">{customer.location}</span>
+                  <span className="break-words">{customer.address}</span>
                 </div>
               </div>
             </div>
@@ -465,7 +480,8 @@ export default function CRM() {
                 {customer.status}
               </Badge>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 break-words">
-                Last activity: {customer.lastActivity}
+                Created At:{" "}
+                {new Date(customer.created_at).toISOString().split("T")[0]}
               </p>
             </div>
           </div>
@@ -601,16 +617,14 @@ export default function CRM() {
                       onClick={() => {
                         {
                           console.log(lead.id);
-                          const leadItem = mockLeads.find(
-                            (l) => l.id === lead.id
-                          );
-                          const updateLeads = mockLeads.map((l) => {
+                          const leadItem = leads.find((l) => l.id === lead.id);
+                          const updateLeads = leads.map((l) => {
                             if (l.id === leadItem.id) {
                               return { ...l, status: statu };
                             }
                             return l;
                           });
-                          setMockLeads(updateLeads);
+                          setleads(updateLeads);
                         }
                       }}
                     >
@@ -694,7 +708,7 @@ export default function CRM() {
                       className="cursor-pointer border-b border-gray-300"
                       key={status}
                       onClick={() => {
-                        const updatedDeals = mockDeals.map((d) => {
+                        const updatedDeals = deals.map((d) => {
                           if (d.id === deal.id && status === "Closed-won") {
                             return { ...d, status: status, probability: 100 };
                           } else if (
@@ -707,7 +721,7 @@ export default function CRM() {
                           }
                           return d;
                         });
-                        setMockDeals(updatedDeals);
+                        setdeals(updatedDeals);
                       }}
                     >
                       {status}
@@ -1788,7 +1802,7 @@ export default function CRM() {
 
         <TabsContent value="Customers" className="space-y-6">
           <div className="grid grid-cols-1 gap-6">
-            {mockCustomers.map((customer) => (
+            {customers.map((customer) => (
               <CustomerCard key={customer.id} customer={customer} />
             ))}
           </div>
@@ -1810,7 +1824,7 @@ export default function CRM() {
                   {/* Scrollable Right Content */}
                   <div className="ml-[15%] w-[85%] overflow-y-scroll p-4">
                     <div className="grid grid-cols-2 gap-6 min-w-fit">
-                      {mockLeads
+                      {leads
                         .filter((lead) => lead.status === leadState)
                         .map((l) => (
                           <LeadCard key={l.id} lead={l} />
@@ -1839,7 +1853,7 @@ export default function CRM() {
                   {/* Scrollable Right Content */}
                   <div className="ml-[15%] w-[85%] overflow-y-scroll p-4">
                     <div className="grid grid-cols-2 gap-6 min-w-fit">
-                      {mockDeals
+                      {deals
                         .filter((deal) => deal.status === dealState)
                         .map((deal) => (
                           <DealCard key={deal.id} deal={deal} />

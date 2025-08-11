@@ -41,6 +41,7 @@ export async function POST(request) {
           price: formData.price || null,
           customFields: formData.customFields || [],
           created_at: formData.created_at || data.toTimeString(),
+          user_email: formData.session.user.email,
         })
         .select();
       if (companyError) {
