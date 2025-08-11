@@ -8,17 +8,16 @@ export async function POST(req) {
 
     try{
         const {data: deal, error} = await supabase.from("Deals").insert({
-            "name" : data.name,
-            "owner" : data.owner,
-            "email":  data.email,
-            "number" : data.phone,
-            "title" : data.title,
-            "value" : data.value,
-            "status" : data.status,
-            "closeDate" : data.closeDate,
-            "source" : data.source,
-            "priority" : data.priority,
-            "user_email" : data.session.user.email
+    "name" : data.name,
+    "owner" : data.owner,
+    "email":  data.email,
+    "number" : data.phone,
+    "title" : data.title,
+    "value" : data.value,
+    "status" : data.status,
+    "closeDate" : data.closeDate,
+    "source" : data.source,
+    "priority" : data.priority,
 
     })
 

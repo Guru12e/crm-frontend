@@ -75,27 +75,33 @@ const dealStatus = [
   "On-hold",
   "Abandoned",
 ];
-const userEmail = FormData.session.user.email;
+
+const rawSession = localStorage.getItem("session");
+console.log(rawSession);
+const session = JSON.parse(rawSession);
+console.log(session.user.email);
+const userEmail = session.user.email;
+
 if (!userEmail) {
-  <>
-    <h1> You need to login to check CRM data.</h1>
-  </>;
-} else {
-  const { data: customers } = await supabase
-    .from("Customers")
-    .select("*")
-    .eq("user_email", userEmail);
-
-  const { data: leads } = await supabase
-    .from("Leads")
-    .select("*")
-    .eq("user_email", userEmail);
-
-  const { data: deals } = await supabase
-    .from("Deals")
-    .select("*")
-    .eq("user_email", userEmail);
+  console.error("User email not found in session");
 }
+const { data: customers } = await supabase
+  .from("Customers")
+  .select("*")
+  .eq("user_email", !userEmail ? "undefined" : userEmail)
+  .order("created_at", { ascending: false });
+
+const { data: leads } = await supabase
+  .from("Leads")
+  .select("*")
+  .eq("user_email", !userEmail ? "undefined" : userEmail)
+  .order("created_at", { ascending: false });
+
+const { data: deals } = await supabase
+  .from("Deals")
+  .select("*")
+  .eq("user_email", !userEmail ? "undefined" : userEmail)
+  .order("created_at", { ascending: false });
 
 console.log(customers, leads, deals);
 
