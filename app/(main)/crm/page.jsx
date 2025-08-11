@@ -107,12 +107,15 @@ const { data: dealsData } = await supabase
 console.log(customersData, leadsData, dealsData);
 
 export default function CRM() {
-  const [activeTab, setActiveTab] = useState("Customers");
+  const [activeTab, setActiveTab] = useState(
+    sessionStorage.getItem("activeTab") || "Customers"
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [sourceFilter, setSourceFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
   const today = new Date();
+  sessionStorage.setItem("activeTab", activeTab);
   const [customerFormData, setCustomerFormData] = useState({
     name: "",
     phone: "",
@@ -494,8 +497,7 @@ export default function CRM() {
                 {customer.status}
               </Badge>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 break-words">
-                Created At:{" "}
-                {new Date(customer.created_at).toISOString().split("T")[0]}
+                Created At: {customer.created_at.split("T")[0]}
               </p>
             </div>
           </div>
@@ -584,7 +586,7 @@ export default function CRM() {
                 {lead.status}
               </Badge>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 break-words">
-                Created: {lead.created}
+                Created: {lead.created_at.split("T")[0]}
               </p>
             </div>
           </div>
@@ -628,18 +630,11 @@ export default function CRM() {
                     <DropdownMenuItem
                       className="cursor-pointer border-b border-gray-300"
                       key={statu}
-                      onClick={() => {
-                        {
-                          console.log(lead.id);
-                          const leadItem = leads.find((l) => l.id === lead.id);
-                          const updateLeads = leads.map((l) => {
-                            if (l.id === leadItem.id) {
-                              return { ...l, status: statu };
-                            }
-                            return l;
-                          });
-                          setleads(updateLeads);
-                        }
+                      onClick={async () => {
+                        await supabase
+                          .from("leads")
+                          .update({ status: statu })
+                          .eq("id", lead.id);
                       }}
                     >
                       {statu}
@@ -721,21 +716,11 @@ export default function CRM() {
                     <DropdownMenuItem
                       className="cursor-pointer border-b border-gray-300"
                       key={status}
-                      onClick={() => {
-                        const updatedDeals = deals.map((d) => {
-                          if (d.id === deal.id && status === "Closed-won") {
-                            return { ...d, status: status, probability: 100 };
-                          } else if (
-                            (d.id === deal.id && status === "Closed-lost") ||
-                            status === "Abandoned"
-                          ) {
-                            return { ...d, status: status, probability: 0 };
-                          } else if (d.id === deal.id) {
-                            return { ...d, status: status };
-                          }
-                          return d;
-                        });
-                        setdeals(updatedDeals);
+                      onClick={async () => {
+                        await supabase
+                          .from("deals")
+                          .update({ status: status })
+                          .eq("id", deal.id);
                       }}
                     >
                       {status}
@@ -1513,18 +1498,47 @@ export default function CRM() {
                         >
                           Deal Source
                         </Label>
-                        <Input
-                          id="source"
-                          type="text"
+                        <Select
                           value={dealFormData.source}
-                          onChange={(e) =>
-                            updateDealFormData("source", e.target.value)
+                          onValueChange={(value) =>
+                            updateDealFormData("source", value)
                           }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.source ? "border-red-500" : ""
-                          }`}
-                          placeholder="e.g., CRM Subscription - 1 Year"
-                        />
+                          className={errors.source ? "border-red-500" : ""}
+                        >
+                          <SelectTrigger
+                            className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
+                              errors.source ? "border-red-500" : ""
+                            }`}
+                          >
+                            <SelectValue placeholder="Select Deal Source" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Advertisement">
+                              Advertisement
+                            </SelectItem>
+                            <SelectItem value="Cold call">Cold call</SelectItem>
+                            <SelectItem value="Employee referral">
+                              Employee referral
+                            </SelectItem>
+                            <SelectItem value="External referral">
+                              External referral
+                            </SelectItem>
+                            <SelectItem value="Sales email alias">
+                              Sales email alias
+                            </SelectItem>
+                            <SelectItem value="Chat">Chat</SelectItem>
+                            <SelectItem value="Facebook">Facebook</SelectItem>
+                            <SelectItem value="Web Research">
+                              Web Research
+                            </SelectItem>
+                            <SelectItem value="X(Twitter)">
+                              X(Twitter)
+                            </SelectItem>
+                            <SelectItem value="Public relations">
+                              Public relations
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
                         <ErrorMessage error={errors.source} />
                       </div>
                       <div>
@@ -1865,7 +1879,7 @@ export default function CRM() {
                   </div>
 
                   {/* Scrollable Right Content */}
-                  <div className="ml-[15%] w-[85%] overflow-y-scroll p-4">
+                  <div className="ml-[15%] w-[85%] overflow-y-scroll ">
                     <div className="grid grid-cols-2 gap-6 min-w-fit">
                       {deals
                         .filter((deal) => deal.status === dealState)
