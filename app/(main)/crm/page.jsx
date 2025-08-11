@@ -85,25 +85,25 @@ const userEmail = session.user.email;
 if (!userEmail) {
   console.error("User email not found in session");
 }
-const { data: customers } = await supabase
+const { data: customersData } = await supabase
   .from("Customers")
   .select("*")
   .eq("user_email", !userEmail ? "undefined" : userEmail)
   .order("created_at", { ascending: false });
 
-const { data: leads } = await supabase
+const { data: leadsData } = await supabase
   .from("Leads")
   .select("*")
   .eq("user_email", !userEmail ? "undefined" : userEmail)
   .order("created_at", { ascending: false });
 
-const { data: deals } = await supabase
+const { data: dealsData } = await supabase
   .from("Deals")
   .select("*")
   .eq("user_email", !userEmail ? "undefined" : userEmail)
   .order("created_at", { ascending: false });
 
-console.log(customers, leads, deals);
+console.log(customersData, leadsData, dealsData);
 
 export default function CRM() {
   const [activeTab, setActiveTab] = useState("Customers");
@@ -156,8 +156,8 @@ export default function CRM() {
   const [customerLoading, setCustomerLoading] = useState(false);
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [dealsLoading, setDealsLoading] = useState(false);
-  // const [leads, setleads] = useState(leadsData);
-  // const [deals, setdeals] = useState(dealsData);
+  const [leads, setleads] = useState(leadsData);
+  const [deals, setdeals] = useState(dealsData);
 
   const ErrorMessage = ({ error }) =>
     error && (
@@ -249,6 +249,7 @@ export default function CRM() {
           status: "",
           created_at: "",
         });
+        window.location.reload(); // refresh once right now
       } else {
         toast.error("Error in Adding Customer", {
           position: "top-right",
@@ -315,6 +316,7 @@ export default function CRM() {
           status: "",
           created_at: "",
         });
+        window.location.reload(); // refresh once right now
       } else {
         toast.error("Error in Adding Leads", {
           position: "top-right",
@@ -399,6 +401,7 @@ export default function CRM() {
           created_at: "",
           closeDate: "",
         });
+        window.location.reload(); // refresh once right now
       } else {
         toast.error("Error in Adding Deal", {
           position: "top-right",
@@ -1808,7 +1811,7 @@ export default function CRM() {
 
         <TabsContent value="Customers" className="space-y-6">
           <div className="grid grid-cols-1 gap-6">
-            {customers.map((customer) => (
+            {customersData.map((customer) => (
               <CustomerCard key={customer.id} customer={customer} />
             ))}
           </div>
@@ -1830,7 +1833,7 @@ export default function CRM() {
                   {/* Scrollable Right Content */}
                   <div className="ml-[15%] w-[85%] overflow-y-scroll p-4">
                     <div className="grid grid-cols-2 gap-6 min-w-fit">
-                      {leads
+                      {leadsData
                         .filter((lead) => lead.status === leadState)
                         .map((l) => (
                           <LeadCard key={l.id} lead={l} />
@@ -1859,7 +1862,7 @@ export default function CRM() {
                   {/* Scrollable Right Content */}
                   <div className="ml-[15%] w-[85%] overflow-y-scroll p-4">
                     <div className="grid grid-cols-2 gap-6 min-w-fit">
-                      {deals
+                      {dealsData
                         .filter((deal) => deal.status === dealState)
                         .map((deal) => (
                           <DealCard key={deal.id} deal={deal} />
