@@ -11,7 +11,7 @@ export async function POST(req) {
 "name" : data.name,
 "owner" : data.owner,
   "email":  data.email,
-  "number" : data.number,
+  "number" : data.phone,
   "title" : data.title,
   "value" : data.value,
   "status" : data.status,
