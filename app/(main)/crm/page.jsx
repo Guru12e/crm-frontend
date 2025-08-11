@@ -49,6 +49,7 @@ import {
   DropdownMenuItem,
   DropdownMenuContent,
 } from "@radix-ui/react-dropdown-menu";
+import { supabase } from "@/utils/supabase/client";
 
 const summaryStats = {
   customers: { total: 1247, new: 89, growth: 12 },
@@ -74,446 +75,14 @@ const dealStatus = [
   "On-hold",
   "Abandoned",
 ];
-const mockCustomers = [
-  {
-    id: 1,
-    name: "TechFlow Inc",
-    contact: "Sarah Johnson",
-    email: "sarah.j@techflow.com",
-    phone: "+1 (555) 123-4567",
-    location: "San Francisco, CA",
-    industry: "Technology",
-    value: "$45,000",
-    status: "Active",
-    onboardedDate: "2024-01-15",
-    lastActivity: "2 days ago",
-    source: "Referral",
-  },
-  {
-    id: 2,
-    name: "DataDrive Solutions",
-    contact: "Michael Chen",
-    email: "m.chen@datadrive.io",
-    phone: "+1 (555) 987-6543",
-    location: "Austin, TX",
-    industry: "Software",
-    value: "$78,500",
-    status: "Active",
-    onboardedDate: "2024-02-20",
-    lastActivity: "1 day ago",
-    source: "Website",
-  },
-  {
-    id: 3,
-    name: "GrowthCorp",
-    contact: "Emily Rodriguez",
-    email: "emily.r@growthcorp.com",
-    phone: "+1 (555) 456-7890",
-    location: "New York, NY",
-    industry: "Marketing",
-    value: "$125,000",
-    status: "At Risk",
-    onboardedDate: "2023-11-10",
-    lastActivity: "1 week ago",
-    source: "Campaign",
-  },
-];
 
-let mockLeadsData = [
-  {
-    id: 1,
-    name: "InnovateLab",
-    contact: "David Kim",
-    email: "d.kim@innovatelab.com",
-    phone: "+1 (555) 234-5678",
-    location: "Seattle, WA",
-    industry: "Technology",
-    score: 85,
-    status: "New",
-    source: "LinkedIn",
-    created: "3 days ago",
-    lastActivity: "1 day ago",
-  },
-  {
-    id: 2,
-    name: "ScaleUp Ventures",
-    contact: "Lisa Thompson",
-    email: "l.thompson@scaleup.vc",
-    phone: "+1 (555) 345-6789",
-    location: "Chicago, IL",
-    industry: "Finance",
-    score: 92,
-    status: "In progress",
-    source: "Referral",
-    created: "1 day ago",
-    lastActivity: "2 hours ago",
-  },
-  {
-    id: 3,
-    name: "Dragon Ventures",
-    contact: "Dwayne Thompson",
-    email: "d.thompson@dragon.vc",
-    phone: "+1 (555) 456-7890",
-    location: "Los Angeles, CA",
-    industry: "Education",
-    score: 78,
-    status: "Contact Attempted",
-    source: "Referral",
-    created: "3 days ago",
-    lastActivity: "1 hour ago",
-  },
-  {
-    id: 4,
-    name: "Snake Ventures",
-    contact: "Morris Morkel",
-    email: "m.morkel@snake.vc",
-    phone: "+1 (555) 567-1234",
-    location: "Denver, CO",
-    industry: "Logistics",
-    score: 80,
-    status: "Meeting Booked",
-    source: "Twitter",
-    created: "2 days ago",
-    lastActivity: "1 hour ago",
-  },
-  {
-    id: 5,
-    name: "NeuralTech",
-    contact: "Jenna Park",
-    email: "jenna@neuraltech.ai",
-    phone: "+1 (555) 123-4567",
-    location: "Boston, MA",
-    industry: "AI",
-    score: 91,
-    status: "Contacted",
-    source: "Event",
-    created: "4 days ago",
-    lastActivity: "Yesterday",
-  },
-  {
-    id: 6,
-    name: "OceanNet",
-    contact: "Carl Nguyen",
-    email: "carl@oceannet.io",
-    phone: "+1 (555) 789-4561",
-    location: "Miami, FL",
-    industry: "Telecom",
-    score: 74,
-    status: "Qualified",
-    source: "Cold Email",
-    created: "5 days ago",
-    lastActivity: "2 days ago",
-  },
-  {
-    id: 7,
-    name: "BrightWare",
-    contact: "Priya Desai",
-    email: "p.desai@brightware.com",
-    phone: "+1 (555) 222-3344",
-    location: "San Diego, CA",
-    industry: "Software",
-    score: 68,
-    status: "Unqualified",
-    source: "Website",
-    created: "6 days ago",
-    lastActivity: "5 days ago",
-  },
-  {
-    id: 8,
-    name: "GreenMatrix",
-    contact: "Tom Richards",
-    email: "tom.r@greenmatrix.org",
-    phone: "+1 (555) 321-4567",
-    location: "Portland, OR",
-    industry: "Sustainability",
-    score: 88,
-    status: "New",
-    source: "Campaign",
-    created: "2 days ago",
-    lastActivity: "Today",
-  },
-  {
-    id: 9,
-    name: "Finverse",
-    contact: "Rita Singh",
-    email: "r.singh@finverse.com",
-    phone: "+1 (555) 908-7654",
-    location: "Atlanta, GA",
-    industry: "Finance",
-    score: 82,
-    status: "In progress",
-    source: "LinkedIn",
-    created: "1 week ago",
-    lastActivity: "Yesterday",
-  },
-  {
-    id: 10,
-    name: "Aether Solutions",
-    contact: "Ali Bashir",
-    email: "a.bashir@aethersol.io",
-    phone: "+1 (555) 901-2345",
-    location: "Detroit, MI",
-    industry: "Engineering",
-    score: 89,
-    status: "Qualified",
-    source: "Cold Call",
-    created: "5 days ago",
-    lastActivity: "3 days ago",
-  },
-  {
-    id: 11,
-    name: "ZeroBit",
-    contact: "Megan Wu",
-    email: "megan@zerobit.tech",
-    phone: "+1 (555) 876-4321",
-    location: "Austin, TX",
-    industry: "Cybersecurity",
-    score: 90,
-    status: "Meeting Booked",
-    source: "Conference",
-    created: "2 days ago",
-    lastActivity: "1 hour ago",
-  },
-  {
-    id: 12,
-    name: "EvoLabs",
-    contact: "Samir Patel",
-    email: "samir@evolabs.org",
-    phone: "+1 (555) 741-8529",
-    location: "Phoenix, AZ",
-    industry: "Biotech",
-    score: 83,
-    status: "Contacted",
-    source: "Referral",
-    created: "4 days ago",
-    lastActivity: "Yesterday",
-  },
-  {
-    id: 13,
-    name: "BlockNet",
-    contact: "Karla Gomez",
-    email: "k.gomez@blocknet.io",
-    phone: "+1 (555) 963-8527",
-    location: "Dallas, TX",
-    industry: "Blockchain",
-    score: 76,
-    status: "Contact Attempted",
-    source: "Website",
-    created: "6 days ago",
-    lastActivity: "Today",
-  },
-  {
-    id: 14,
-    name: "FusionEdge",
-    contact: "Ryan Burke",
-    email: "r.burke@fusionedge.ai",
-    phone: "+1 (555) 147-2583",
-    location: "Las Vegas, NV",
-    industry: "AI",
-    score: 87,
-    status: "In progress",
-    source: "Cold Email",
-    created: "3 days ago",
-    lastActivity: "Yesterday",
-  },
-  {
-    id: 15,
-    name: "ClearCompute",
-    contact: "Isabella Cruz",
-    email: "i.cruz@clearcompute.com",
-    phone: "+1 (555) 369-2587",
-    location: "Charlotte, NC",
-    industry: "Cloud",
-    score: 84,
-    status: "Qualified",
-    source: "Partner",
-    created: "5 days ago",
-    lastActivity: "Today",
-  },
-];
+const { data: mockCustomers } = await supabase.from("Customers").select("*");
 
-let mockDealsData = [
-  {
-    id: 1,
-    name: "Enterprise Package - TechFlow",
-    company: "TechFlow Inc",
-    value: "$89,000",
-    status: "Negotiation",
-    probability: 75,
-    closeDate: "2024-12-15",
-    owner: "Sarah Johnson",
-    source: "Referral",
-    lastActivity: "1 day ago",
-  },
-  {
-    id: 2,
-    name: "Annual Subscription - DataDrive",
-    company: "DataDrive Solutions",
-    value: "$156,000",
-    status: "Proposal Sent",
-    probability: 60,
-    closeDate: "2024-12-30",
-    owner: "Michael Chen",
-    source: "Website",
-    lastActivity: "3 hours ago",
-  },
-  {
-    id: 3,
-    name: "Basic Plan - GrowthCorp",
-    company: "GrowthCorp",
-    value: "$25,000",
-    status: "New",
-    probability: 25,
-    closeDate: "2024-10-05",
-    owner: "Emily Rodriguez",
-    source: "Campaign",
-    lastActivity: "2 days ago",
-  },
-  {
-    id: 4,
-    name: "Startup Bundle - InnovateLab",
-    company: "InnovateLab",
-    value: "$40,000",
-    status: "On-hold",
-    probability: 35,
-    closeDate: "2024-11-20",
-    owner: "David Kim",
-    source: "LinkedIn",
-    lastActivity: "3 days ago",
-  },
-  {
-    id: 5,
-    name: "Growth Plan - ScaleUp",
-    company: "ScaleUp Ventures",
-    value: "$110,000",
-    status: "Negotiation",
-    probability: 70,
-    closeDate: "2024-12-05",
-    owner: "Lisa Thompson",
-    source: "Referral",
-    lastActivity: "Yesterday",
-  },
-  {
-    id: 6,
-    name: "Corporate Deal - OceanNet",
-    company: "OceanNet",
-    value: "$95,000",
-    status: "Proposal Sent",
-    probability: 65,
-    closeDate: "2024-10-25",
-    owner: "Carl Nguyen",
-    source: "Cold Email",
-    lastActivity: "1 hour ago",
-  },
-  {
-    id: 7,
-    name: "Subscription - GreenMatrix",
-    company: "GreenMatrix",
-    value: "$78,000",
-    status: "Closed-won",
-    probability: 100,
-    closeDate: "2024-08-01",
-    owner: "Tom Richards",
-    source: "Campaign",
-    lastActivity: "Today",
-  },
-  {
-    id: 8,
-    name: "Premium Plan - BrightWare",
-    company: "BrightWare",
-    value: "$60,000",
-    status: "Closed-lost",
-    probability: 0,
-    closeDate: "2024-07-15",
-    owner: "Priya Desai",
-    source: "Website",
-    lastActivity: "Last week",
-  },
-  {
-    id: 9,
-    name: "Elite Tier - FusionEdge",
-    company: "FusionEdge",
-    value: "$142,000",
-    status: "Abandoned",
-    probability: 0,
-    closeDate: "2024-09-30",
-    owner: "Ryan Burke",
-    source: "Cold Email",
-    lastActivity: "2 days ago",
-  },
-  {
-    id: 10,
-    name: "AI Services - NeuralTech",
-    company: "NeuralTech",
-    value: "$130,000",
-    status: "Negotiation",
-    probability: 80,
-    closeDate: "2024-11-10",
-    owner: "Jenna Park",
-    source: "Event",
-    lastActivity: "Today",
-  },
-  {
-    id: 11,
-    name: "Security Suite - ZeroBit",
-    company: "ZeroBit",
-    value: "$105,000",
-    status: "Proposal Sent",
-    probability: 55,
-    closeDate: "2024-10-22",
-    owner: "Megan Wu",
-    source: "Conference",
-    lastActivity: "Yesterday",
-  },
-  {
-    id: 12,
-    name: "Enterprise AI - ClearCompute",
-    company: "ClearCompute",
-    value: "$125,000",
-    status: "New",
-    probability: 35,
-    closeDate: "2024-09-18",
-    owner: "Isabella Cruz",
-    source: "Partner",
-    lastActivity: "Today",
-  },
-  {
-    id: 13,
-    name: "Full Package - BlockNet",
-    company: "BlockNet",
-    value: "$88,000",
-    status: "Negotiation",
-    probability: 77,
-    closeDate: "2024-12-05",
-    owner: "Karla Gomez",
-    source: "Website",
-    lastActivity: "Today",
-  },
-  {
-    id: 14,
-    name: "Biotech Plan - EvoLabs",
-    company: "EvoLabs",
-    value: "$93,000",
-    status: "On-hold",
-    probability: 45,
-    closeDate: "2024-11-01",
-    owner: "Samir Patel",
-    source: "Referral",
-    lastActivity: "2 days ago",
-  },
-  {
-    id: 15,
-    name: "Team Plan - Aether Solutions",
-    company: "Aether Solutions",
-    value: "$68,000",
-    status: "Closed-lost",
-    probability: 0,
-    closeDate: "2024-08-18",
-    owner: "Ali Bashir",
-    source: "Cold Call",
-    lastActivity: "Last week",
-  },
-];
+const { data: mockLeads } = await supabase.from("Leads").select("*");
+
+const { data: mockDeals } = await supabase.from("Deals").select("*");
+
+console.log(mockCustomers, mockLeads, mockDeals);
 
 export default function CRM() {
   const [activeTab, setActiveTab] = useState("Customers");
@@ -528,8 +97,8 @@ export default function CRM() {
     email: "",
     linkedIn: "",
     location: "",
-    job: "",
-    jobRole: "",
+    website: "",
+    industry: "",
     status: "",
     created_at: today,
   });
@@ -566,8 +135,8 @@ export default function CRM() {
   const [customerLoading, setCustomerLoading] = useState(false);
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [dealsLoading, setDealsLoading] = useState(false);
-  const [mockLeads, setMockLeads] = useState(mockLeadsData);
-  const [mockDeals, setMockDeals] = useState(mockDealsData);
+  // const [mockLeads, setMockLeads] = useState(mockLeadsData);
+  // const [mockDeals, setMockDeals] = useState(mockDealsData);
 
   const ErrorMessage = ({ error }) =>
     error && (
@@ -654,8 +223,8 @@ export default function CRM() {
           email: "",
           linkedIn: "",
           location: "",
-          job: "",
-          jobRole: "",
+          website: "",
+          industry: "",
           status: "",
           created_at: "",
         });
@@ -774,6 +343,9 @@ export default function CRM() {
       dealFormData.closeDate = today;
       errors.closeDate = "";
     }
+    if (!dealFormData.created_at) {
+      dealFormData.created_at = today;
+    }
     if (!isValid) {
       setDealsLoading(false);
       setErrors(errors);
@@ -800,10 +372,11 @@ export default function CRM() {
           email: "",
           linkedIn: "",
           location: "",
-          job: "",
-          jobRole: "",
+          title: "",
+          value: "",
           status: "",
           created_at: "",
+          closeDate: "",
         });
       } else {
         toast.error("Error in Adding Deal", {
@@ -1282,15 +855,15 @@ export default function CRM() {
                         Industry
                       </Label>
                       <Select
-                        value={customerFormData.job}
+                        value={customerFormData.industry}
                         onValueChange={(value) =>
-                          updateCustomerFormData("job", value)
+                          updateCustomerFormData("industry", value)
                         }
-                        className={errors.job ? "border-red-500" : ""}
+                        className={errors.industry ? "border-red-500" : ""}
                       >
                         <SelectTrigger
                           className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                            errors.job ? "border-red-500" : ""
+                            errors.industry ? "border-red-500" : ""
                           }`}
                         >
                           <SelectValue placeholder="Select industry" />
@@ -1307,11 +880,11 @@ export default function CRM() {
                           <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
-                      <ErrorMessage error={errors.job} />
+                      <ErrorMessage error={errors.industry} />
                     </div>
                     <div>
                       <Label
-                        htmlFor="jobRole"
+                        htmlFor="website"
                         className="mb-2 text-slate-700 dark:text-slate-300"
                       >
                         Company Website
@@ -1319,16 +892,16 @@ export default function CRM() {
                       <Input
                         id="companyWebsite"
                         type="url"
-                        value={customerFormData.jobRole}
+                        value={customerFormData.website}
                         onChange={(e) =>
-                          updateCustomerFormData("jobRole", e.target.value)
+                          updateCustomerFormData("website", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.jobRole ? "border-red-500" : ""
+                          errors.website ? "border-red-500" : ""
                         }`}
                         placeholder="https://yourcompany.com"
                       />
-                      <ErrorMessage error={errors.jobRole} />
+                      <ErrorMessage error={errors.website} />
                     </div>
                     <div>
                       <Label
@@ -1604,7 +1177,7 @@ export default function CRM() {
                             <SelectItem value="other">Other</SelectItem>
                           </SelectContent>
                         </Select>
-                        <ErrorMessage error={errors.job} />
+                        <ErrorMessage error={errors.industry} />
                       </div>
                       <div>
                         <Label
@@ -1689,20 +1262,20 @@ export default function CRM() {
                             <SelectValue placeholder="Select Lead Status" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="new">New</SelectItem>
-                            <SelectItem value="in-progress">
+                            <SelectItem value="New">New</SelectItem>
+                            <SelectItem value="In progress">
                               In progress
                             </SelectItem>
-                            <SelectItem value="contact attempted">
-                              Contact attempted
+                            <SelectItem value="Contact Attempted">
+                              Contact Attempted
                             </SelectItem>
-                            <SelectItem value="contacted">Contacted</SelectItem>
-                            <SelectItem value="qualified">Qualified</SelectItem>
-                            <SelectItem value="unqualified">
+                            <SelectItem value="Contacted">Contacted</SelectItem>
+                            <SelectItem value="Qualified">Qualified</SelectItem>
+                            <SelectItem value="Unqualified">
                               Unqualified
                             </SelectItem>
-                            <SelectItem value="meeting booked">
-                              Meeting booked
+                            <SelectItem value="Meeting Booked">
+                              Meeting Booked
                             </SelectItem>
                           </SelectContent>
                         </Select>
@@ -1946,24 +1519,24 @@ export default function CRM() {
                             <SelectValue placeholder="Select Deal Status" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="new">New</SelectItem>
-                            <SelectItem value="proposal_sent">
+                            <SelectItem value="New">New</SelectItem>
+                            <SelectItem value="Proposal Sent">
                               Proposal Sent
                             </SelectItem>
-                            <SelectItem value="negotiation">
+                            <SelectItem value="Negotiation">
                               Negotiation
                             </SelectItem>
-                            <SelectItem value="contract_sent">
+                            <SelectItem value="Contract Sent">
                               Contract Sent
                             </SelectItem>
-                            <SelectItem value="closed_won">
+                            <SelectItem value="Closed-won">
                               Closed - Won
                             </SelectItem>
-                            <SelectItem value="closed_lost">
+                            <SelectItem value="Closed-lost">
                               Closed - Lost
                             </SelectItem>
-                            <SelectItem value="on_hold">On Hold</SelectItem>
-                            <SelectItem value="abandoned">Abandoned</SelectItem>
+                            <SelectItem value="On-hold">On Hold</SelectItem>
+                            <SelectItem value="Abandoned">Abandoned</SelectItem>
                           </SelectContent>
                         </Select>
                         <ErrorMessage error={errors.dealStatus} />

@@ -435,18 +435,18 @@ export default function OnBoardingFormComponent({ session }) {
                         <SelectValue placeholder="Select your role" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="ceo">CEO</SelectItem>
-                        <SelectItem value="cmo">CMO</SelectItem>
-                        <SelectItem value="sales-manager">
+                        <SelectItem value="CEO">CEO</SelectItem>
+                        <SelectItem value="CMO">CMO</SelectItem>
+                        <SelectItem value="Sales Manager">
                           Sales Manager
                         </SelectItem>
-                        <SelectItem value="marketing-manager">
+                        <SelectItem value="Marketing Manager">
                           Marketing Manager
                         </SelectItem>
-                        <SelectItem value="sales-rep">
+                        <SelectItem value="Sales Representative">
                           Sales Representative
                         </SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
                       </SelectContent>
                     </Select>
                     <ErrorMessage error={errors.role} />
@@ -559,15 +559,15 @@ export default function OnBoardingFormComponent({ session }) {
                           <SelectValue placeholder="Select industry" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="technology">Technology</SelectItem>
-                          <SelectItem value="healthcare">Healthcare</SelectItem>
-                          <SelectItem value="finance">Finance</SelectItem>
-                          <SelectItem value="retail">Retail</SelectItem>
-                          <SelectItem value="manufacturing">
+                          <SelectItem value="Technology">Technology</SelectItem>
+                          <SelectItem value="Healthcare">Healthcare</SelectItem>
+                          <SelectItem value="Finance">Finance</SelectItem>
+                          <SelectItem value="Retail">Retail</SelectItem>
+                          <SelectItem value="Manufacturing">
                             Manufacturing
                           </SelectItem>
-                          <SelectItem value="education">Education</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
+                          <SelectItem value="Education">Education</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
                         </SelectContent>
                       </Select>
                       <ErrorMessage error={errors.industry} />
