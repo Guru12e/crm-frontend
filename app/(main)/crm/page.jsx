@@ -1725,22 +1725,38 @@ export default function CRM() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <SummaryCard
           title="On-boarded Customers"
-          total={summaryStats.customers.total}
-          subtitle={`${summaryStats.customers.new} new this month`}
+          total={customersData.length}
+          subtitle={
+            customersData.filter((cust) => {
+              const createdAt = new Date(cust.created_at);
+              const now = new Date();
+              return (
+                createdAt.getMonth() === now.getMonth() &&
+                createdAt.getFullYear() === now.getFullYear()
+              );
+            }).length
+          }
           growth={summaryStats.customers.growth}
           icon={Users}
         />
         <SummaryCard
           title="Active Leads"
-          total={summaryStats.leads.total}
-          subtitle={`${summaryStats.leads.qualified} qualified`}
+          total={leadsData.length}
+          subtitle={
+            leadsData.filter((lead) => lead.status === "Qualified").length
+          }
           growth={summaryStats.leads.growth}
           icon={TrendingUp}
         />
         <SummaryCard
           title="Active Deals"
-          total={`$${(summaryStats.deals.value / 1000000).toFixed(1)}M`}
-          subtitle={`${summaryStats.deals.total} deals • ${summaryStats.deals.won} won`}
+          total={dealsData.reduce(
+            (sum, deal) => sum + Number(deal.value || 0),
+            0
+          )}
+          subtitle={`${dealsData.length} deals • ${
+            dealsData.filter((deal) => deal.status === "Closed - Won").length
+          } won`}
           growth={summaryStats.deals.growth}
           icon={DollarSign}
         />
