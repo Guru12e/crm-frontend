@@ -57,7 +57,7 @@ const summaryStats = {
   leads: { total: 2456, qualified: 567, growth: 18 },
   deals: { total: 189, won: 67, growth: 15, value: 2340000 },
 };
-
+const customerStatus = ["Active", "Inactive", "At Risk"];
 const leadStatus = [
   "New",
   "In progress",
@@ -111,7 +111,7 @@ export default function CRM() {
     sessionStorage.getItem("activeTab") || "Customers"
   );
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All statuses");
   const [sourceFilter, setSourceFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
   const today = new Date();
@@ -1805,9 +1805,31 @@ export default function CRM() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All statuses">All statuses</SelectItem>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Inactive">Inactive</SelectItem>
-                  <SelectItem value="At Risk">At Risk</SelectItem>
+                  {activeTab === "Customers" ? (
+                    <>
+                      {customerStatus.map((state, index) => (
+                        <SelectItem key={index} value={state}>
+                          {state}
+                        </SelectItem>
+                      ))}
+                    </>
+                  ) : activeTab === "Leads" ? (
+                    <>
+                      {leadStatus.map((state, index) => (
+                        <SelectItem key={index} value={state}>
+                          {state}
+                        </SelectItem>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      {dealStatus.map((state, index) => (
+                        <SelectItem key={index} value={state}>
+                          {state}
+                        </SelectItem>
+                      ))}
+                    </>
+                  )}
                 </SelectContent>
               </Select>
               <Select value={sourceFilter} onValueChange={setSourceFilter}>
@@ -1833,80 +1855,89 @@ export default function CRM() {
                   <SelectItem value="2024-10">October 2024</SelectItem>
                 </SelectContent>
               </Select>
-              <Button
-                variant="outline"
-                className="bg-white/50 dark:bg-slate-800/50 border-white/20 w-full lg:w-auto"
-              >
-                <Filter className="w-4 h-4 mr-2" />
-                Advanced
-              </Button>
             </div>
           </CardContent>
         </Card>
 
         <TabsContent value="Customers" className="space-y-6">
           <div className="grid grid-cols-1 gap-6">
-            {customersData.map((customer) => (
-              <CustomerCard key={customer.id} customer={customer} />
-            ))}
+            {customersData
+              .filter(
+                (customer) =>
+                  statusFilter === "All statuses" ||
+                  customer.status === statusFilter
+              )
+              .map((customer) => (
+                <CustomerCard key={customer.id} customer={customer} />
+              ))}
           </div>
         </TabsContent>
 
         <TabsContent value="Leads" className="space-y-6">
           <div className="overflow-y-hidden">
-            {leadStatus.map((leadState) => (
-              <Card
-                key={leadState}
-                className="mt-4 h-[35vh] relative overflow-hidden"
-              >
-                <CardContent className="flex h-full p-0">
-                  {/* Sticky Left Label */}
-                  <div className="w-[15%] bg-gray-300 dark:bg-slate-800 flex items-center justify-center text-2xl font-bold text-slate-800 dark:text-white absolute text-center left-0 top-0 bottom-0 z-10">
-                    {leadState}
-                  </div>
-
-                  {/* Scrollable Right Content */}
-                  <div className="ml-[15%] w-[85%] overflow-y-scroll p-4">
-                    <div className="grid grid-cols-2 gap-6 min-w-fit">
-                      {leads
-                        .filter((lead) => lead.status === leadState)
-                        .map((l) => (
-                          <LeadCard key={l.id} lead={l} />
-                        ))}
+            {leadStatus
+              .filter(
+                (leadState) =>
+                  statusFilter === "All statuses" || leadState === statusFilter
+              )
+              .map((leadState) => (
+                <Card
+                  key={leadState}
+                  className="mt-4 h-[35vh] relative overflow-hidden"
+                >
+                  <CardContent className="flex h-full p-0">
+                    {/* Sticky Left Label */}
+                    <div className="w-[15%] bg-gray-300 dark:bg-slate-800 flex items-center justify-center text-2xl font-bold text-slate-800 dark:text-white absolute text-center left-0 top-0 bottom-0 z-10">
+                      {leadState}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+
+                    {/* Scrollable Right Content */}
+                    <div className="ml-[15%] w-[85%] overflow-y-scroll p-4">
+                      <div className="grid grid-cols-2 gap-6 min-w-fit">
+                        {leads
+                          .filter((lead) => lead.status === leadState)
+                          .map((l) => (
+                            <LeadCard key={l.id} lead={l} />
+                          ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
           </div>
         </TabsContent>
 
         <TabsContent value="Deals" className="space-y-6">
           <div className="overflow-y-hidden">
-            {dealStatus.map((dealState) => (
-              <Card
-                key={dealState}
-                className="mt-4 h-[35vh] relative overflow-hidden"
-              >
-                <CardContent className="flex h-full p-0">
-                  {/* Sticky Left Label */}
-                  <div className="w-[15%] bg-gray-300 dark:bg-slate-800 flex items-center justify-center text-2xl font-bold text-slate-800 dark:text-white absolute text-center left-0 top-0 bottom-0 z-10">
-                    {dealState}
-                  </div>
-
-                  {/* Scrollable Right Content */}
-                  <div className="ml-[15%] w-[85%] overflow-y-scroll ">
-                    <div className="grid grid-cols-2 gap-6 min-w-fit">
-                      {deals
-                        .filter((deal) => deal.status === dealState)
-                        .map((deal) => (
-                          <DealCard key={deal.id} deal={deal} />
-                        ))}
+            {dealStatus
+              .filter(
+                (dealState) =>
+                  statusFilter === "All statuses" || dealState === statusFilter
+              )
+              .map((dealState) => (
+                <Card
+                  key={dealState}
+                  className="mt-4 h-[35vh] relative overflow-hidden"
+                >
+                  <CardContent className="flex h-full p-0">
+                    {/* Sticky Left Label */}
+                    <div className="w-[15%] bg-gray-300 dark:bg-slate-800 flex items-center justify-center text-2xl font-bold text-slate-800 dark:text-white absolute text-center left-0 top-0 bottom-0 z-10">
+                      {dealState}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+
+                    {/* Scrollable Right Content */}
+                    <div className="ml-[15%] w-[85%] overflow-y-scroll ">
+                      <div className="grid grid-cols-2 gap-6 min-w-fit">
+                        {deals
+                          .filter((deal) => deal.status === dealState)
+                          .map((deal) => (
+                            <DealCard key={deal.id} deal={deal} />
+                          ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
           </div>
         </TabsContent>
       </Tabs>
