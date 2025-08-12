@@ -51,12 +51,14 @@ import {
   DropdownMenuContent,
 } from "@radix-ui/react-dropdown-menu";
 import { supabase } from "@/utils/supabase/client";
+import { Elsie } from "next/font/google";
 
 const summaryStats = {
   customers: { total: 1247, new: 89, growth: 12 },
   leads: { total: 2456, qualified: 567, growth: 18 },
   deals: { total: 189, won: 67, growth: 15, value: 2340000 },
 };
+
 const customerStatus = ["Active", "Inactive", "At Risk"];
 const leadStatus = [
   "New",
@@ -76,7 +78,6 @@ const dealStatus = [
   "On-hold",
   "Abandoned",
 ];
-
 const rawSession = localStorage.getItem("session");
 console.log(rawSession);
 const session = JSON.parse(rawSession);
@@ -748,6 +749,20 @@ export default function CRM() {
       </CardContent>
     </Card>
   );
+  const sum = dealsData.reduce((sum, deal) => sum + Number(deal.value || 0), 0);
+  const formatNumber = (num) => {
+    if (num >= 1_000_000_000_000) {
+      return (num / 1_000_000_000_000).toFixed(2) + "T";
+    } else if (num >= 1_000_000_000) {
+      return (num / 1_000_000_000).toFixed(2) + "B";
+    } else if (num >= 1_000_000) {
+      return (num / 1_000_000).toFixed(2) + "M";
+    } else if (num >= 1_000) {
+      return (num / 1_000).toFixed(2) + "K";
+    } else {
+      return num.toString();
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -1726,7 +1741,7 @@ export default function CRM() {
         <SummaryCard
           title="On-boarded Customers"
           total={customersData.length}
-          subtitle={
+          subtitle={`${
             customersData.filter((cust) => {
               const createdAt = new Date(cust.created_at);
               const now = new Date();
@@ -1735,25 +1750,23 @@ export default function CRM() {
                 createdAt.getFullYear() === now.getFullYear()
               );
             }).length
-          }
+          } new this month`}
           growth={summaryStats.customers.growth}
           icon={Users}
         />
         <SummaryCard
           title="Active Leads"
           total={leadsData.length}
-          subtitle={
+          subtitle={`${
             leadsData.filter((lead) => lead.status === "Qualified").length
-          }
+          } qualified`}
           growth={summaryStats.leads.growth}
           icon={TrendingUp}
         />
+
         <SummaryCard
           title="Active Deals"
-          total={dealsData.reduce(
-            (sum, deal) => sum + Number(deal.value || 0),
-            0
-          )}
+          total={formatNumber(sum)}
           subtitle={`${dealsData.length} deals • ${
             dealsData.filter((deal) => deal.status === "Closed - Won").length
           } won`}
