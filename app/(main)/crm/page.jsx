@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRef } from "react";
+import Papa from "papaparse";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -421,6 +423,32 @@ export default function CRM() {
       setDealsLoading(false);
     }
   };
+
+  const fileInputRef = useRef();
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        console.log("Parsed CSV Data:", results.data);
+
+        const { data, error } = await supabase
+          .from(activeTab)
+          .insert(results.data);
+
+        if (error) {
+          console.error("Error inserting data:", error);
+        } else {
+          console.log("Data inserted successfully:", data);
+        }
+      },
+    });
+  };
+
   const SummaryCard = ({ title, total, subtitle, growth, icon: Icon }) => (
     <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
       <CardContent className="p-6">
@@ -766,7 +794,7 @@ export default function CRM() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:justify-left sm:items-center">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
             CRM Dashboard
@@ -776,9 +804,27 @@ export default function CRM() {
           </p>
         </div>
 
+        <div className="ml-auto">
+          <button
+            className="bg-gradient-to-r px-3 py-2 rounded-xl from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white w-full sm:w-auto"
+            onClick={() => fileInputRef.current.click()}
+          >
+            Upload {activeTab} CSV
+          </button>
+
+          {/* Hidden file input */}
+          <input
+            type="file"
+            accept=".csv"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+        </div>
+
         <Sheet>
           <SheetTrigger>
-            <div className="bg-gradient-to-r px-3 py-2 rounded-xl from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white w-full sm:w-auto">
+            <div className="bg-gradient-to-r px-3 py-2 rounded-xl from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white w-full sm:w-auto ml-5">
               Add New {activeTab}
             </div>
           </SheetTrigger>
