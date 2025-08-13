@@ -5,40 +5,47 @@ import { supabase } from "@/utils/supabase/client";
 
 export default function OurProspects() {
   const [result, setResult] = useState("");
-  const [companyData, setCompanyData] = useState(null);
+  const [companyData, setCompanyData] = useState({});
+  const rawSession = localStorage.getItem("session");
+  const session = JSON.parse(rawSession);
+  const userEmail = session.user.email;
+  console.log("userEmail:", userEmail);
 
   useEffect(() => {
     const fetchData = async () => {
-      const rawSession = localStorage.getItem("session");
       if (!rawSession) return;
 
-      const session = JSON.parse(rawSession);
-      const userEmail = session?.user?.email;
       if (!userEmail) return;
 
       const { data, error } = await supabase
         .from("Users")
         .select("*")
-        .eq("email", userEmail)
-        .single();
+        .eq("email", userEmail);
 
       if (error) {
         console.error(error);
       } else {
-        setCompanyData(data);
+        console.log("In else");
+        setCompanyData(data[0]);
       }
     };
 
     fetchData();
   }, []);
+  console.log("Company data set:", companyData);
 
   const handleClick = async () => {
-    if (!companyData?.companyDescription) return;
+    console.log("In click");
+    console.log("Inclick:", companyData);
+    if (!companyData.companyDescription) return;
 
-    const res = await fetch("/api/page", {
+    const res = await fetch("/api/ICP", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ description: companyData.companyDescription }),
+      body: JSON.stringify({
+        user_email: userEmail,
+        description: companyData.companyDescription,
+      }),
     });
 
     if (res.ok) {
