@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRef } from "react";
+import Papa from "papaparse";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -421,6 +423,36 @@ export default function CRM() {
       setDealsLoading(false);
     }
   };
+
+  const fileInputRef = useRef();
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        console.log("Parsed CSV Data:", results.data);
+        results.data.forEach((item) => {
+          item.user_email = userEmail;
+          item.created_at = today;
+        });
+
+        const { data, error } = await supabase
+          .from(activeTab)
+          .insert(results.data);
+        window.location.reload(); // refresh once right now
+        if (error) {
+          console.error("Error inserting data:", error);
+        } else {
+          console.log("Data inserted successfully:", data);
+        }
+      },
+    });
+  };
+
   const SummaryCard = ({ title, total, subtitle, growth, icon: Icon }) => (
     <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
       <CardContent className="p-6">
@@ -766,7 +798,7 @@ export default function CRM() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:justify-left sm:items-center">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
             CRM Dashboard
@@ -776,9 +808,332 @@ export default function CRM() {
           </p>
         </div>
 
+        <div className="flex sm:flex-col py-5 md:py-0 md:flex-row md:ml-auto">
+          <Sheet>
+            <SheetTrigger asChild>
+              <button className="bg-gradient-to-r px-3 py-2 rounded-xl from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white w-full md:ml-5">
+                Upload {activeTab} CSV
+              </button>
+            </SheetTrigger>
+            <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh]">
+              <SheetHeader>
+                <SheetTitle>Upload {activeTab} CSV</SheetTitle>
+                <SheetDescription>
+                  <>
+                    <div
+                      className={`${
+                        activeTab == "Customers" ? "grid" : "hidden"
+                      } p-3 grid-cols-1 md:grid-cols-2 gap-4`}
+                    >
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2">
+                          📄 CSV Format Requirements
+                        </h3>
+                        <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                          <li>
+                            Required Columns:
+                            <ul className="list-disc pl-5 mt-1 space-y-1">
+                              <li>
+                                <b>name</b>
+                              </li>
+                              <li>
+                                <b>number</b>
+                              </li>
+                              <li>
+                                <b>email</b>
+                              </li>
+                              <li>
+                                <b>status</b>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                            Optional Columns:
+                            <ul className="list-disc pl-5 mt-1 space-y-1">
+                              <li>address</li>
+                              <li>website</li>
+                              <li>industry</li>
+                              <li>linkedIn</li>
+                              <li>price</li>
+                              <li>issues</li>
+                            </ul>
+                          </li>
+                        </ul>
+
+                        {/* Tip Box */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mt-4 text-sm text-blue-700">
+                          💡 <span className="font-semibold">Tip:</span>{" "}
+                          Download our template to ensure your CSV is properly
+                          formatted for import.
+                        </div>
+                      </div>
+
+                      {/* Download Template */}
+                      <div className="gap-4 md:space-y-6">
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2">
+                            📥 Download Template
+                          </h3>
+                          <Button
+                            variant="outline"
+                            onClick={() =>
+                              window.open("/templates/customer_template.csv")
+                            }
+                          >
+                            Download Sample CSV
+                          </Button>
+                        </div>
+
+                        {/* Select CSV File */}
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2">
+                            📂 Select CSV File
+                          </h3>
+                          <Button
+                            onClick={() => fileInputRef.current.click()}
+                            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                          >
+                            Choose File
+                          </Button>
+                          <input
+                            type="file"
+                            accept=".csv"
+                            ref={fileInputRef}
+                            onChange={handleFileUpload}
+                            className="hidden"
+                          />
+                        </div>
+
+                        {/* Pro Tips */}
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2">
+                            💡 Pro Tips
+                          </h3>
+                          <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                            <li>Double-check for typos before uploading.</li>
+                            <li>
+                              Keep file size under 5MB for faster uploads.
+                            </li>
+                            <li>
+                              Ensure phone numbers are in international format.
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className={`${
+                        activeTab == "Leads" ? "grid" : "hidden"
+                      } p-3 grid-cols-1 md:grid-cols-2 gap-4`}
+                    >
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2">
+                          📄 CSV Format Requirements
+                        </h3>
+                        <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                          <li>
+                            Required Columns:
+                            <ul className="list-disc pl-5 mt-1 space-y-1">
+                              <li>
+                                <b>name</b>
+                              </li>
+                              <li>
+                                <b>number</b>
+                              </li>
+                              <li>
+                                <b>status</b>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                            Optional Columns:
+                            <ul className="list-disc pl-5 mt-1 space-y-1">
+                              <li>email</li>
+                              <li>age</li>
+                              <li>industry</li>
+                              <li>company</li>
+                              <li>income</li>
+                              <li>address</li>
+                              <li>linkedIn</li>
+                              <li>description</li>
+                              <li>website</li>
+                              <li>source</li>
+                            </ul>
+                          </li>
+                        </ul>
+
+                        {/* Tip Box */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mt-4 text-sm text-blue-700">
+                          💡 <span className="font-semibold">Tip:</span>{" "}
+                          Download our template to ensure your CSV is properly
+                          formatted for import.
+                        </div>
+                      </div>
+
+                      {/* Download Template */}
+                      <div className="gap-4 md:space-y-6">
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2">
+                            📥 Download Template
+                          </h3>
+                          <Button
+                            variant="outline"
+                            onClick={() =>
+                              window.open("/templates/customer_template.csv")
+                            }
+                          >
+                            Download Sample CSV
+                          </Button>
+                        </div>
+
+                        {/* Select CSV File */}
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2">
+                            📂 Select CSV File
+                          </h3>
+                          <Button
+                            onClick={() => fileInputRef.current.click()}
+                            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                          >
+                            Choose File
+                          </Button>
+                          <input
+                            type="file"
+                            accept=".csv"
+                            ref={fileInputRef}
+                            onChange={handleFileUpload}
+                            className="hidden"
+                          />
+                        </div>
+
+                        {/* Pro Tips */}
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2">
+                            💡 Pro Tips
+                          </h3>
+                          <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                            <li>Double-check for typos before uploading.</li>
+                            <li>
+                              Keep file size under 5MB for faster uploads.
+                            </li>
+                            <li>
+                              Ensure phone numbers are in international format.
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className={`${
+                        activeTab == "Deals" ? "grid" : "hidden"
+                      } p-3 grid-cols-1 md:grid-cols-2 gap-4`}
+                    >
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2">
+                          📄 CSV Format Requirements
+                        </h3>
+                        <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                          <li>
+                            Required Columns:
+                            <ul className="list-disc pl-5 mt-1 space-y-1">
+                              <li>
+                                <b>name</b>
+                              </li>
+                              <li>
+                                <b>number</b>
+                              </li>
+                              <li>
+                                <b>email</b>
+                              </li>
+                              <li>
+                                <b>status</b>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                            Optional Columns:
+                            <ul className="list-disc pl-5 mt-1 space-y-1">
+                              <li>address</li>
+                              <li>website</li>
+                              <li>industry</li>
+                              <li>linkedIn</li>
+                              <li>price</li>
+                              <li>issues</li>
+                            </ul>
+                          </li>
+                        </ul>
+
+                        {/* Tip Box */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mt-4 text-sm text-blue-700">
+                          💡 <span className="font-semibold">Tip:</span>{" "}
+                          Download our template to ensure your CSV is properly
+                          formatted for import.
+                        </div>
+                      </div>
+
+                      {/* Download Template */}
+                      <div className="gap-4 md:space-y-6">
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2">
+                            📥 Download Template
+                          </h3>
+                          <Button
+                            variant="outline"
+                            onClick={() =>
+                              window.open("/templates/customer_template.csv")
+                            }
+                          >
+                            Download Sample CSV
+                          </Button>
+                        </div>
+
+                        {/* Select CSV File */}
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2">
+                            📂 Select CSV File
+                          </h3>
+                          <Button
+                            onClick={() => fileInputRef.current.click()}
+                            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                          >
+                            Choose File
+                          </Button>
+                          <input
+                            type="file"
+                            accept=".csv"
+                            ref={fileInputRef}
+                            onChange={handleFileUpload}
+                            className="hidden"
+                          />
+                        </div>
+
+                        {/* Pro Tips */}
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2">
+                            💡 Pro Tips
+                          </h3>
+                          <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                            <li>Double-check for typos before uploading.</li>
+                            <li>
+                              Keep file size under 5MB for faster uploads.
+                            </li>
+                            <li>
+                              Ensure phone numbers are in international format.
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                </SheetDescription>
+              </SheetHeader>
+            </SheetContent>
+          </Sheet>
+        </div>
+
         <Sheet>
           <SheetTrigger>
-            <div className="bg-gradient-to-r px-3 py-2 rounded-xl from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white w-full sm:w-auto">
+            <div className="bg-gradient-to-r px-3 py-2 rounded-xl from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white w-full md:ml-5">
               Add New {activeTab}
             </div>
           </SheetTrigger>
