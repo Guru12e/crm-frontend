@@ -979,7 +979,7 @@ export default function CRM() {
                           <Button
                             variant="outline"
                             onClick={() =>
-                              window.open("/templates/customer_template.csv")
+                              window.open("/templates/leads_template.csv")
                             }
                           >
                             Download Sample CSV
@@ -1040,6 +1040,9 @@ export default function CRM() {
                                 <b>name</b>
                               </li>
                               <li>
+                                <b>title</b>
+                              </li>
+                              <li>
                                 <b>number</b>
                               </li>
                               <li>
@@ -1048,17 +1051,18 @@ export default function CRM() {
                               <li>
                                 <b>status</b>
                               </li>
+                              <li>
+                                <b>value</b>
+                              </li>
                             </ul>
                           </li>
                           <li>
                             Optional Columns:
                             <ul className="list-disc pl-5 mt-1 space-y-1">
-                              <li>address</li>
-                              <li>website</li>
-                              <li>industry</li>
-                              <li>linkedIn</li>
-                              <li>price</li>
-                              <li>issues</li>
+                              <li>owner</li>
+                              <li>source</li>
+                              <li>priority</li>
+                              <li>closeDate</li>
                             </ul>
                           </li>
                         </ul>
@@ -1080,7 +1084,7 @@ export default function CRM() {
                           <Button
                             variant="outline"
                             onClick={() =>
-                              window.open("/templates/customer_template.csv")
+                              window.open("/templates/deals_template.csv")
                             }
                           >
                             Download Sample CSV
