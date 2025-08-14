@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase/client";
+import UpdateCompanyDetails from "@/components/UpdateCompanyDetails";
 
 export default function OurProspects() {
   const [result, setResult] = useState("");
@@ -37,14 +38,14 @@ export default function OurProspects() {
   const handleClick = async () => {
     console.log("In click");
     console.log("Inclick:", companyData);
-    if (!companyData.companyDescription) return;
+    if (!companyData) return;
 
     const res = await fetch("/api/ICP", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         user_email: userEmail,
-        description: companyData.companyDescription,
+        description: companyData,
       }),
     });
 
@@ -57,15 +58,9 @@ export default function OurProspects() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <h1 className="text-2xl font-bold">ICP Page</h1>
-      <pre>{result}</pre>
-      <button
-        onClick={handleClick}
-        className="px-4 py-2 bg-blue-500 text-white gap-4 rounded-xl"
-      >
-        Click Me
-      </button>
+      <UpdateCompanyDetails />
     </div>
   );
 }
