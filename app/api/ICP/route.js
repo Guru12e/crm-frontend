@@ -14,6 +14,7 @@ export async function POST(request) {
 
   if (!user_1) {
     try {
+      console.log(formData.description);
       const response = await fetch("http://127.0.0.1:5000/chat", {
         method: "POST",
         headers: {
