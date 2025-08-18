@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useRef } from "react";
+import { Link } from "next/link";
 import Papa from "papaparse";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import Updateleads from "@/components/Updateleads";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -130,6 +132,7 @@ export default function CRM() {
     status: "",
     created_at: today,
   });
+  const [showUpdateLeads, setShowUpdateLeads] = useState(false);
   const [leadsFormData, setLeadsFormData] = useState({
     name: "", //req
     email: "",
@@ -584,9 +587,21 @@ export default function CRM() {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white break-words">
-                {lead.name}
-              </h3>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white break-words bg-transparent hover:bg-transparent cursor-pointer hover:text-blue-500 ">
+                    {lead.name}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh]">
+                  <SheetHeader>
+                    <SheetTitle>Lead Data</SheetTitle>
+                    <SheetDescription>
+                      <Updateleads lead_id={lead.id} />
+                    </SheetDescription>
+                  </SheetHeader>
+                </SheetContent>
+              </Sheet>
               <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 break-words">
                 {lead.contact}
               </p>
@@ -675,67 +690,6 @@ export default function CRM() {
                   ))}
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
-          <div className="flex space-x-2 justify-center sm:justify-end">
-            <div className="flex sm:flex-col py-5 md:py-0 md:flex-row md:ml-auto">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button size="sm" variant="ghost" className="p-2">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </SheetTrigger>
-
-                <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh]">
-                  <SheetHeader>
-                    <SheetTitle>Lead Data</SheetTitle>
-                    <SheetDescription>
-                      <div className="p-3 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {[
-                          { label: "Name", value: lead.name },
-                          {
-                            label: "Created At",
-                            value: lead.created_at?.split("T")[0],
-                          },
-                          { label: "Email", value: lead.email },
-                          { label: "Number", value: lead.number },
-                          { label: "Age", value: lead.age },
-                          {
-                            label: "LinkedIn Profile",
-                            value: lead.linkedIn,
-                          },
-                          { label: "Industry", value: lead.industry },
-                          { label: "Company", value: lead.company },
-                          { label: "Income", value: lead.income },
-                          { label: "Address", value: lead.address },
-                          {
-                            label: "Website",
-                            value: lead.website,
-                          },
-                          { label: "Lead Status", value: lead.status },
-                          { label: "Lead Source", value: lead.source },
-                          { label: "Description", value: lead.description },
-                        ].map((item, index) => (
-                          <div
-                            key={index}
-                            className="p-4 rounded-lg border border-gray-200 shadow-sm bg-white"
-                          >
-                            <p className="text-sm font-medium text-gray-500">
-                              {item.label}
-                            </p>
-                            <p className="mt-1 text-base font-semibold text-gray-800">
-                              {item.value || "-"}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </SheetDescription>
-                  </SheetHeader>
-                </SheetContent>
-              </Sheet>
-            </div>
-            <Button size="sm" variant="ghost" className="p-2">
-              <Edit className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </CardContent>
