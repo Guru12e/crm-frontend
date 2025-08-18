@@ -32,10 +32,7 @@ const navigation = [
     name: "Prospects",
     href: "/prospects",
     icon: Users,
-    subpages: [
-      { name: "Our Prospects", href: "/prospects/our-prospects" },
-      { name: "Upload Your CSV", href: "/prospects/upload-csv" },
-    ],
+    subpages: [{ name: "Our Prospects", href: "/prospects/our-prospects" }],
   },
   { name: "Engagement", href: "/engagement", icon: MessageSquare },
   { name: "CRM", href: "/crm", icon: Database },
@@ -44,7 +41,6 @@ const navigation = [
   { name: "Calendar", href: "/calendar", icon: Calendar },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
 ];
-
 export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -324,8 +320,10 @@ export default function Layout({ children }) {
                 size="sm"
                 className="hidden sm:flex items-center space-x-2 hover:bg-white/30 dark:hover:bg-slate-800/50 whitespace-nowrap"
               >
-                <HelpCircle className="h-4 w-4" />
-                <span className="hidden md:inline">Contact Us</span>
+                <HelpCircle className="h-4 w-4 cursor-pointer" />
+                <span className="hidden md:inline cursor-pointer">
+                  Contact Us
+                </span>
               </Button>
               <Button
                 variant="ghost"
@@ -338,7 +336,7 @@ export default function Layout({ children }) {
                 variant="ghost"
                 size="sm"
                 onClick={toggleTheme}
-                className="p-2 hover:bg-white/30 dark:hover:bg-slate-800/50"
+                className="p-2 hover:bg-white/30 dark:hover:bg-slate-800/50 cursor-pointer"
               >
                 {darkMode ? (
                   <Sun className="h-5 w-5" />
@@ -346,7 +344,7 @@ export default function Layout({ children }) {
                   <Moon className="h-5 w-5" />
                 )}
               </Button>
-              <UserButton />
+              <UserButton className="cursor-pointer" />
             </div>
           </div>
         </div>

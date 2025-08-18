@@ -69,7 +69,10 @@ export default function UserButton() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/company-details" className="w-full cursor-pointer">
+          <Link
+            href="/prospects/our-prospects"
+            className="w-full cursor-pointer"
+          >
             <Settings className="mr-2 h-4 w-4" />
             <span>Company Details</span>
           </Link>

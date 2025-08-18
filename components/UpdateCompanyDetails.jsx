@@ -9,7 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ToastContainer, toast } from "react-toastify";
+import isEqual from "lodash/isEqual";
 import "react-toastify/dist/ReactToastify.css";
+import { fetchData } from "next-auth/client/_utils";
 const ErrorMessage = ({ error }) => {
   if (!error) return null;
   return (
@@ -33,35 +35,38 @@ export default function CompanyProfile() {
   });
   const [errors, setErrors] = useState({ newProduct: {} });
   const [userEmail, setUserEmail] = useState(null);
-
   useEffect(() => {
     try {
       const rawSession = localStorage.getItem("session");
       if (rawSession) {
         const session = JSON.parse(rawSession);
-        setUserEmail(session?.user?.email);
+        setUserEmail(session?.user?.email || null);
       }
     } catch (error) {
       console.error("Failed to parse session from localStorage:", error);
     }
   }, []);
 
+  // ✅ Fetch data only when email exists
   useEffect(() => {
     if (!userEmail) return;
 
     const cachedData = localStorage.getItem("companyDataCache");
-
     if (cachedData) {
       try {
         const parsed = JSON.parse(cachedData);
         setCompanyData(parsed);
         setProducts(Array.isArray(parsed.products) ? parsed.products : []);
+        console.log("Loaded from cache:", parsed);
       } catch (error) {
         console.error("Failed to parse cached data:", error);
         localStorage.removeItem("companyDataCache");
       }
-    } else {
-      const fetchData = async () => {
+      return;
+    }
+
+    const fetchData = async () => {
+      try {
         const { data, error } = await supabase
           .from("Users")
           .select(
@@ -70,52 +75,74 @@ export default function CompanyProfile() {
           .eq("email", userEmail)
           .single();
 
+        if (error) throw error;
+
         const { data: icpData, error: icpError } = await supabase
           .from("ICP")
           .select("*")
           .eq("user_email", userEmail)
           .single();
-        if (error) {
-          console.error("Error fetching data:", error);
-        } else if (data) {
-          setCompanyData(data);
-          try {
-            const parsedProducts =
-              typeof data.products === "string"
-                ? JSON.parse(data.products || "[]")
-                : data.products || [];
-            setProducts(Array.isArray(parsedProducts) ? parsedProducts : []);
-          } catch (err) {
-            console.error("Error parsing products:", err);
-            setProducts([]);
-          }
-          if (icpData) {
-            setIcpData(icpData);
-          } else if (icpError) {
-            console.error("Error fetching ICP data:", icpError);
-          }
-          if (!icpData) {
-            console.warn("No ICP data found");
-            const res = await fetch("/api/ICP", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                user_email: userEmail,
-                description: companyData,
-              }),
-            });
 
-            if (res.ok) {
-              const data = await res.json();
-              console.log(data);
-              setResult(data.output);
-            }
-          }
-        }
-      };
-      fetchData();
-    }
+        setCompanyData(data);
+        setProducts(
+          typeof data.products === "string"
+            ? JSON.parse(data.products || "[]")
+            : data.products || []
+        );
+        if (icpData) setIcpData(icpData);
+
+        console.log("Fetched company data:", data);
+        if (icpData) console.log("Fetched ICP data:", icpData);
+        if (icpError) console.error("Error fetching ICP data:", icpError);
+      } catch (err) {
+        console.error("Error fetching data from Supabase:", err);
+      }
+    };
+
+    fetchData();
   }, [userEmail]);
+
+  // ✅ Log whenever state changes (no stale logs!)
+  useEffect(() => {
+    if (companyData && Object.keys(companyData).length > 0) {
+      console.log("Company data updated:", companyData);
+    }
+  }, [companyData]);
+
+  useEffect(() => {
+    if (icpData && Object.keys(icpData).length > 0) {
+      console.log("ICP data updated:", icpData);
+    }
+  }, [icpData]);
+
+  // ✅ Call ICP API only when both email & companyData are ready
+  useEffect(() => {
+    const createICPEntry = async () => {
+      console.log("Creating ICP entry with:", { userEmail, companyData });
+
+      const res = await fetch("/api/ICP", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_email: userEmail,
+          description: companyData,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        console.log("ICP response:", data);
+        setResult(data.output);
+      } else {
+        console.error("Error creating ICP entry:", res.statusText);
+      }
+    };
+
+    if (userEmail && companyData?.companyName && !icpData) {
+      createICPEntry();
+      window.location.reload();
+    }
+  }, [userEmail, companyData]);
 
   const handleCompanyChange = (field, value) => {
     setCompanyData((prev) => ({ ...prev, [field]: value }));
@@ -125,6 +152,7 @@ export default function CompanyProfile() {
     const updatedProducts = [...products];
     updatedProducts[index] = { ...updatedProducts[index], [field]: value };
     setProducts(updatedProducts);
+    setCompanyData((prev) => ({ ...prev, products: updatedProducts }));
   };
 
   const validateNewProduct = () => {
@@ -182,37 +210,36 @@ export default function CompanyProfile() {
       companyDetails.companyName === companyData.companyName &&
       companyDetails.companyDescription === companyData.companyDescription &&
       companyDetails.companyWebsite === companyData.companyWebsite &&
-      JSON.stringify(companyDetails.products) ===
-        JSON.stringify(companyData.products);
+      isEqual(companyDetails.products, companyData.products);
 
     if (noChanges) {
       toast.info("No changes detected.", { position: "top-right" });
       return;
+      window.location.reload();
     } else {
       if (icpData) {
         const { error } = await supabase
           .from("ICP")
           .delete()
           .eq("user_email", userEmail);
+
         if (error) {
           console.error("Error deleting ICP data:", error);
-        } else {
-          const res = await fetch("/api/ICP", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              user_email: userEmail,
-              description: companyData,
-            }),
-          });
-
-          if (res.ok) {
-            const data = await res.json();
-            console.log(data);
-            setResult(data.output);
-            window.location.reload();
-          }
         }
+      }
+      const res = await fetch("/api/ICP", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_email: userEmail,
+          description: companyData,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        console.log(data);
+        setResult(data.output);
       }
 
       const { error } = await supabase

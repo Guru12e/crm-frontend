@@ -6,7 +6,7 @@ import UpdateCompanyDetails from "@/components/UpdateCompanyDetails";
 
 export default function OurProspects() {
   const [result, setResult] = useState("");
-  const [companyData, setCompanyData] = useState({});
+  const [companyData_1, setCompanyData] = useState({});
   const rawSession = localStorage.getItem("session");
   const session = JSON.parse(rawSession);
   const userEmail = session.user.email;
@@ -33,19 +33,19 @@ export default function OurProspects() {
 
     fetchData();
   }, []);
-  console.log("Company data set:", companyData);
+  console.log("Company data set:", companyData_1);
 
   const handleClick = async () => {
     console.log("In click");
-    console.log("Inclick:", companyData);
-    if (!companyData) return;
+    console.log("Inclick:", companyData_1);
+    if (!companyData_1) return;
 
     const res = await fetch("/api/ICP", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         user_email: userEmail,
-        description: companyData,
+        description: companyData_1,
       }),
     });
 
@@ -58,7 +58,7 @@ export default function OurProspects() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="">
       <h1 className="text-2xl font-bold">ICP Page</h1>
       <UpdateCompanyDetails />
     </div>
