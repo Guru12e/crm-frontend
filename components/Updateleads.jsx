@@ -25,6 +25,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "./ui/sheet";
+import { set } from "lodash";
 const ErrorMessage = ({ error }) => {
   if (!error) return null;
   return (
@@ -36,6 +37,7 @@ const ErrorMessage = ({ error }) => {
 };
 
 export default function leads(lead_id) {
+  const [loading, setLoading] = useState(false);
   const [LeadsData, setLeadsData] = useState({});
   const [errors, setErrors] = useState({ newProduct: {} });
 
@@ -62,10 +64,11 @@ export default function leads(lead_id) {
 
   console.log("LeadsData:", LeadsData);
   const handleUpdateDB = async () => {
+    setLoading(true);
     const dataToUpdate = {
       name: LeadsData.name,
       email: LeadsData.email,
-      number: LeadsData.phone,
+      number: LeadsData.number,
       age: LeadsData.age,
       linkedIn: LeadsData.linkedIn,
       industry: LeadsData.industry,
@@ -116,8 +119,9 @@ export default function leads(lead_id) {
           "Data updated permanently. All changes made are permanent.",
           { position: "top-right" }
         );
-        window.location.reload();
         localStorage.removeItem("companyDataCache");
+        setLoading(false);
+        window.location.reload();
       }
     }
   };
@@ -165,7 +169,7 @@ export default function leads(lead_id) {
             id="leadNumber"
             placeholder="Lead's Phone Number"
             value={LeadsData.number || ""}
-            onChange={(e) => handleLeadChange("phone", e.target.value)}
+            onChange={(e) => handleLeadChange("number", e.target.value)}
           />
         </div>
         <div>
@@ -271,7 +275,7 @@ export default function leads(lead_id) {
           <Label className={"mb-4"} htmlFor="description">
             Lead description
           </Label>
-          <Input
+          <Textarea
             id="description"
             placeholder="Lead description"
             value={LeadsData.description || ""}

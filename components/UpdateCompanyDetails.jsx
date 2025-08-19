@@ -12,6 +12,7 @@ import { ToastContainer, toast } from "react-toastify";
 import isEqual from "lodash/isEqual";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchData } from "next-auth/client/_utils";
+import { set } from "lodash";
 const ErrorMessage = ({ error }) => {
   if (!error) return null;
   return (
@@ -23,6 +24,7 @@ const ErrorMessage = ({ error }) => {
 };
 
 export default function CompanyProfile() {
+  const [loading, setLoading] = useState(false);
   const [companyData, setCompanyData] = useState({});
   const [products, setProducts] = useState([]);
   const [icpData, setIcpData] = useState({});
@@ -47,7 +49,6 @@ export default function CompanyProfile() {
     }
   }, []);
 
-  // ✅ Fetch data only when email exists
   useEffect(() => {
     if (!userEmail) return;
 
@@ -115,7 +116,6 @@ export default function CompanyProfile() {
     }
   }, [icpData]);
 
-  // ✅ Call ICP API only when both email & companyData are ready
   useEffect(() => {
     const createICPEntry = async () => {
       console.log("Creating ICP entry with:", { userEmail, companyData });
@@ -180,6 +180,7 @@ export default function CompanyProfile() {
   };
 
   const handleSaveChanges = () => {
+    setLoading(true);
     localStorage.setItem(
       "companyDataCache",
       JSON.stringify({ ...companyData, products })
@@ -190,9 +191,11 @@ export default function CompanyProfile() {
         position: "top-right",
       }
     );
+    setLoading(false);
   };
 
   const handleUpdateDB = async () => {
+    setLoading(true);
     const dataToUpdate = {
       companyName: companyData.companyName,
       companyDescription: companyData.companyDescription,
@@ -214,8 +217,8 @@ export default function CompanyProfile() {
 
     if (noChanges) {
       toast.info("No changes detected.", { position: "top-right" });
+      setLoading(false);
       return;
-      window.location.reload();
     } else {
       if (icpData) {
         const { error } = await supabase
@@ -257,6 +260,8 @@ export default function CompanyProfile() {
         );
         localStorage.removeItem("companyDataCache");
       }
+      setLoading(false);
+      window.location.reload();
     }
   };
 
