@@ -4,6 +4,14 @@ import { useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
+import {
+  Circle,
+  Loader,
+  Loader2,
+  Loader2Icon,
+  LoaderCircle,
+  LoaderCircleIcon,
+} from "lucide-react";
 
 export default function RedirectPage() {
   const searchParams = useSearchParams();
@@ -14,22 +22,30 @@ export default function RedirectPage() {
   }, [callbackUrl]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen new-gradient text-white">
+    <div className="flex flex-col items-center justify-center h-screen new-gradient text-black">
       <Image
-        src="/images/logo3.png"
-        alt="Astrokids.ai Logo"
-        width={120}
-        height={120}
+        src="/images/logo.png"
+        alt="Logo"
+        width={150}
+        height={150}
         className="mb-6 animate-pulse"
       />
-      <h1 className="text-3xl font-bold mb-4">Redirecting you to the stars…</h1>
-      <p className="text-lg text-center max-w-md">
-        We’re preparing your personalized cosmic experience on{" "}
-        <strong>Astrokids.ai</strong>.<br />
+
+      <h1 className="text-2xl font-bold mb-4">
+        Taking you closer to your customers...
+      </h1>
+      <p className="text-lg">
+        We're optimizing PiBi GTM Engine to accelerate your growth...
+      </p>
+      <p className="text-lg mt-4">
         Hang tight while we connect you via Google!
       </p>
+
       <div className="mt-10">
-        <div className="w-16 h-16 border-4 border-white border-dashed rounded-full animate-spin"></div>
+        <div className="relative w-16 h-16">
+          <LoaderCircle className="absolute inset-0  text-blue-700 h-16 w-16 animate-spin" />
+          <LoaderCircle className="absolute inset-4 text-gray-700 h-8 w-8 animate-spin-reverse" />
+        </div>
       </div>
     </div>
   );
