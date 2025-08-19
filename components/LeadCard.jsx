@@ -12,11 +12,12 @@ import { MapPin, Building2, Mail, Phone } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import Updateleads from "./Updateleads";
 
 export default function LeadCard({ lead, setId }) {
@@ -30,7 +31,7 @@ export default function LeadCard({ lead, setId }) {
     "Unqualified",
   ];
   return (
-    <Card className="backdrop-blur-sm bg-white/70 h-[23vh] w-[48vh] z-0 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
+    <Card className="backdrop-blur-sm bg-white/70 h-[23vh] w-[58vh] z-0 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
       <CardContent className="p-3 pt-4">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex items-start space-x-0 flex-1 min-w-0">
@@ -97,39 +98,35 @@ export default function LeadCard({ lead, setId }) {
               <Phone className="h-4 w-4 mr-1" />
               Call
             </Button>
-            <DropdownMenu className="relative">
-              <DropdownMenuTrigger asChild>
-                <Button
-                  size="sm"
-                  className={`bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none cursor-pointer ${
-                    lead.status === "Unqualified" || lead.status === "Qualified"
-                      ? "hidden"
-                      : "block"
-                  } `}
-                  onClick={() => setId(lead.id)}
-                >
-                  Update Status
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-48 absolute top-[100%] bg-gray-700 text-white transform translate-x-[-50%] translate-y-[-120%] rounded-lg p-2 mt-2">
+            <Select>
+              <SelectTrigger className="w-48 bg-gray-200 flex justify-between items-center rounded-md px-3 py-2 cursor-pointer text-blue-500">
+                <h1 className="text-black">Update Status</h1>
+                <SelectValue />
+              </SelectTrigger>
+
+              <SelectContent
+                sideOffset={4}
+                className="w-48 bg-gray-200 text-black rounded-lg p-2"
+              >
                 {leadStatus
                   .slice(leadStatus.indexOf(lead.status) + 1)
-                  .map((statu) => (
-                    <DropdownMenuItem
-                      className="cursor-pointer border-b border-gray-300"
-                      key={statu}
+                  .map((status) => (
+                    <SelectItem
+                      key={status}
+                      value={status}
+                      className="cursor-pointer border-b border-gray-300 last:border-0"
                       onClick={async () => {
                         await supabase
-                          .from("leads")
-                          .update({ status: statu })
+                          .from("Leads")
+                          .update({ status })
                           .eq("id", lead.id);
                       }}
                     >
-                      {statu}
-                    </DropdownMenuItem>
+                      {status}
+                    </SelectItem>
                   ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </CardContent>

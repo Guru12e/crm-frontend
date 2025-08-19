@@ -12,6 +12,9 @@ import {
   Package,
   AlertCircle,
   Sheet,
+  ChevronDown,
+  Activity,
+  BookmarkPlus,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,6 +29,13 @@ import {
   SheetTrigger,
 } from "./ui/sheet";
 import { set } from "lodash";
+import {
+  Select,
+  SelectItem,
+  SelectTrigger,
+  SelectContent,
+  SelectValue,
+} from "./ui/select";
 const ErrorMessage = ({ error }) => {
   if (!error) return null;
   return (
@@ -39,8 +49,9 @@ const ErrorMessage = ({ error }) => {
 export default function leads(lead_id) {
   const [loading, setLoading] = useState(false);
   const [LeadsData, setLeadsData] = useState({});
+  const [openActivities, setOpenActivities] = useState([]);
+  const [selectedActivity, setSelectedActivity] = useState("");
   const [errors, setErrors] = useState({ newProduct: {} });
-
   const handleLeadChange = (field, value) => {
     setLeadsData((prev) => ({ ...prev, [field]: value }));
   };
@@ -56,6 +67,11 @@ export default function leads(lead_id) {
         console.error("Error fetching lead data:", error);
       } else {
         setLeadsData(data);
+        setOpenActivities(
+          typeof data.openActivities === "string"
+            ? JSON.parse(data.openActivities || "[]")
+            : data.openActivities || []
+        );
       }
     };
 
@@ -125,20 +141,21 @@ export default function leads(lead_id) {
       }
     }
   };
+  const Activities = ["Meeting", "Email", "Call", "Product Demo", "Task"];
   return (
     <div className="flex flex-col overflow-y-scroll">
-      <div className="py-4 md:py-6 w-full mx-auto space-y-6 bg-slate-50 dark:bg-slate-900">
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-        />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      <div className="py-4 md:py-6 w-full mx-auto space-y-6 bg-slate-50 dark:bg-slate-900 p-3 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label className={"mb-4"} htmlFor="leadName">
             Lead Name
@@ -271,7 +288,7 @@ export default function leads(lead_id) {
             onChange={(e) => handleLeadChange("address", e.target.value)}
           />
         </div>
-        <div>
+        <div className="md:col-span-2">
           <Label className={"mb-4"} htmlFor="description">
             Lead description
           </Label>
@@ -281,6 +298,70 @@ export default function leads(lead_id) {
             value={LeadsData.description || ""}
             onChange={(e) => handleLeadChange("description", e.target.value)}
           />
+        </div>
+        <div className="md:col-span-2">
+          <Card>
+            <CardHeader className={`flex items-center justify-between`}>
+              <CardTitle>Open Activities</CardTitle>
+              <Select
+                value={selectedActivity}
+                onValueChange={(val) => setSelectedActivity(val)}
+              >
+                <SelectTrigger>
+                  <h1 className="text-black">Add Activity</h1>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Activities.map((activity) => (
+                    <SelectItem className="relative">{activity}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </CardHeader>
+            <CardContent>
+              <Card className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm">
+                <CardHeader>
+                  <CardTitle>Current Activities</CardTitle>
+                  <CardContent>
+                    {openActivities.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="font-medium text-slate-900 dark:text-white">
+                          Your Current Activities
+                        </h4>
+                        {openActivities.map((activity, idx) => (
+                          <div
+                            key={activity.id}
+                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border border-slate-200 dark:border-slate-700 rounded-lg bg-white/30 dark:bg-slate-800/30"
+                          >
+                            <div className="flex-1 space-y-3">
+                              <div className="flex flex-col gap-4 items-center justify-center">
+                                <div className="flex flex-row gap-4 justify-between items-center">
+                                  <Label>{activity.title}</Label>
+                                  <Label>{activity.category}</Label>
+                                </div>
+                                <Label>{activity.date}</Label>
+                              </div>
+                              <Label>{activity.description}</Label>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {openActivities.length === 0 && (
+                      <div className="text-center py-6 text-slate-500 dark:text-slate-400">
+                        <BookmarkPlus className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                        <p className="text-sm">
+                          No activities added yet. Add your first activity above
+                          to get started.
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </CardHeader>
+              </Card>
+            </CardContent>
+          </Card>
         </div>
         <Button
           onClick={handleUpdateDB}
