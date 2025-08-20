@@ -12,12 +12,11 @@ import { MapPin, Building2, Mail, Phone, Eye, Edit } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
 import Updateleads from "./Updateleads";
 
 export default function DealCard({ deal, setId }) {
@@ -74,35 +73,34 @@ export default function DealCard({ deal, setId }) {
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-100  transition-opacity">
           <div className="flex flex-wrap gap-2">
-            <Select>
-              <SelectTrigger className="w-48 bg-gray-400 text-white flex justify-between items-center rounded-md px-3 py-2 cursor-pointer">
-                <h1 className="text-black">Update Status</h1>
-                <SelectValue />
-              </SelectTrigger>
-
-              <SelectContent
-                sideOffset={4}
-                className="w-48 bg-gray-200 text-white rounded-lg p-2"
-              >
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  className={`bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none cursor-pointer`}
+                >
+                  Update Status
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48 absolute top-[100%] bg-gray-700 text-white transform translate-x-[-50%] translate-y-[-120%] rounded-lg p-2 mt-2">
                 {dealStatus
                   .slice(dealStatus.indexOf(deal.status) + 1)
                   .map((status) => (
-                    <SelectItem
+                    <DropdownMenuItem
+                      className="cursor-pointer border-b border-gray-300"
                       key={status}
-                      value={status}
-                      className="cursor-pointer border-b border-gray-300 last:border-0"
                       onClick={async () => {
                         await supabase
                           .from("deals")
-                          .update({ status })
+                          .update({ status: status })
                           .eq("id", deal.id);
                       }}
                     >
                       {status}
-                    </SelectItem>
+                    </DropdownMenuItem>
                   ))}
-              </SelectContent>
-            </Select>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button
               size="sm"
               variant="outline"

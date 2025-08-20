@@ -12,12 +12,11 @@ import { MapPin, Building2, Mail, Phone } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
 import Updateleads from "./Updateleads";
 
 export default function LeadCard({ lead, setId }) {
@@ -50,7 +49,7 @@ export default function LeadCard({ lead, setId }) {
                     {lead.name}
                   </Button>
                 </SheetTrigger>
-                <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh]">
+                <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] min-w-[85vw]">
                   <SheetHeader>
                     <SheetTitle>Lead Data</SheetTitle>
                     <SheetDescription>
@@ -98,35 +97,39 @@ export default function LeadCard({ lead, setId }) {
               <Phone className="h-4 w-4 mr-1" />
               Call
             </Button>
-            <Select>
-              <SelectTrigger className="w-48 bg-gray-200 flex justify-between items-center rounded-md px-3 py-2 cursor-pointer text-blue-500">
-                <h1 className="text-black">Update Status</h1>
-                <SelectValue />
-              </SelectTrigger>
-
-              <SelectContent
-                sideOffset={4}
-                className="w-48 bg-gray-200 text-black rounded-lg p-2"
-              >
+            <DropdownMenu className="relative">
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  className={`bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none cursor-pointer ${
+                    lead.status === "Unqualified" || lead.status === "Qualified"
+                      ? "hidden"
+                      : "block"
+                  } `}
+                  onClick={() => setId(lead.id)}
+                >
+                  Update Status
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48 absolute top-[100%] bg-gray-700 text-white transform translate-x-[-50%] translate-y-[-120%] rounded-lg p-2 mt-2">
                 {leadStatus
                   .slice(leadStatus.indexOf(lead.status) + 1)
-                  .map((status) => (
-                    <SelectItem
-                      key={status}
-                      value={status}
-                      className="cursor-pointer border-b border-gray-300 last:border-0"
+                  .map((statu) => (
+                    <DropdownMenuItem
+                      className="cursor-pointer border-b border-gray-300"
+                      key={statu}
                       onClick={async () => {
                         await supabase
-                          .from("Leads")
-                          .update({ status })
+                          .from("leads")
+                          .update({ status: statu })
                           .eq("id", lead.id);
                       }}
                     >
-                      {status}
-                    </SelectItem>
+                      {statu}
+                    </DropdownMenuItem>
                   ))}
-              </SelectContent>
-            </Select>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </CardContent>
