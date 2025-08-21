@@ -70,36 +70,35 @@ export default function leads(lead_id) {
   const [openActivities, setOpenActivities] = useState([]);
   const [closedActivities, setClosedActivities] = useState([]);
   const [selectedActivity, setSelectedActivity] = useState("");
-  const [openDialog, setOpenDialog] = useState(false);
+  const [activityToDelete, setActivityToDelete] = useState(null);
   const [errors, setErrors] = useState({ newProduct: {} });
   const handleLeadChange = (field, value) => {
     setLeadsData((prev) => ({ ...prev, [field]: value }));
   };
+  const fetchLeadData = async () => {
+    const { data, error } = await supabase
+      .from("Leads")
+      .select("*")
+      .eq("id", lead_id.lead_id)
+      .single();
+
+    if (error) {
+      console.error("Error fetching lead data:", error);
+    } else {
+      setLeadsData(data);
+      setOpenActivities(
+        typeof data.open_activities === "string"
+          ? JSON.parse(data.open_activities || "[]")
+          : data.open_activities || []
+      );
+      setClosedActivities(
+        typeof data.closed_activities === "string"
+          ? JSON.parse(data.closed_activities || "[]")
+          : data.closed_activities || []
+      );
+    }
+  };
   useEffect(() => {
-    const fetchLeadData = async () => {
-      const { data, error } = await supabase
-        .from("Leads")
-        .select("*")
-        .eq("id", lead_id.lead_id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching lead data:", error);
-      } else {
-        setLeadsData(data);
-        setOpenActivities(
-          typeof data.open_activities === "string"
-            ? JSON.parse(data.open_activities || "[]")
-            : data.open_activities || []
-        );
-        setClosedActivities(
-          typeof data.closed_activities === "string"
-            ? JSON.parse(data.closed_activities || "[]")
-            : data.closed_activities || []
-        );
-      }
-    };
-
     fetchLeadData();
   }, [lead_id]);
 
@@ -135,22 +134,12 @@ export default function leads(lead_id) {
       console.error("Error updating activity:", error);
       toast.error("Error updating activity!", { position: "top-right" });
     } else {
-      setOpenActivities((prev) => [
-        ...prev,
-        {
-          title,
-          description,
-          date,
-          id: Date.now(),
-          category: selectedActivity,
-        },
-      ]);
+      await fetchLeadData();
       setActivitiesFormData({ title: "", description: "", date: "" });
       toast.success("Activity updated successfully!", {
         position: "top-right",
         zIndex: 9999,
       });
-      window.location.reload();
     }
   };
   const handleRemoveActivity = async (activityId) => {
@@ -167,9 +156,7 @@ export default function leads(lead_id) {
       console.error("Error removing activity:", error);
       toast.error("Error removing activity!", { position: "top-right" });
     } else {
-      setOpenActivities((prev) =>
-        prev.filter((activity) => activity.id !== activityId)
-      );
+      await fetchLeadData();
       toast.success("Activity removed successfully!", {
         position: "top-right",
         zIndex: 9999,
@@ -232,9 +219,7 @@ export default function leads(lead_id) {
       console.error("Error closing activity:", error);
       toast.error("Error closing activity!", { position: "top-right" });
     } else {
-      setOpenActivities((prev) =>
-        prev.filter((activity) => activity.id !== activityId)
-      );
+      await fetchLeadData();
       toast.success("Activity closed successfully!", {
         position: "top-right",
         zIndex: 9999,
@@ -301,7 +286,7 @@ export default function leads(lead_id) {
         );
         localStorage.removeItem("companyDataCache");
         setLoading(false);
-        window.location.reload();
+        fetchLeadData();
       }
     }
   };
@@ -516,7 +501,7 @@ export default function leads(lead_id) {
                       {selectedActivity} Details
                     </DialogTitle>
                   </DialogHeader>
-                  <DialogDescription className="mx-5 gap-5 space-y-3">
+                  <div className="mx-5 gap-5 space-y-3">
                     <div>
                       <Label
                         className={"mb-4 text-gray-600 space-b-2"}
@@ -572,7 +557,7 @@ export default function leads(lead_id) {
                         }
                       />
                     </div>
-                  </DialogDescription>
+                  </div>
                   <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-4">
                     <Button
                       onClick={() =>
@@ -608,7 +593,10 @@ export default function leads(lead_id) {
                     {openActivities.length > 0 && (
                       <div className="grid grid-cols-2 gap-4">
                         {openActivities.map((activity, idx) => (
-                          <Card className="shadow-md rounded-2xl border border-purple-500 dark:border-slate-700 bg-white dark:bg-slate-800">
+                          <Card
+                            key={activity.id}
+                            className="shadow-md rounded-2xl border border-purple-500 dark:border-slate-700 bg-white dark:bg-slate-800"
+                          >
                             {/* Header: Title + Category */}
                             <CardHeader className="pb-2">
                               <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100 break-words">
@@ -671,11 +659,18 @@ export default function leads(lead_id) {
                                 />
                                 <div className="grid grid-cols-3 gap-4 mt-5">
                                   <Dialog
-                                    open={openDialog}
-                                    onOpenChange={setOpenDialog}
+                                    open={activityToDelete === activity.id}
+                                    onOpenChange={() =>
+                                      setActivityToDelete(null)
+                                    }
                                   >
-                                    <DialogTrigger>
-                                      <Button className="border-2 border-red-500 bg-white text-red-500 hover:bg-red-50 hover:text-red-700">
+                                    <DialogTrigger asChild>
+                                      <Button
+                                        className="border-2 border-red-500 bg-white text-red-500 hover:bg-red-50 hover:text-red-700"
+                                        onClick={() =>
+                                          setActivityToDelete(activity.id)
+                                        }
+                                      >
                                         <Delete />
                                         Delete Activity
                                       </Button>
@@ -696,6 +691,7 @@ export default function leads(lead_id) {
                                           variant="outline"
                                           onClick={() => {
                                             handleRemoveActivity(activity.id);
+                                            setActivityToDelete(null);
                                           }}
                                         >
                                           Delete
@@ -704,7 +700,7 @@ export default function leads(lead_id) {
                                           className="border-2 border-gray-300 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                                           variant="ghost"
                                           onClick={() => {
-                                            setOpenDialog(false);
+                                            setActivityToDelete(null);
                                           }}
                                         >
                                           Cancel
@@ -763,7 +759,10 @@ export default function leads(lead_id) {
                     {closedActivities.length > 0 && (
                       <div className="grid grid-cols-2 gap-4">
                         {closedActivities.map((activity, idx) => (
-                          <Card className="shadow-md rounded-2xl border border-purple-500 dark:border-slate-700 bg-white dark:bg-slate-800">
+                          <Card
+                            key={activity.id}
+                            className="shadow-md rounded-2xl border border-purple-500 dark:border-slate-700 bg-white dark:bg-slate-800"
+                          >
                             {/* Header: Title + Category */}
                             <CardHeader className="pb-2">
                               <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100 break-words">

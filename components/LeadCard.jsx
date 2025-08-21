@@ -44,12 +44,12 @@ export default function LeadCard({ lead, setId }) {
             </Avatar>
             <div className="flex-1 min-w-0">
               <Sheet>
-                <SheetTrigger asChild>
+                <SheetTrigger asChild key={lead.id}>
                   <Button className="mt-1 text-base sm:text-lg font-semibold text-slate-900 dark:text-white break-words bg-transparent hover:bg-transparent cursor-pointer hover:text-blue-500 ">
                     {lead.name}
                   </Button>
                 </SheetTrigger>
-                <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] max-w-screen min-w-screen">
+                <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] min-w-[85vw]">
                   <SheetHeader>
                     <SheetTitle>Lead Data</SheetTitle>
                     <SheetDescription>
