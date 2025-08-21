@@ -18,6 +18,9 @@ import {
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
 import Updateleads from "./Updateleads";
+import { supabase } from "@/utils/supabase/client";
+import { useEffect } from "react";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function LeadCard({ lead, setId }) {
   const leadStatus = [
@@ -29,11 +32,43 @@ export default function LeadCard({ lead, setId }) {
     "Qualified",
     "Unqualified",
   ];
+  const fetchLeadData = async () => {
+    const { data, error } = await supabase
+      .from("Leads")
+      .select("*")
+      .eq("id", lead.id)
+      .single();
+
+    if (error) {
+      console.error("Error fetching lead data:", error);
+      return null;
+    }
+
+    return data;
+  };
+
+  useEffect(() => {
+    fetchLeadData();
+  }, [lead.id]);
+
   return (
-    <Card className="backdrop-blur-sm bg-white/70 h-[23vh] w-[58vh] z-0 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
+    <Card className="backdrop-blur-sm bg-white/70 h-[23vh] w-[42vh] z-0 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
       <CardContent className="p-3 pt-4">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex items-start space-x-0 flex-1 min-w-0">
+            <div>
+              <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+              />
+            </div>
             <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
               <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xl font-semibold">
                 {lead.name
@@ -67,10 +102,20 @@ export default function LeadCard({ lead, setId }) {
             <div className="text-left">
               <Badge
                 variant={
-                  lead.status === "Hot"
-                    ? "destructive"
-                    : lead.status === "Qualified"
+                  lead.status === "New"
                     ? "default"
+                    : lead.status === "In progress"
+                    ? "secondary"
+                    : lead.status === "Contact Attempted"
+                    ? "secondary"
+                    : lead.status === "Contacted"
+                    ? "secondary"
+                    : lead.status === "Meeting Booked"
+                    ? "info"
+                    : lead.status === "Qualified"
+                    ? "success"
+                    : lead.status === "Unqualified"
+                    ? "destructive"
                     : "secondary"
                 }
               >
@@ -80,56 +125,62 @@ export default function LeadCard({ lead, setId }) {
           </div>
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-100">
-          <div className="flex flex-wrap gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
-            >
-              <Mail className="h-4 w-4 mr-1" />
-              Email
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
-            >
-              <Phone className="h-4 w-4 mr-1" />
-              Call
-            </Button>
-            <DropdownMenu className="relative">
-              <DropdownMenuTrigger asChild>
-                <Button
-                  size="sm"
-                  className={`bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none cursor-pointer ${
-                    lead.status === "Unqualified" || lead.status === "Qualified"
-                      ? "hidden"
-                      : "block"
-                  } `}
-                  onClick={() => setId(lead.id)}
-                >
-                  Update Status
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-48 absolute top-[100%] bg-gray-700 text-white transform translate-x-[-50%] translate-y-[-120%] rounded-lg p-2 mt-2">
-                {leadStatus
-                  .slice(leadStatus.indexOf(lead.status) + 1)
-                  .map((statu) => (
+          <div className="flex items-center justify-around gap-4">
+            <div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
+              >
+                <Mail className="h-4 w-4 mr-1" />
+                Email
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
+              >
+                <Phone className="h-4 w-4 mr-1" />
+                Call
+              </Button>
+            </div>
+            <div>
+              <DropdownMenu className="relative">
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="sm"
+                    className={`bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none cursor-pointer ${
+                      lead.status === "Qualified" ? "hidden" : "block"
+                    } `}
+                    onClick={() => setId(lead.id)}
+                  >
+                    Update Status
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-48 absolute top-[100%] bg-gray-700 text-white transform translate-x-[38%] translate-y-[-80%] z-1000 rounded-lg p-2 mt-2">
+                  {leadStatus.map((statu) => (
                     <DropdownMenuItem
                       className="cursor-pointer border-b border-gray-300"
                       key={statu}
                       onClick={async () => {
                         await supabase
-                          .from("leads")
+                          .from("Leads")
                           .update({ status: statu })
                           .eq("id", lead.id);
+                        toast.success("Lead status updated", {
+                          autoClose: 3000,
+                          position: "top-right",
+                        });
+                        await fetchLeadData();
+                        window.location.reload();
                       }}
                     >
                       {statu}
                     </DropdownMenuItem>
                   ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </CardContent>
