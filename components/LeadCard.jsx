@@ -8,7 +8,15 @@ import {
   SheetHeader,
   SheetContent,
 } from "./ui/sheet";
-import { MapPin, Building2, Mail, Phone } from "lucide-react";
+import {
+  MapPin,
+  Building2,
+  Mail,
+  Phone,
+  Upload,
+  UploadCloud,
+  LucideUpload,
+} from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import {
@@ -16,11 +24,22 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Label,
 } from "@radix-ui/react-dropdown-menu";
 import Updateleads from "./Updateleads";
 import { supabase } from "@/utils/supabase/client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTrigger,
+} from "./ui/dialog";
+import { Textarea } from "./ui/textarea";
 
 export default function LeadCard({ lead, setId }) {
   const leadStatus = [
@@ -32,27 +51,39 @@ export default function LeadCard({ lead, setId }) {
     "Qualified",
     "Unqualified",
   ];
-  const fetchLeadData = async () => {
-    const { data, error } = await supabase
+  const [newState, setNewState] = useState("");
+  const [open, setOpen] = useState(false);
+  const [description, setDescription] = useState("");
+  const handleStatusUpdate = async () => {
+    const stage_history = lead.stage_history || [];
+    const length = stage_history.length;
+    const start_date = stage_history[length - 1]?.end_date || lead.created_at;
+    const current_history = {
+      old_status: lead.status,
+      new_status: newState,
+      start_date: start_date.split("T")[0],
+      end_date: new Date().toISOString().split("T")[0],
+      state_description: description,
+    };
+    stage_history.push(current_history);
+    const { error } = await supabase
       .from("Leads")
-      .select("*")
-      .eq("id", lead.id)
-      .single();
+      .update({
+        stage_history: stage_history,
+        status: newState,
+      })
+      .eq("id", lead.id);
 
     if (error) {
-      console.error("Error fetching lead data:", error);
-      return null;
+      console.error("Error updating lead:", error);
+      toast.error("Error updating lead");
+    } else {
+      toast.success("Lead updated successfully");
     }
-
-    return data;
   };
 
-  useEffect(() => {
-    fetchLeadData();
-  }, [lead.id]);
-
   return (
-    <Card className="backdrop-blur-sm bg-white/70 h-[23vh] w-[42vh] z-0 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
+    <Card className="backdrop-blur-sm bg-white/70 h-[23vh] w-[45vh] z-0 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
       <CardContent className="p-3 pt-4">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex items-start space-x-0 flex-1 min-w-0">
@@ -145,41 +176,67 @@ export default function LeadCard({ lead, setId }) {
               </Button>
             </div>
             <div>
-              <DropdownMenu className="relative">
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    size="sm"
-                    className={`bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none cursor-pointer ${
-                      lead.status === "Qualified" ? "hidden" : "block"
-                    } `}
-                    onClick={() => setId(lead.id)}
-                  >
-                    Update Status
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-48 absolute top-[100%] bg-gray-700 text-white transform translate-x-[38%] translate-y-[-80%] z-1000 rounded-lg p-2 mt-2">
-                  {leadStatus.map((statu) => (
-                    <DropdownMenuItem
-                      className="cursor-pointer border-b border-gray-300"
-                      key={statu}
-                      onClick={async () => {
-                        await supabase
-                          .from("Leads")
-                          .update({ status: statu })
-                          .eq("id", lead.id);
-                        toast.success("Lead status updated", {
-                          autoClose: 3000,
-                          position: "top-right",
-                        });
-                        await fetchLeadData();
-                        window.location.reload();
-                      }}
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DropdownMenu className="relative">
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      size="sm"
+                      className={`bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none cursor-pointer ${
+                        lead.status === "Qualified" ? "hidden" : "block"
+                      } `}
+                      onClick={() => setId(lead.id)}
                     >
-                      {statu}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                      Update Status
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-48 absolute top-[100%] bg-gray-700 text-white transform translate-x-[38%] translate-y-[-80%] z-1000 rounded-lg p-2 mt-2">
+                    {leadStatus.map((statu) => (
+                      <DialogTrigger asChild key={statu}>
+                        <DropdownMenuItem
+                          className="cursor-pointer border-b border-gray-300"
+                          key={statu}
+                          onClick={() => {
+                            setNewState(statu);
+                            setOpen(true);
+                          }}
+                        >
+                          {statu}
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                    ))}
+                  </DropdownMenuContent>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Status Info</DialogTitle>
+                      <DialogDescription>
+                        You are currently updating the status from{" "}
+                        <span className="font-semibold">{lead.status}</span> to{" "}
+                        <span className="font-semibold">{newState}</span>.
+                        <>
+                          <Textarea
+                            placeholder="Explain in  detail about the actions performed in this stage. Along with reason for updating the status"
+                            className="mt-1"
+                            onChange={(e) => setDescription(e.target.value)}
+                          />
+                        </>
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <Button
+                        type="submit"
+                        onClick={() => {
+                          handleStatusUpdate();
+                          setOpen(false);
+                        }}
+                        className="border cursor-pointer border-green-500 bg-transparent hover:bg-green-200 hover:text-green-700 text-green-500"
+                      >
+                        <LucideUpload className="h-4 w-4 mr-2" />
+                        Update Status
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </DropdownMenu>
+              </Dialog>
             </div>
           </div>
         </div>
