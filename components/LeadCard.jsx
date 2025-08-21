@@ -49,7 +49,7 @@ export default function LeadCard({ lead, setId }) {
                     {lead.name}
                   </Button>
                 </SheetTrigger>
-                <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] min-w-[85vw]">
+                <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] max-w-screen min-w-screen">
                   <SheetHeader>
                     <SheetTitle>Lead Data</SheetTitle>
                     <SheetDescription>

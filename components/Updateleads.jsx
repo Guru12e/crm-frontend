@@ -176,11 +176,16 @@ export default function leads(lead_id) {
       });
     }
   };
-  const handleEditActivity = async (activityId, field, value) => {
-    setLoading(true);
-    const updatedActivities = openActivities.map((activity) =>
-      activity.id === activityId ? { ...activity, [field]: value } : activity
+  const handleEditActivity = (activityId, field, value) => {
+    setOpenActivities((prev) =>
+      prev.map((activity) =>
+        activity.id === activityId ? { ...activity, [field]: value } : activity
+      )
     );
+  };
+  const handleFinishEditActivity = async (activityId) => {
+    setLoading(true);
+    const updatedActivities = openActivities;
 
     const { error } = await supabase
       .from("Leads")
@@ -304,17 +309,19 @@ export default function leads(lead_id) {
   const Activities = ["Meeting", "Email", "Call", "Product Demo", "Task"];
   return (
     <div className="flex flex-col">
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </div>
       <div className="py-4  md:py-6 w-full mx-auto space-y-6 bg-slate-50 dark:bg-slate-900 p-3 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <Label className={"mb-4 text-gray-600"} htmlFor="leadName">
@@ -708,7 +715,7 @@ export default function leads(lead_id) {
                                   <Button
                                     className="border-2 border-blue-500 bg-white text-blue-500 hover:bg-blue-50 hover:text-blue-700"
                                     onClick={() => {
-                                      handleEditActivity(activity.id);
+                                      handleFinishEditActivity(activity.id);
                                     }}
                                   >
                                     <Edit />
