@@ -71,6 +71,7 @@ export default function leads(lead_id) {
   const [closedActivities, setClosedActivities] = useState([]);
   const [selectedActivity, setSelectedActivity] = useState("");
   const [activityToDelete, setActivityToDelete] = useState(null);
+  const [stageHistory, setStageHistory] = useState([]);
   const [errors, setErrors] = useState({ newProduct: {} });
   const handleLeadChange = (field, value) => {
     setLeadsData((prev) => ({ ...prev, [field]: value }));
@@ -95,6 +96,11 @@ export default function leads(lead_id) {
         typeof data.closed_activities === "string"
           ? JSON.parse(data.closed_activities || "[]")
           : data.closed_activities || []
+      );
+      setStageHistory(
+        typeof data.stage_history === "string"
+          ? JSON.parse(data.stage_history || "[]")
+          : data.stage_history || []
       );
     }
   };
@@ -837,6 +843,75 @@ export default function leads(lead_id) {
           <Plus className="w-4 h-4 mr-2" /> Update Lead Data
         </Button>
       </div>
+      <Card className="bg-transparent text-gray-600 border-0">
+        <CardHeader className="flex items-center justify-between">
+          <CardTitle>Stage History</CardTitle>
+        </CardHeader>
+
+        <CardContent>
+          <Card className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm">
+            <CardContent>
+              {stageHistory.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+                    <thead className="bg-gray-50 dark:bg-slate-700/50">
+                      <tr>
+                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider">
+                          Old Status
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider">
+                          New Status
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider">
+                          Start Date
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider">
+                          End Date
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider">
+                          Description
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
+                      {stageHistory.map((stage, idx) => (
+                        <tr
+                          key={idx}
+                          className="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors"
+                        >
+                          <td className="px-4 py-3 text-sm text-gray-900 dark:text-slate-100">
+                            {stage.old_status}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-900 dark:text-slate-100">
+                            {stage.new_status}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300">
+                            {stage.start_date}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300">
+                            {stage.end_date}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300 break-words max-w-xs">
+                            {stage.state_description}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-center py-6 text-slate-500 dark:text-slate-400">
+                  <BookmarkPlus className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p className="text-sm">
+                    No stage history yet. Progress through stages to see
+                    history.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </CardContent>
+      </Card>
     </div>
   );
 }
