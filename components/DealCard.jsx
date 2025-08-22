@@ -19,7 +19,7 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 import Updateleads from "./Updateleads";
 
-export default function DealCard({ deal, setId }) {
+export default function DealCard({ deal, setId, onChange }) {
   const dealStatus = [
     "New",
     "Proposal Sent",

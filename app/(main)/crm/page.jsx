@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRef } from "react";
 import { Link } from "next/link";
 import Papa from "papaparse";
@@ -94,25 +94,6 @@ const userEmail = session.user.email;
 if (!userEmail) {
   console.error("User email not found in session");
 }
-const { data: customersData } = await supabase
-  .from("Customers")
-  .select("*")
-  .eq("user_email", !userEmail ? "undefined" : userEmail)
-  .order("created_at", { ascending: false });
-
-const { data: leadsData } = await supabase
-  .from("Leads")
-  .select("*")
-  .eq("user_email", !userEmail ? "undefined" : userEmail)
-  .order("created_at", { ascending: false });
-
-const { data: dealsData } = await supabase
-  .from("Deals")
-  .select("*")
-  .eq("user_email", !userEmail ? "undefined" : userEmail)
-  .order("created_at", { ascending: false });
-
-console.log(customersData, leadsData, dealsData);
 
 export default function CRM() {
   const [activeTab, setActiveTab] = useState(
@@ -122,6 +103,9 @@ export default function CRM() {
   const [statusFilter, setStatusFilter] = useState("All statuses");
   const [sourceFilter, setSourceFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
+  const [customersData, setCustomersData] = useState([]);
+  const [leadsData, setLeadsData] = useState([]);
+  const [dealsData, setDealsData] = useState([]);
   const today = new Date();
   sessionStorage.setItem("activeTab", activeTab);
   const [customerFormData, setCustomerFormData] = useState({
@@ -171,8 +155,6 @@ export default function CRM() {
   const [customerLoading, setCustomerLoading] = useState(false);
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [dealsLoading, setDealsLoading] = useState(false);
-  const [leads, setleads] = useState(leadsData);
-  const [deals, setdeals] = useState(dealsData);
 
   const ErrorMessage = ({ error }) =>
     error && (
@@ -194,7 +176,54 @@ export default function CRM() {
     setDealFormData((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
+  const fetchCustomers = async () => {
+    const { data: customersData } = await supabase
+      .from("Customers")
+      .select("*")
+      .eq("user_email", !userEmail ? "undefined" : userEmail)
+      .order("created_at", { ascending: false });
+    if (customersData) {
+      setCustomersData(customersData);
+    } else {
+      console.error("Error fetching customers");
+    }
+  };
 
+  const fetchLeads = async () => {
+    const { data: leadsData } = await supabase
+      .from("Leads")
+      .select("*")
+      .eq("user_email", !userEmail ? "undefined" : userEmail)
+      .order("created_at", { ascending: false });
+    if (leadsData) {
+      setLeadsData(leadsData);
+    } else {
+      console.error("Error fetching leads");
+    }
+  };
+
+  const fetchDeals = async () => {
+    const { data: dealsData } = await supabase
+      .from("Deals")
+      .select("*")
+      .eq("user_email", !userEmail ? "undefined" : userEmail)
+      .order("created_at", { ascending: false });
+    if (dealsData) {
+      setDealsData(dealsData);
+    } else {
+      console.error("Error fetching deals");
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomers();
+    fetchLeads();
+    fetchDeals();
+  }, [userEmail]);
+
+  console.log(customersData);
+  console.log("Hello", leadsData);
+  console.log("Hi", dealsData);
   const handleCustomerSubmit = async (e) => {
     e.preventDefault();
     setCustomerLoading(true);
@@ -1971,10 +2000,16 @@ export default function CRM() {
                     {/* Scrollable Right Content */}
                     <div className="ml-[15%] w-[85%] overflow-y-scroll p-4">
                       <div className="grid grid-cols-2 gap-6 min-w-fit">
-                        {leads
+                        {leadsData
                           .filter((lead) => lead.status === leadState)
                           .map((l) => (
-                            <LeadCard key={l.id} lead={l} />
+                            <LeadCard
+                              key={l.id}
+                              lead={l}
+                              onChange={() => {
+                                fetchLeads();
+                              }}
+                            />
                           ))}
                       </div>
                     </div>
@@ -2005,10 +2040,16 @@ export default function CRM() {
                     {/* Scrollable Right Content */}
                     <div className="ml-[15%] w-[85%] overflow-y-scroll ">
                       <div className="grid grid-cols-2 gap-6 min-w-fit">
-                        {deals
+                        {dealsData
                           .filter((deal) => deal.status === dealState)
                           .map((deal) => (
-                            <DealCard key={deal.id} deal={deal} />
+                            <DealCard
+                              key={deal.id}
+                              deal={deal}
+                              onChange={() => {
+                                fetchDeals();
+                              }}
+                            />
                           ))}
                       </div>
                     </div>

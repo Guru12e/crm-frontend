@@ -41,7 +41,7 @@ import {
 } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
 
-export default function LeadCard({ lead, setId }) {
+export default function LeadCard({ lead, setId, onChange }) {
   const leadStatus = [
     "New",
     "In progress",
@@ -227,6 +227,7 @@ export default function LeadCard({ lead, setId }) {
                         onClick={() => {
                           handleStatusUpdate();
                           setOpen(false);
+                          onChange();
                         }}
                         className="border cursor-pointer border-green-500 bg-transparent hover:bg-green-200 hover:text-green-700 text-green-500"
                       >

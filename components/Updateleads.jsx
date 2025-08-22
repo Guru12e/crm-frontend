@@ -23,6 +23,16 @@ import {
   SquareCheck,
   Edit,
 } from "lucide-react";
+import {
+  Phone,
+  Mail,
+  Calendar,
+  Presentation,
+  CheckCircle2,
+  XCircle,
+  ArrowRightLeft,
+  UserPlus,
+} from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -109,6 +119,65 @@ export default function leads(lead_id) {
   }, [lead_id]);
 
   console.log("LeadsData:", LeadsData);
+
+  const allEvents = [
+    // open activities
+    ...openActivities.map((a) => ({
+      title: a.title,
+      description: a.description,
+      date: a.date,
+      type: "open",
+      category: a.category,
+    })),
+
+    // closed activities
+    ...closedActivities.map((a) => ({
+      title: a.title,
+      description: a.description,
+      date: a.closed_at, // important: closed_at
+      type: "closed",
+      category: a.category,
+    })),
+
+    // stage history
+    ...stageHistory.map((s) => ({
+      title: `${s.old_status} → ${s.new_status}`,
+      description: s.state_description,
+      date: s.end_date,
+      type: "stage",
+      category: "Stage",
+    })),
+
+    // lead created event at the end
+    {
+      title: "Lead Created",
+      description: "Lead was created in the system",
+      date: LeadsData.created_at ? LeadsData.created_at.split("T")[0] : "N/A",
+      type: "lead",
+      category: "Lead",
+    },
+  ];
+
+  // sort descending based on date
+  allEvents.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  const iconMap = {
+    meeting: Calendar,
+    call: Phone,
+    email: Mail,
+    demo: Presentation,
+    closed: CheckCircle2,
+    open: XCircle,
+    stage: ArrowRightLeft,
+    lead: UserPlus,
+  };
+
+  const colorMap = {
+    open: "text-blue-500",
+    closed: "text-green-500",
+    stage: "text-purple-500",
+    lead: "text-orange-500",
+  };
 
   const [activitiesFormData, setActivitiesFormData] = useState({
     title: "",
@@ -910,6 +979,45 @@ export default function leads(lead_id) {
               )}
             </CardContent>
           </Card>
+        </CardContent>
+      </Card>
+      <Card className="bg-transparent border-0">
+        <CardHeader>
+          <CardTitle>Timeline</CardTitle>
+        </CardHeader>
+
+        <CardContent>
+          <div className="relative border-l border-gray-300 dark:border-gray-700 ml-4">
+            {allEvents.map((event, idx) => {
+              const Icon =
+                iconMap[event.category?.toLowerCase()] ||
+                iconMap[event.type] ||
+                iconMap.stage;
+              const color = colorMap[event.type] || "text-gray-500";
+
+              return (
+                <div key={idx} className="mb-8 ml-4 relative gap-5">
+                  <span className="absolute -left-12 top-1 flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-gray-700 ">
+                    <Icon className={`w-5 h-5 ${color}`} />
+                  </span>
+
+                  <div className="bg-white dark:bg-slate-800 shadow-sm rounded-lg p-3">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                      {event.title}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      {event.date}
+                    </p>
+                    {event.description && (
+                      <p className="text-sm mt-1 text-slate-700 dark:text-slate-300">
+                        {event.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </CardContent>
       </Card>
     </div>
