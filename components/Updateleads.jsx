@@ -81,6 +81,7 @@ export default function leads(lead_id) {
   const [closedActivities, setClosedActivities] = useState([]);
   const [selectedActivity, setSelectedActivity] = useState("");
   const [activityToDelete, setActivityToDelete] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [stageHistory, setStageHistory] = useState([]);
   const [errors, setErrors] = useState({ newProduct: {} });
   const handleLeadChange = (field, value) => {
@@ -111,6 +112,11 @@ export default function leads(lead_id) {
         typeof data.stage_history === "string"
           ? JSON.parse(data.stage_history || "[]")
           : data.stage_history || []
+      );
+      setMessages(
+        typeof data.messages === "string"
+          ? JSON.parse(data.messages || "[]")
+          : data.messages || []
       );
     }
   };
@@ -666,7 +672,7 @@ export default function leads(lead_id) {
                   </CardTitle>
                   <CardContent className="">
                     {openActivities.length > 0 && (
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid md:grid-cols-2 gap-4">
                         {openActivities.map((activity, idx) => (
                           <Card
                             key={activity.id}
@@ -687,10 +693,7 @@ export default function leads(lead_id) {
                                 />
                               </CardTitle>
                             </CardHeader>
-
-                            {/* Content */}
                             <CardContent className="space-y-4">
-                              {/* Info Row: Date + Category (responsive) */}
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                   <Label className="text-slate-500 dark:text-slate-400 text-xs">
@@ -719,7 +722,6 @@ export default function leads(lead_id) {
                                 </div>
                               </div>
 
-                              {/* Description */}
                               <div>
                                 <Textarea
                                   className="text-slate-500 dark:text-slate-400 text-xs"
@@ -832,7 +834,7 @@ export default function leads(lead_id) {
                 <CardHeader>
                   <CardContent className="">
                     {closedActivities.length > 0 && (
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid md:grid-cols-2 gap-4">
                         {closedActivities.map((activity, idx) => (
                           <Card
                             key={activity.id}
@@ -1018,6 +1020,55 @@ export default function leads(lead_id) {
               );
             })}
           </div>
+        </CardContent>
+      </Card>
+      <Card className="bg-transparent text-gray-600 border-0">
+        <CardHeader className="flex items-center justify-between">
+          <CardTitle>Last Messages</CardTitle>
+        </CardHeader>
+
+        <CardContent>
+          {messages && messages.length > 0 ? (
+            <div className="space-y-3">
+              {messages.slice(-5).map((msg, idx) => (
+                <Card
+                  key={idx}
+                  className={`rounded-xl shadow-sm border ${
+                    msg.type === "customer"
+                      ? "border-blue-400 bg-blue-50 dark:bg-slate-800/50"
+                      : "border-green-400 bg-green-50 dark:bg-slate-800/50"
+                  }`}
+                >
+                  <CardContent className="p-3">
+                    {/* Sender Type */}
+                    <div className="flex items-center justify-between mb-2">
+                      <span
+                        className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                          msg.type === "customer"
+                            ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                            : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                        }`}
+                      >
+                        {msg.type === "customer" ? "Customer" : "Assistant"}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {new Date(msg.timestamp).toLocaleString()}
+                      </span>
+                    </div>
+
+                    {/* Message Content */}
+                    <p className="text-sm text-slate-800 dark:text-slate-100 whitespace-pre-wrap break-words">
+                      {msg.message}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-6 text-slate-500 dark:text-slate-400">
+              <p className="text-sm">No messages found.</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
