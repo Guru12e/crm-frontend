@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import UserButton from "@/components/UserButton";
 import { Label } from "@/components/ui/label";
 
@@ -52,11 +52,14 @@ export default function Layout({ children }) {
   const location = useSearchParams().get("pathname") || "/home";
   const [alertMessage, setAlertMessage] = useState(false);
   const [user, setUser] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (user) {
       setUser(JSON.parse(user));
+    } else {
+      router.push("/");
     }
   }, []);
 
