@@ -86,9 +86,7 @@ const dealStatus = [
   "Abandoned",
 ];
 const rawSession = localStorage.getItem("session");
-console.log(rawSession);
 const session = JSON.parse(rawSession);
-console.log(session.user.email);
 const userEmail = session.user.email;
 
 if (!userEmail) {
@@ -221,9 +219,6 @@ export default function CRM() {
     fetchDeals();
   }, [userEmail]);
 
-  console.log(customersData);
-  console.log("Hello", leadsData);
-  console.log("Hi", dealsData);
   const handleCustomerSubmit = async (e) => {
     e.preventDefault();
     setCustomerLoading(true);
@@ -267,7 +262,6 @@ export default function CRM() {
       setErrors(errors);
       return;
     } else {
-      console.log(customerFormData);
       const session = localStorage.getItem("session");
       const req = await fetch("/api/addCustomer", {
         method: "POST",
@@ -308,7 +302,6 @@ export default function CRM() {
     e.preventDefault();
     setLeadsLoading(true);
     let isValid = true;
-    console.log(leadsFormData);
     if (!leadsFormData.name) {
       errors.leadName = "Name is required";
       isValid = false;
@@ -329,12 +322,10 @@ export default function CRM() {
     }
 
     if (!isValid) {
-      console.log("From if");
       setLeadsLoading(false);
       setErrors(errors);
       return;
     } else {
-      console.log("From else");
       const session = localStorage.getItem("session");
       const req = await fetch("/api/addLeads", {
         method: "POST",
@@ -419,7 +410,6 @@ export default function CRM() {
       setErrors(errors);
       return;
     } else {
-      console.log(dealFormData);
       const session = localStorage.getItem("session");
       const req = await fetch("/api/addDeals", {
         method: "POST",
@@ -469,7 +459,6 @@ export default function CRM() {
       header: true,
       skipEmptyLines: true,
       complete: async (results) => {
-        console.log("Parsed CSV Data:", results.data);
         results.data.forEach((item) => {
           item.user_email = userEmail;
           item.created_at = today;
@@ -482,7 +471,7 @@ export default function CRM() {
         if (error) {
           console.error("Error inserting data:", error);
         } else {
-          console.log("Data inserted successfully:", data);
+          console.log("Data inserted successfully:");
         }
       },
     });

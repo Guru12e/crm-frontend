@@ -45,7 +45,6 @@ export async function POST(request) {
         })
         .select();
       if (companyError) {
-        console.log(companyError);
         return NextResponse.json(
           { error: `Failed to insert company: ${companyError.message}` },
           { status: 500 }
