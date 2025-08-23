@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { supabase } from "@/utils/supabase/client";
+import { Input } from "./ui/input";
 
 // Toolbar button
 const ToolbarButton = ({ children, onClick }) => (
@@ -50,7 +51,6 @@ const Dropdown = ({ options, onChange, value }) => (
 
 export default function ComposeDialog({ lead, open, onOpenChange }) {
   const [isMaximized, setIsMaximized] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
   const [fontSize, setFontSize] = useState("14px");
   const fileInputRef = useRef(null);
 
@@ -58,7 +58,7 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
   const [form, setForm] = useState({
     from_email: user.email,
     refres_token: user.refresh_token,
-    to_email: "",
+    to_email: lead.email || "",
     subject: "",
     body: "",
   });
@@ -124,27 +124,6 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
     );
 
   // If minimized → show only a bar
-  if (isMinimized) {
-    return (
-      <div className="fixed bottom-0 right-4 bg-gray-800 text-white px-4 py-2 rounded-t-md shadow-lg flex items-center justify-between w-72">
-        <span className="truncate text-sm">New Message</span>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setIsMinimized(false)}
-            className="hover:opacity-75"
-          >
-            <Maximize2 size={16} />
-          </button>
-          <button
-            onClick={() => onOpenChange(false)}
-            className="hover:opacity-75"
-          >
-            <X size={16} />
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -157,15 +136,9 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
         hideClose
       >
         {/* Header */}
-        <DialogHeader className="bg-gray-600 dark:bg-gray-900 text-white px-4 py-2 flex justify-between items-center rounded-t-lg">
+        <DialogHeader className="bg-gray-600 dark:bg-gray-900 text-white px-4 py-2 flex justify-between rounded-t-lg">
           <Label className="text-sm">New Message</Label>
           <div className="flex gap-2 ml-auto">
-            <button
-              onClick={() => setIsMinimized(true)}
-              className="p-1 hover:bg-gray-700 rounded"
-            >
-              <Minus size={16} />
-            </button>
             <button
               onClick={() => setIsMaximized(!isMaximized)}
               className="p-1 hover:bg-gray-700 rounded"
@@ -188,10 +161,11 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
               <label className="text-sm text-gray-500 dark:text-gray-400 mr-2">
                 To
               </label>
-              <input
+              <Input
+                name="to_email"
                 type="email"
-                value={recipients.to}
-                onChange={(e) => handleChange("to_email", e.target.value)}
+                value={form.to_email}
+                onChange={handleChange}
                 className="flex-grow focus:outline-none text-sm bg-transparent"
               />
             </div>
@@ -199,17 +173,19 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
               <label className="text-sm text-gray-500 dark:text-gray-400 mr-2">
                 Subject
               </label>
-              <input
+              <Input
+                name="subject"
                 type="text"
-                value={subject}
-                onChange={(e) => handleChange("subject", e.target.value)}
+                placeholder={form.subject}
+                onChange={handleChange}
                 className="flex-grow focus:outline-none text-sm bg-transparent"
               />
             </div>
           </div>
 
           <div
-            onChange={(e) => handleChange("body", e.target.value)}
+            name="body"
+            onChange={handleChange}
             contentEditable="true"
             className="flex-grow p-4 focus:outline-none overflow-y-auto text-sm"
             aria-label="Email body"
