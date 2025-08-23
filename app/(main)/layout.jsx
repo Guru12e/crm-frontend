@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Home,
   Users,
@@ -18,6 +18,7 @@ import {
   Search,
   HelpCircle,
   Bot,
+  AlertTriangleIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import UserButton from "@/components/UserButton";
+import { Label } from "@/components/ui/label";
 
 const navigation = [
   { name: "Home", href: "/home", icon: Home },
@@ -48,6 +50,15 @@ export default function Layout({ children }) {
   const [expandedItems, setExpandedItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const location = useSearchParams().get("pathname") || "/home";
+  const [alertMessage, setAlertMessage] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      setUser(JSON.parse(user));
+    }
+  }, []);
 
   const toggleExpanded = (name) => {
     setExpandedItems((prev) =>
@@ -301,7 +312,6 @@ export default function Layout({ children }) {
             >
               <Menu className="h-5 w-5" />
             </Button>
-
             <div className="flex-1 max-w-md min-w-0 ml-2 sm:ml-0">
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
@@ -313,7 +323,28 @@ export default function Layout({ children }) {
                 />
               </div>
             </div>
-
+            {user && user.refresh_token == null && (
+              <div className="flex items-center gap-4">
+                <AlertTriangleIcon
+                  className="cursor-pointer"
+                  onMouseOver={() => setAlertMessage((prev) => !prev)}
+                />
+                {alertMessage && (
+                  <div className="flex items-center space-x-2 bg-yellow-100 border border-yellow-400 text-yellow-700 px-3 py-2 rounded">
+                    <Label className="text-sm text-slate-600 dark:text-slate-400 ">
+                      "Please connect your Gmail to automatically send emails to
+                      Leads."
+                    </Label>
+                    <Link
+                      href="/api/auth/email"
+                      className="text-blue-500 hover:underline"
+                    >
+                      Connect Gmail
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
             <div className="flex items-center space-x-2 sm:space-x-4">
               <Button
                 variant="ghost"

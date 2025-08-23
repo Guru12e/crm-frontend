@@ -40,6 +40,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
+import EmailTemplate from "./EmailTemplate";
 
 export default function LeadCard({ lead, setId, onChange }) {
   const leadStatus = [
@@ -53,6 +54,7 @@ export default function LeadCard({ lead, setId, onChange }) {
   ];
   const [newState, setNewState] = useState("");
   const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState(false);
   const [description, setDescription] = useState("");
   const handleStatusUpdate = async () => {
     const stage_history = lead.stage_history || [];
@@ -162,10 +164,12 @@ export default function LeadCard({ lead, setId, onChange }) {
                 size="sm"
                 variant="outline"
                 className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
+                onClick={() => setEmail(true)}
               >
                 <Mail className="h-4 w-4 mr-1" />
                 Email
               </Button>
+              <EmailTemplate lead={lead} open={email} onOpenChange={setEmail} />
               <Button
                 size="sm"
                 variant="outline"

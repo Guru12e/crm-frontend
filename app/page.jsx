@@ -1,14 +1,25 @@
+"use client";
 import OnBoarding from "@/components/OnBoarding";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { useEffect } from "react";
 
-export default async function Home() {
-  const session = await getServerSession(authOptions);
+export default function Home() {
+  useEffect(() => {
+    const getUser = async () => {
+      const res = await fetch("/api/getUser", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (res.status !== 200) {
+        return;
+      }
+      const data = await res.json();
+      localStorage.setItem("user", JSON.stringify(data));
+      redirect("/home");
+    };
 
-  if (session) {
-    redirect(`/home`);
-  }
+    getUser();
+  }, []);
 
   return (
     <div>
