@@ -40,6 +40,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
+import EmailTemplate from "./EmailTemplate";
 
 export default function LeadCard({ lead, setId, onChange }) {
   const leadStatus = [
@@ -53,6 +54,7 @@ export default function LeadCard({ lead, setId, onChange }) {
   ];
   const [newState, setNewState] = useState("");
   const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState(false);
   const [description, setDescription] = useState("");
   const handleStatusUpdate = async () => {
     const stage_history = lead.stage_history || [];
@@ -83,7 +85,7 @@ export default function LeadCard({ lead, setId, onChange }) {
   };
 
   return (
-    <Card className="backdrop-blur-sm bg-white/70 h-[23vh] w-[45vh] z-0 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
+    <Card className="backdrop-blur-sm bg-white/70 h-auto w-full sm:max-w-md md:max-w-lg lg:max-w-sm z-0 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group mx-auto">
       <CardContent className="p-3 pt-4">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex items-start space-x-0 flex-1 min-w-0">
@@ -115,7 +117,7 @@ export default function LeadCard({ lead, setId, onChange }) {
                     {lead.name}
                   </Button>
                 </SheetTrigger>
-                <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] min-w-[85vw]">
+                <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] md:min-w-[85vw] min-w-screen ">
                   <SheetHeader>
                     <SheetTitle>Lead Data</SheetTitle>
                     <SheetDescription>
@@ -162,10 +164,12 @@ export default function LeadCard({ lead, setId, onChange }) {
                 size="sm"
                 variant="outline"
                 className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
+                onClick={() => setEmail(true)}
               >
                 <Mail className="h-4 w-4 mr-1" />
                 Email
               </Button>
+              <EmailTemplate lead={lead} open={email} onOpenChange={setEmail} />
               <Button
                 size="sm"
                 variant="outline"

@@ -1991,15 +1991,17 @@ export default function CRM() {
                   key={leadState}
                   className="mt-4 h-[35vh] relative overflow-hidden"
                 >
-                  <CardContent className="flex h-full p-0">
-                    {/* Sticky Left Label */}
-                    <div className="w-[15%] bg-gray-300 dark:bg-slate-800 flex items-center justify-center text-2xl font-bold text-slate-800 dark:text-white absolute text-center left-0 top-0 bottom-0 z-10">
+                  <CardContent className="flex flex-col md:flex-row h-full p-0">
+                    <div className="w-full md:w-[15%] absolute md:left-0 top-0 md:bottom-0 bg-gray-300 dark:bg-slate-800 flex items-center justify-center py-3 md:py-1 px-2 md:p-1 text-xl font-bold text-slate-800 dark:text-white z-10 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700">
                       {leadState}
                     </div>
 
-                    {/* Scrollable Right Content */}
-                    <div className="ml-[15%] w-[85%] overflow-y-scroll p-4">
-                      <div className="grid grid-cols-2 gap-6 min-w-fit">
+                    <div
+                      className="w-full md:ml-[15%] md:w-[85%] 
+                          h-[calc(35vh-40px)] md:h-full 
+                          overflow-y-auto p-2 md:p-4"
+                    >
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-6 min-w-fit">
                         {leadsData
                           .filter((lead) => lead.status === leadState)
                           .map((l) => (
@@ -2031,15 +2033,17 @@ export default function CRM() {
                   key={dealState}
                   className="mt-4 h-[35vh] relative overflow-hidden"
                 >
-                  <CardContent className="flex h-full p-0">
-                    {/* Sticky Left Label */}
-                    <div className="w-[15%] bg-gray-300 dark:bg-slate-800 flex items-center justify-center text-2xl font-bold text-slate-800 dark:text-white absolute text-center left-0 top-0 bottom-0 z-10">
+                  <CardContent className="flex flex-col md:flex-row h-full p-0">
+                    <div className="w-full md:w-[15%] absolute md:left-0 top-0 md:bottom-0 bg-gray-300 dark:bg-slate-800 flex items-center justify-center py-3 md:py-1 px-2 md:p-1 text-xl font-bold text-slate-800 dark:text-white z-10 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700">
                       {dealState}
                     </div>
 
-                    {/* Scrollable Right Content */}
-                    <div className="ml-[15%] w-[85%] overflow-y-scroll ">
-                      <div className="grid grid-cols-2 gap-6 min-w-fit">
+                    <div
+                      className="w-full md:ml-[15%] md:w-[85%] 
+                          h-[calc(35vh-40px)] md:h-full 
+                          overflow-y-auto p-2 md:p-4"
+                    >
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-6 min-w-fit">
                         {dealsData
                           .filter((deal) => deal.status === dealState)
                           .map((deal) => (
