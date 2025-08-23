@@ -136,24 +136,25 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
             ? "w-full h-full md:w-3/5 md:h-4/5"
             : "w-full md:w-[550px] h-[60vh] md:h-auto"
         }`}
-        hideClose
       >
         {/* Header */}
         <DialogHeader className="bg-gray-600 dark:bg-gray-900 text-white px-4 py-2 flex justify-between rounded-t-lg">
-          <DialogTitle className="text-sm">New Message</DialogTitle>
-          <div className="flex gap-2 ml-auto">
-            <button
-              onClick={() => setIsMaximized(!isMaximized)}
-              className="p-1 hover:bg-gray-700 rounded"
-            >
-              <Maximize2 size={16} />
-            </button>
-            <button
-              className="p-1 hover:bg-gray-700 rounded"
-              onClick={() => onOpenChange(false)}
-            >
-              <X size={16} />
-            </button>
+          <div className="flex justify-between text-center space-x-2">
+            <Label className="text-sm">New Message</Label>
+            <div className="gap-25 ml-auto">
+              <button
+                onClick={() => setIsMaximized(!isMaximized)}
+                className="p-1 hover:bg-gray-600 rounded"
+              >
+                <Maximize2 size={16} />
+              </button>
+              <button
+                className="p-1 hover:bg-gray-600 rounded"
+                onClick={() => onOpenChange(false)}
+              >
+                <X size={16} />
+              </button>
+            </div>
           </div>
         </DialogHeader>
 
