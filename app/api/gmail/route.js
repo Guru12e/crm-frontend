@@ -1,4 +1,3 @@
-import nodemailer from "nodemailer";
 import { google } from "googleapis";
 import { NextResponse } from "next/server";
 
@@ -15,42 +14,39 @@ export async function POST(req) {
 
     const oAuth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
-      process.env.GOOGLE_REDIRECT_URI
+      process.env.GOOGLE_CLIENT_SECRET
     );
 
     oAuth2Client.setCredentials({ refresh_token: refresh_token });
 
-    const accessToken = (await oAuth2Client.getAccessToken()).token;
+    const gmail = google.gmail({ version: "v1", auth: oAuth2Client });
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        type: "OAuth2",
-        user: from_email,
-        clientId: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        refreshToken: refresh_token,
-        accessToken: accessToken,
+    const messagesParts = [
+      `From: ${from_email}`,
+      `To: ${to_email}`,
+      `Subject: ${subject}`,
+      "",
+      body,
+    ];
+
+    const message = messagesParts.join("\n");
+    const encodedMessage = Buffer.from(message)
+      .toString("base64")
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_");
+
+    const res = await gmail.users.messages.send({
+      userId: "me",
+      requestBody: {
+        raw: encodedMessage,
       },
     });
 
-    const mailOptions = {
-      from: from_email,
-      to: to_email,
-      subject: subject,
-      html: body,
-    };
-
-    await transporter.sendMail(mailOptions);
-
-    console.log("✅ Email sent successfully to:", to_email);
     return NextResponse.json({
       success: true,
       message: "Email sent successfully",
     });
   } catch (error) {
-    console.log(error);
     console.error("❌ Failed to send email:", error);
     return NextResponse.json(
       { success: false, error: error.message },
