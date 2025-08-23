@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog_1"; // ShadCN Dialog
 import {
   X,
@@ -14,6 +14,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { Label } from "@radix-ui/react-dropdown-menu";
+import { supabase } from "@/utils/supabase/client";
 
 // Toolbar button
 const ToolbarButton = ({ children, onClick }) => (
@@ -47,18 +48,56 @@ const Dropdown = ({ options, onChange, value }) => (
   </div>
 );
 
-export default function ComposeDialog({ open, onOpenChange }) {
+export default function ComposeDialog({ lead, open, onOpenChange }) {
   const [isMaximized, setIsMaximized] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [subject, setSubject] = useState("");
-  const [recipients, setRecipients] = useState({ to: "", cc: "", bcc: "" });
   const [fontSize, setFontSize] = useState("14px");
-
-  const editorRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  const handleRecipientChange = (field, value) => {
-    setRecipients((prev) => ({ ...prev, [field]: value }));
+  const user = localStorage.getItem("user");
+  const [form, setForm] = useState({
+    from_email: user.email,
+    refres_token: user.refresh_token,
+    to_email: "",
+    subject: "",
+    body: "",
+  });
+  const fetchLeadData = async (leadId) => {
+    try {
+      if (lead.email != form.to_email) {
+        const { error } = await supabase
+          .from("leads")
+          .update({ email: form.to_email })
+          .eq("id", leadId);
+      }
+    } catch (error) {
+      console.error("Error fetching lead data:", error);
+    }
+  };
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+  const handleSendEmail = async () => {
+    try {
+      const res = await fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        alert("✅ Email sent successfully!");
+        setOpen(false);
+        fetchLeadData(lead.id);
+        setForm({ from_email: "", to_email: "", subject: "", body: "" });
+      } else {
+        alert("❌ Failed: " + data.error);
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      alert("⚠ Something went wrong!");
+    }
   };
 
   // FIX: wrap selection with span to persist styles
@@ -152,7 +191,7 @@ export default function ComposeDialog({ open, onOpenChange }) {
               <input
                 type="email"
                 value={recipients.to}
-                onChange={(e) => handleRecipientChange("to", e.target.value)}
+                onChange={(e) => handleChange("to_email", e.target.value)}
                 className="flex-grow focus:outline-none text-sm bg-transparent"
               />
             </div>
@@ -163,14 +202,14 @@ export default function ComposeDialog({ open, onOpenChange }) {
               <input
                 type="text"
                 value={subject}
-                onChange={(e) => setSubject(e.target.value)}
+                onChange={(e) => handleChange("subject", e.target.value)}
                 className="flex-grow focus:outline-none text-sm bg-transparent"
               />
             </div>
           </div>
 
           <div
-            ref={editorRef}
+            onChange={(e) => handleChange("body", e.target.value)}
             contentEditable="true"
             className="flex-grow p-4 focus:outline-none overflow-y-auto text-sm"
             aria-label="Email body"
@@ -180,7 +219,10 @@ export default function ComposeDialog({ open, onOpenChange }) {
           {/* Footer / Toolbar */}
           <footer className="px-4 py-2 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900">
             <div className="flex items-center space-x-1">
-              <button className="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition-colors text-sm">
+              <button
+                className="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition-colors text-sm"
+                onClick={handleSendEmail}
+              >
                 Send
               </button>
               <div className="flex items-center ml-2 space-x-1">
@@ -217,9 +259,6 @@ export default function ComposeDialog({ open, onOpenChange }) {
                 className="hidden"
               />
             </div>
-            <button className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full">
-              <Trash2 size={18} />
-            </button>
           </footer>
         </div>
       </DialogContent>
