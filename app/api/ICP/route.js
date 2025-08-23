@@ -10,11 +10,9 @@ export async function POST(request) {
     .select("user_email")
     .eq("user_email", formData.user_email)
     .single();
-  console.log(user_1);
 
   if (!user_1) {
     try {
-      console.log(formData.description);
       const response = await fetch("http://127.0.0.1:5000/chat", {
         method: "POST",
         headers: {
@@ -55,7 +53,7 @@ export async function POST(request) {
         );
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return NextResponse.json(
         { error: "Internal Server Error" },
         { status: 400 }

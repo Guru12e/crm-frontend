@@ -62,7 +62,6 @@ export default function Layout({ children }) {
       router.push("/");
     }
   }, []);
-
   const toggleExpanded = (name) => {
     setExpandedItems((prev) =>
       prev.includes(name)
@@ -306,7 +305,7 @@ export default function Layout({ children }) {
         )}
       >
         <div className="sticky top-0 z-40 backdrop-blur-xl bg-white/90 dark:bg-slate-900/90 border-b border-white/30 dark:border-slate-700/50">
-          <div className="flex h-16 items-center justify-between px-4 sm:px-6">
+          <div className="flex h-16 items-center justify-end px-4 sm:px-6">
             <Button
               variant="ghost"
               size="sm"
@@ -315,39 +314,42 @@ export default function Layout({ children }) {
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <div className="flex-1 max-w-md min-w-0 ml-2 sm:ml-0">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                <Input
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-white/50 dark:bg-slate-800/50 border-white/30 dark:border-slate-700/50 text-sm w-full"
-                />
+            <div className="flex-1">
+              <div className="max-w-md min-w-0 ml-2 sm:ml-0">
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <Input
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 bg-white/50 dark:bg-slate-800/50 border-white/30 dark:border-slate-700/50 text-sm w-full"
+                  />
+                </div>
               </div>
             </div>
-            {user && user.refresh_token == null && (
-              <div className="flex items-center gap-4">
-                <AlertTriangleIcon
-                  className="cursor-pointer"
-                  onMouseOver={() => setAlertMessage((prev) => !prev)}
-                />
-                {alertMessage && (
-                  <div className="flex items-center space-x-2 bg-yellow-100 border border-yellow-400 text-yellow-700 px-3 py-2 rounded">
-                    <Label className="text-sm text-slate-600 dark:text-slate-400 ">
-                      "Please connect your Gmail to automatically send emails to
-                      Leads."
-                    </Label>
-                    <Link
-                      href="/api/auth/email"
-                      className="text-blue-500 hover:underline"
-                    >
-                      Connect Gmail
-                    </Link>
-                  </div>
-                )}
-              </div>
-            )}
+            {user &&
+              (user.refresh_token == null || user.refresh_token == "") && (
+                <div className="flex items-center gap-4">
+                  <AlertTriangleIcon
+                    className="cursor-pointer"
+                    onMouseOver={() => setAlertMessage((prev) => !prev)}
+                  />
+                  {alertMessage && (
+                    <div className="flex items-center space-x-2 bg-yellow-100 border border-yellow-400 text-yellow-700 px-3 py-2 rounded">
+                      <Label className="text-sm text-slate-600 dark:text-slate-400 ">
+                        "Please connect your Gmail to automatically send emails
+                        to Leads."
+                      </Label>
+                      <Link
+                        href="/api/auth/email"
+                        className="text-blue-500 hover:underline"
+                      >
+                        Connect Gmail
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
             <div className="flex items-center space-x-2 sm:space-x-4">
               <Button
                 variant="ghost"

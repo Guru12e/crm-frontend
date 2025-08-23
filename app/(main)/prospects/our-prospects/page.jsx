@@ -10,7 +10,6 @@ export default function OurProspects() {
   const rawSession = localStorage.getItem("session");
   const session = JSON.parse(rawSession);
   const userEmail = session.user.email;
-  console.log("userEmail:", userEmail);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,18 +25,14 @@ export default function OurProspects() {
       if (error) {
         console.error(error);
       } else {
-        console.log("In else");
         setCompanyData(data[0]);
       }
     };
 
     fetchData();
   }, []);
-  console.log("Company data set:", companyData_1);
 
   const handleClick = async () => {
-    console.log("In click");
-    console.log("Inclick:", companyData_1);
     if (!companyData_1) return;
 
     const res = await fetch("/api/ICP", {
@@ -51,10 +46,8 @@ export default function OurProspects() {
 
     if (res.ok) {
       const data = await res.json();
-      console.log(data);
       setResult(data.output);
     }
-    console.log(result);
   };
 
   return (

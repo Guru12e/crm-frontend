@@ -16,6 +16,8 @@ import {
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { supabase } from "@/utils/supabase/client";
 import { Input } from "./ui/input";
+import { DialogTitle } from "./ui/dialog";
+import { Textarea } from "./ui/textarea";
 
 // Toolbar button
 const ToolbarButton = ({ children, onClick }) => (
@@ -55,9 +57,10 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
   const fileInputRef = useRef(null);
 
   const user = localStorage.getItem("user");
+  const parsedUser = JSON.parse(user);
   const [form, setForm] = useState({
-    from_email: user.email,
-    refres_token: user.refresh_token,
+    from_email: parsedUser["email"],
+    refresh_token: parsedUser["refresh_token"],
     to_email: lead.email || "",
     subject: "",
     body: "",
@@ -79,7 +82,8 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
   };
   const handleSendEmail = async () => {
     try {
-      const res = await fetch("/api/email", {
+      console.log("Sending email with form data:", form);
+      const res = await fetch("/api/gmail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -92,17 +96,16 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
         fetchLeadData(lead.id);
         setForm({ from_email: "", to_email: "", subject: "", body: "" });
       } else {
-        alert("❌ Failed: " + data.error);
+        console.log("❌ Failed:", data.error);
       }
     } catch (err) {
       console.error("Error:", err);
-      alert("⚠ Something went wrong!");
     }
   };
 
   // FIX: wrap selection with span to persist styles
   const applyStyle = useCallback((command, value = null) => {
-    if (!editorRef.current) return;
+    if (!form.body) return;
     if (command === "fontSize") {
       const sel = window.getSelection();
       if (!sel.rangeCount) return;
@@ -113,7 +116,7 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
     } else {
       document.execCommand(command, false, value);
     }
-    editorRef.current.focus();
+    form.body.current.focus();
   }, []);
 
   const handleFileAttach = () => fileInputRef.current?.click();
@@ -137,7 +140,7 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
       >
         {/* Header */}
         <DialogHeader className="bg-gray-600 dark:bg-gray-900 text-white px-4 py-2 flex justify-between rounded-t-lg">
-          <Label className="text-sm">New Message</Label>
+          <DialogTitle className="text-sm">New Message</DialogTitle>
           <div className="flex gap-2 ml-auto">
             <button
               onClick={() => setIsMaximized(!isMaximized)}
@@ -183,14 +186,13 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
             </div>
           </div>
 
-          <div
+          <Textarea
             name="body"
             onChange={handleChange}
-            contentEditable="true"
             className="flex-grow p-4 focus:outline-none overflow-y-auto text-sm"
             aria-label="Email body"
             style={{ fontSize }}
-          ></div>
+          />
 
           {/* Footer / Toolbar */}
           <footer className="px-4 py-2 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900">

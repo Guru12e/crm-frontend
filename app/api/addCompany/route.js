@@ -43,7 +43,6 @@ export async function POST(request) {
       .single();
 
     if (companyError) {
-      console.log(companyError);
       return NextResponse.json(
         { error: `Failed to insert company: ${companyError.message}` },
         { status: 500 }
@@ -52,7 +51,6 @@ export async function POST(request) {
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

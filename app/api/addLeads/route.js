@@ -25,12 +25,12 @@ export async function POST(request) {
     })
 
     if(error) {
-        console.log(error)
+        console.error(error);
     }
     return new NextResponse("success" , {status : 200})
 } catch (err) {
-    console.log(err)
-    return new NextResponse("success" , {status : 200})
+    console.error(err);
+    return new NextResponse("error" , {status : 400})
     }
 }
 
