@@ -91,6 +91,27 @@ export default function LeadCard({ lead, setId, onChange }) {
     }
   };
 
+  const handleMoveToDeal = async (lead) => {
+    const { error } = await supabase.from("Deals").insert({
+      name: lead.name,
+      phone: lead.phone,
+      email: lead.email,
+      linkedIn: lead.linkedIn,
+      location: lead.location,
+      status: "New",
+      created_at: today.toISOString().split("T")[0],
+      closeDate: today.toISOString().split("T")[0],
+      user_email: lead.userEmail,
+    });
+    if (error) {
+      console.error("Error moving lead to deal:", error);
+      toast.error("Error moving lead to deal");
+    } else {
+      toast.success("Lead moved to deal successfully");
+      onChange();
+    }
+  };
+
   return (
     <>
       <Card className="backdrop-blur-sm bg-white/70 h-auto w-full sm:max-w-md md:max-w-lg lg:max-w-sm z-0 hover:scale-103 hover:shadow-lg dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-1000 group mx-auto cursor-pointer">
@@ -120,7 +141,7 @@ export default function LeadCard({ lead, setId, onChange }) {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <Label className="mt-1 ml-2 text-base sm:text-lg font-semibold text-slate-900 dark:text-white break-words bg-transparent hover:bg-transparent">
+                  <Label className="mt-2 ml-2 text-base sm:text-lg font-semibold text-slate-900 dark:text-white break-words bg-transparent hover:bg-transparent">
                     {lead.name}
                   </Label>
                   <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 break-words">
@@ -129,7 +150,15 @@ export default function LeadCard({ lead, setId, onChange }) {
                 </div>
               </div>
             </SheetTrigger>
-            <div className="flex mt-1 sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2">
+            <Badge
+              variant={lead.source === "Email" ? "Qualified" : "hidden"}
+              className={`mt-3 ${
+                lead.source === "Email" ? "visible" : "invisible"
+              }`}
+            >
+              Automated
+            </Badge>
+            <div className="flex mt-2 sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2">
               <div className="text-left">
                 <Badge
                   variant={
@@ -251,6 +280,9 @@ export default function LeadCard({ lead, setId, onChange }) {
                             onClick={() => {
                               setNewState(statu);
                               setOpen(true);
+                              if (newState === "Qualified") {
+                                handleMoveToDeal(lead);
+                              }
                             }}
                           >
                             {statu}
@@ -301,7 +333,7 @@ export default function LeadCard({ lead, setId, onChange }) {
         <SheetHeader>
           <SheetTitle>Lead Data</SheetTitle>
           <SheetDescription>
-            <Updateleads lead_id={lead.id} />
+            <Updateleads lead_id={lead.id} onChange={onChange} />
           </SheetDescription>
         </SheetHeader>
       </SheetContent>

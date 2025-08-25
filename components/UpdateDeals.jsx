@@ -66,7 +66,7 @@ const ErrorMessage = ({ error }) => {
   );
 };
 
-export default function Deals(deal_id) {
+export default function Deals(deal_id, onChange) {
   const today = new Date().toISOString().split("T")[0];
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -216,6 +216,7 @@ export default function Deals(deal_id) {
         position: "top-right",
         zIndex: 9999,
       });
+      onChange();
     }
   };
 
@@ -238,6 +239,7 @@ export default function Deals(deal_id) {
         position: "top-right",
         zIndex: 9999,
       });
+      onChange();
     }
   };
   const handleEditActivity = (activityId, field, value) => {
@@ -269,6 +271,7 @@ export default function Deals(deal_id) {
         zIndex: 9999,
       });
       setOpenActivities(updatedActivities);
+      onChange();
     }
 
     setLoading(false);
@@ -303,6 +306,7 @@ export default function Deals(deal_id) {
         position: "top-right",
         zIndex: 9999,
       });
+      onChange();
     }
   };
 
@@ -327,8 +331,6 @@ export default function Deals(deal_id) {
       .select("*")
       .eq("id", deal_id.deal_id)
       .single();
-    console.log(dealDetails);
-    console.log("deal data:", DealsData);
     const noChanges =
       dealDetails.name === DealsData.name &&
       dealDetails.email === DealsData.email &&
@@ -361,9 +363,32 @@ export default function Deals(deal_id) {
           "Data updated permanently. All changes made are permanent.",
           { position: "top-right" }
         );
+        if (DealsData.status === "Closed-won") {
+          const customerData = {
+            name: DealsData.name,
+            email: DealsData.email,
+            phone: DealsData.number,
+            linkedIn: DealsData.linkedIn,
+            location: DealsData.location,
+            industry: DealsData.industry,
+            status: DealsData.status,
+            created_at: today,
+            user_email: DealsData.user_email,
+          };
+          const { error } = await supabase
+            .from("Customers")
+            .insert([customerData]);
+
+          if (error) {
+            console.error("Error creating customer:", error);
+            toast.error("Error creating customer");
+          } else {
+            toast.success("Customer created successfully");
+          }
+        }
         localStorage.removeItem("companyDataCache");
         setLoading(false);
-        fetchDealData();
+        await fetchDealData();
       }
     }
   };
@@ -488,6 +513,7 @@ export default function Deals(deal_id) {
           </Label>
           <Input
             className="bg-white"
+            type="date"
             id="closeDate"
             placeholder="Deal close date"
             value={DealsData.closeDate || ""}

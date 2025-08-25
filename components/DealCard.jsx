@@ -40,6 +40,7 @@ export default function DealCard({ deal, setId, onChange }) {
     "On-hold",
     "Abandoned",
   ];
+  const today = new Date().toISOString().split("T")[0];
   const [email, setEmail] = useState(false);
   const [newState, setNewState] = useState("");
   const [open, setOpen] = useState(false);
@@ -70,6 +71,29 @@ export default function DealCard({ deal, setId, onChange }) {
       toast.error("Error updating deal");
     } else {
       toast.success("Deal updated successfully");
+      if (newState === "Closed-won") {
+        const customerData = {
+          name: deal.name,
+          email: deal.email,
+          phone: deal.phone,
+          linkedIn: deal.linkedIn,
+          location: deal.location,
+          industry: deal.industry,
+          status: deal.status,
+          created_at: today,
+          user_email: deal.user_email,
+        };
+        const { error } = await supabase
+          .from("Customers")
+          .insert([customerData]);
+
+        if (error) {
+          console.error("Error creating customer:", error);
+          toast.error("Error creating customer");
+        } else {
+          toast.success("Customer created successfully");
+        }
+      }
       onChange();
     }
   };
@@ -111,7 +135,7 @@ export default function DealCard({ deal, setId, onChange }) {
                   </div>
                   <Badge variant="outline">{deal.status}</Badge>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 break-words">
-                    Close: {deal.closeDate.split("T")[0]}
+                    Close: {deal?.closeDate?.split("T")[0] ?? ""}
                   </p>
                 </div>
               </div>
@@ -260,7 +284,7 @@ export default function DealCard({ deal, setId, onChange }) {
         <SheetHeader>
           <SheetTitle>Deal Data</SheetTitle>
           <SheetDescription>
-            <UpdateDeals deal_id={deal.id} />
+            <UpdateDeals deal_id={deal.id} onChange={onChange} />
           </SheetDescription>
         </SheetHeader>
       </SheetContent>

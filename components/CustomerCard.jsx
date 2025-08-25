@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback } from "./ui/avatar";
-import { Card, CardAction, CardContent, CardDescription } from "./ui/card";
+import { Card, CardContent } from "./ui/card";
 import {
   MapPin,
   Building2,

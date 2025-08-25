@@ -37,6 +37,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "react-toastify";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/utils/supabase/client";
+import leads from "@/components/Updateleads";
 
 const summaryStats = {
   customers: { total: 1247, new: 89, growth: 12 },
@@ -194,9 +195,19 @@ export default function CRM() {
   };
 
   useEffect(() => {
-    fetchCustomers();
-    fetchLeads();
-    fetchDeals();
+    if (userEmail) {
+      fetchCustomers();
+      fetchLeads();
+      fetchDeals();
+    }
+
+    const intervalId = setInterval(() => {
+      fetchCustomers();
+      fetchLeads();
+      fetchDeals();
+    }, 60000);
+
+    return () => clearInterval(intervalId);
   }, [userEmail]);
 
   const handleCustomerSubmit = async (e) => {
@@ -281,7 +292,7 @@ export default function CRM() {
           status: "",
           created_at: "",
         });
-        window.location.reload();
+        await fetchCustomers();
       } else {
         toast.error("Error in Adding Customer", {
           position: "top-right",
@@ -295,71 +306,92 @@ export default function CRM() {
   const handleLeadsSubmit = async (e) => {
     e.preventDefault();
     setLeadsLoading(true);
+
+    let newErrors = {};
     let isValid = true;
+
     if (!leadsFormData.name) {
-      errors.leadName = "Name is required";
+      newErrors.leadName = "Name is required";
       isValid = false;
-    } else {
-      errors.leadName = "";
     }
     if (!leadsFormData.phone) {
-      errors.leadPhone = "Phone is required";
+      newErrors.leadPhone = "Phone is required";
       isValid = false;
-    } else {
-      errors.leadPhone = "";
     }
     if (!leadsFormData.status) {
-      errors.leadStatus = "Status is required";
+      newErrors.leadStatus = "Status is required";
       isValid = false;
-    } else {
-      errors.leadStatus = "";
     }
+
+    setErrors(newErrors);
 
     if (!isValid) {
       setLeadsLoading(false);
-      setErrors(errors);
       return;
-    } else {
-      const req = await fetch("/api/addLeads", {
+    }
+
+    const req = await fetch("/api/addLeads", {
+      method: "POST",
+      body: JSON.stringify({ ...leadsFormData, session }),
+    });
+
+    if (leadsFormData.status === "Qualified") {
+      const leadToDeal = {
+        name: leadsFormData.name,
+        phone: leadsFormData.phone,
+        email: leadsFormData.email,
+        linkedIn: leadsFormData.linkedIn,
+        location: leadsFormData.location,
+        status: "New",
+        created_at: today.toISOString().split("T")[0],
+        closeDate: today.toISOString().split("T")[0],
+        user_email: userEmail,
+      };
+
+      await fetch("/api/addDeals", {
         method: "POST",
-        body: JSON.stringify({
-          ...leadsFormData,
-          session: session,
-        }),
+        body: JSON.stringify({ ...leadToDeal, session }),
       });
 
-      if (req.status == 200) {
-        toast.success("Lead Added", {
+      if (req.status === 200) {
+        toast.success("Deal Added Since Lead is Qualified", {
           autoClose: 3000,
           position: "top-right",
         });
-
-        console.log(req);
-        const updatedLead = await req.json();
-        console.log(updatedLead);
-        setLeadsData((prevLeads) => [...prevLeads, updatedLead]);
-        setLeadsFormData({
-          name: "",
-          phone: "",
-          email: "",
-          linkedIn: "",
-          location: "",
-          job: "",
-          jobRole: "",
-          status: "",
-          created_at: "",
-          user_email: userEmail,
-        });
-        window.location.reload();
+        await fetchDeals();
       } else {
-        toast.error("Error in Adding Leads", {
+        toast.error("Error in Adding Deal", {
           position: "top-right",
           autoClose: 3000,
         });
       }
-
-      setLeadsLoading(false);
     }
+
+    if (req.status === 200) {
+      toast.success("Lead Added", { autoClose: 3000, position: "top-right" });
+      const updatedLead = await req.json();
+      setLeadsData((prevLeads) => [...prevLeads, updatedLead]);
+      setLeadsFormData({
+        name: "",
+        phone: "",
+        email: "",
+        linkedIn: "",
+        location: "",
+        website: "",
+        industry: "",
+        status: "",
+        created_at: "",
+        user_email: userEmail,
+      });
+      await fetchLeads();
+    } else {
+      toast.error("Error in Adding Leads", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+
+    setLeadsLoading(false);
   };
 
   const handleDealsSubmit = async (e) => {
@@ -421,6 +453,27 @@ export default function CRM() {
           autoClose: 3000,
           position: "top-right",
         });
+        if (dealFormData.status === "Closed-won") {
+          const customerData = {
+            name: dealFormData.name,
+            phone: dealFormData.phone,
+            email: dealFormData.email,
+            linkedIn: dealFormData.linkedIn,
+            location: dealFormData.location,
+            industry: dealFormData.industry,
+            status: "Active",
+            created_at: today.toISOString().split("T")[0],
+            user_email: userEmail,
+          };
+          await fetch("/api/addCustomer", {
+            method: "POST",
+            body: JSON.stringify({
+              ...customerData,
+              session: session,
+            }),
+          });
+          await fetchCustomers();
+        }
         const updatedDeal = await req.json();
         setDealsData((prevDeals) => [...prevDeals, updatedDeal]);
 
@@ -437,7 +490,7 @@ export default function CRM() {
           closeDate: "",
           user_email: userEmail,
         });
-        window.location.reload();
+        await fetchDeals();
       } else {
         toast.error("Error in Adding Deal", {
           position: "top-right",
@@ -467,7 +520,6 @@ export default function CRM() {
         const { data, error } = await supabase
           .from(activeTab)
           .insert(results.data);
-        window.location.reload();
         if (error) {
           console.error("Error inserting data:", error);
         } else {

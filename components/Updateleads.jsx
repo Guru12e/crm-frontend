@@ -72,7 +72,7 @@ const ErrorMessage = ({ error }) => {
   );
 };
 
-export default function leads(lead_id) {
+export default function leads(lead_id, onChange) {
   const today = new Date().toISOString().split("T")[0];
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -365,6 +365,26 @@ export default function leads(lead_id) {
           "Data updated permanently. All changes made are permanent.",
           { position: "top-right" }
         );
+        if (LeadsData.status === "Qualified") {
+          const { error } = await supabase.from("Deals").insert({
+            name: LeadsData.name,
+            phone: LeadsData.number,
+            email: LeadsData.email,
+            linkedIn: LeadsData.linkedIn,
+            location: LeadsData.location,
+            status: "New",
+            created_at: today.toISOString().split("T")[0],
+            closeDate: today.toISOString().split("T")[0],
+            user_email: LeadsData.userEmail,
+          });
+          if (error) {
+            console.error("Error moving lead to deal:", error);
+            toast.error("Error moving lead to deal");
+          } else {
+            toast.success("Lead moved to deal successfully");
+            onChange();
+          }
+        }
         localStorage.removeItem("companyDataCache");
         setLoading(false);
         fetchLeadData();
