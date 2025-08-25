@@ -34,7 +34,6 @@ export default function PricingPage() {
   const [companyData, setCompanyData] = useState({});
   const [products, setProducts] = useState([]);
   const [result, setResult] = useState(null);
-  const [customerLoading, setCustomerLoading] = useState(false);
   const [newProduct, setNewProduct] = useState({
     name: "",
     category: "",
@@ -55,6 +54,28 @@ export default function PricingPage() {
       console.error("Failed to parse session from localStorage:", error);
     }
   }, []);
+  const fetchData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("Users")
+        .select("products, email")
+        .eq("email", userEmail)
+        .single();
+
+      if (error) throw error;
+
+      setCompanyData(data);
+      setProducts(
+        typeof data.products === "string"
+          ? JSON.parse(data.products || "[]")
+          : data.products || []
+      );
+
+      console.log("Fetched company data:", data);
+    } catch (err) {
+      console.error("Error fetching data from Supabase:", err);
+    }
+  };
 
   useEffect(() => {
     if (!userEmail) return;
@@ -72,29 +93,6 @@ export default function PricingPage() {
       }
       return;
     }
-
-    const fetchData = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("Users")
-          .select("products, email")
-          .eq("email", userEmail)
-          .single();
-
-        if (error) throw error;
-
-        setCompanyData(data);
-        setProducts(
-          typeof data.products === "string"
-            ? JSON.parse(data.products || "[]")
-            : data.products || []
-        );
-
-        console.log("Fetched company data:", data);
-      } catch (err) {
-        console.error("Error fetching data from Supabase:", err);
-      }
-    };
 
     fetchData();
   }, [userEmail]);
@@ -223,7 +221,7 @@ export default function PricingPage() {
         localStorage.removeItem("companyDataCache");
       }
       setLoading(false);
-      window.location.reload();
+      await fetchData();
     }
   };
 
@@ -241,9 +239,9 @@ export default function PricingPage() {
               </p>
             </div>
             <SheetTrigger as Child>
-              <Button className="bg-gradient-to-r px-3 py-2 rounded-xl from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white w-full ">
+              <Label className="bg-gradient-to-r px-3 py-2 rounded-xl from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white w-full ">
                 Add New Product
-              </Button>
+              </Label>
             </SheetTrigger>
           </div>
           <SheetContent>
@@ -348,15 +346,15 @@ export default function PricingPage() {
                       <ErrorMessage error={errors.newProduct.description} />
                     </div>
                     <Button
-                      disabled={customerLoading}
+                      disabled={loading}
                       onClick={addProduct}
                       className={`${
-                        customerLoading
+                        loading
                           ? "bg-gray-400 hover:bg-gray-500"
                           : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
                       }  cursor-pointer text-white`}
                     >
-                      {customerLoading && (
+                      {loading && (
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       )}
                       Add Product
