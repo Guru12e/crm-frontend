@@ -38,7 +38,7 @@ const navigation = [
   },
   { name: "Engagement", href: "/engagement", icon: MessageSquare },
   { name: "CRM", href: "/crm", icon: Database },
-  { name: "Outreach", href: "/outreach", icon: Send },
+  { name: "Pricing", href: "/pricing", icon: Send },
   { name: "Campaigns", href: "/campaigns", icon: Megaphone },
   { name: "Calendar", href: "/calendar", icon: Calendar },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
