@@ -128,7 +128,7 @@ export default function CRM() {
       const sessionJSON = JSON.parse(localStorage.getItem("session"));
       setSession(sessionJSON);
       setUserEmail(sessionJSON.user.email);
-      setActiveTab(sessionStorage.getItem("activeTab"));
+      setActiveTab(sessionStorage.getItem("activeTab") || "Customers");
     };
 
     getSession();
@@ -205,13 +205,15 @@ export default function CRM() {
     let isValid = true;
     if (!customerFormData.name) {
       errors.name = "Name is required";
+      toast.error("Name is required");
       isValid = false;
     } else {
       errors.name = "";
     }
 
     if (!customerFormData.number) {
-      errors.number = "Number is Required";
+      errors.number = "Phone Number is Required";
+      toast.error("Phone Number is Required");
       isValid = false;
     } else {
       errors.number = "";
@@ -231,7 +233,8 @@ export default function CRM() {
 
     if (customerFormData.linkedIn) {
       if (!customerFormData.linkedIn.includes("https://www.linkedin.com/")) {
-        errors.linkedIn = "Linked Url Required";
+        errors.linkedIn = "LinkedIn Url Required";
+        toast.error("LinkedIn Url Required");
         isValid = false;
       } else {
         errors.linkedIn = "";
@@ -240,6 +243,10 @@ export default function CRM() {
     if (!isValid) {
       setCustomerLoading(false);
       setErrors(errors);
+      toast.error("Please fix the errors in the form", {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     } else {
       const req = await fetch("/api/addCustomer", {

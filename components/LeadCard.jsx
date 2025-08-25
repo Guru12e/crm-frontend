@@ -8,16 +8,7 @@ import {
   SheetHeader,
   SheetContent,
 } from "./ui/sheet";
-import {
-  MapPin,
-  Building2,
-  Mail,
-  Phone,
-  Upload,
-  UploadCloud,
-  LucideUpload,
-  Eye,
-} from "lucide-react";
+import { Mail, Phone, LucideUpload, Eye, Trash2 } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import {
@@ -29,7 +20,7 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 import Updateleads from "./Updateleads";
 import { supabase } from "@/utils/supabase/client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import {
   Dialog,
@@ -53,10 +44,12 @@ export default function LeadCard({ lead, setId, onChange }) {
     "Qualified",
     "Unqualified",
   ];
+
   const [newState, setNewState] = useState("");
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState(false);
   const [description, setDescription] = useState("");
+
   const handleStatusUpdate = async () => {
     const stage_history = lead.stage_history || [];
     const length = stage_history.length;
@@ -82,6 +75,19 @@ export default function LeadCard({ lead, setId, onChange }) {
       toast.error("Error updating lead");
     } else {
       toast.success("Lead updated successfully");
+      onChange();
+    }
+  };
+
+  const handleDeleteLead = async (leadId) => {
+    const { error } = await supabase.from("Leads").delete().eq("id", leadId);
+
+    if (error) {
+      console.error("Error deleting lead:", error);
+      toast.error("Error deleting lead");
+    } else {
+      toast.success("Lead deleted successfully");
+      onChange();
     }
   };
 
@@ -166,6 +172,7 @@ export default function LeadCard({ lead, setId, onChange }) {
                   </DialogTrigger>
 
                   <EmailTemplate
+                    type="lead"
                     email={lead.email}
                     open={email}
                     onOpenChange={setEmail}
@@ -180,10 +187,45 @@ export default function LeadCard({ lead, setId, onChange }) {
                   Call
                 </Button>
                 <SheetTrigger asChild>
-                  <button className="bg-white/50 dark:bg-slate-800/50 border p-1 rounded cursor-pointer hover:scale-105 transition-transform border-black/10 flex-1 sm:flex-none">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
+                  >
                     <Eye className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </SheetTrigger>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Delete Lead</DialogTitle>
+                      <DialogDescription>
+                        Are you sure you want to delete this lead?
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <Button
+                        type="submit"
+                        onClick={() => {
+                          handleDeleteLead(lead.id);
+                          setOpen(false);
+                          onChange();
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
 
               <div>
