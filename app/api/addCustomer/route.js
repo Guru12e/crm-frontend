@@ -43,7 +43,7 @@ export async function POST(request) {
           created_at: formData.created_at || data.toTimeString(),
           user_email: formData.session.user.email,
         })
-        .select();
+        .select("*");
       if (companyError) {
         return NextResponse.json(
           { error: `Failed to insert company: ${companyError.message}` },
@@ -51,7 +51,7 @@ export async function POST(request) {
         );
       }
 
-      return NextResponse.json({ success: true }, { status: 200 });
+      return NextResponse.json(companyData, { status: 200 });
     } else {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }

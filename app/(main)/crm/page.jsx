@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRef } from "react";
-import { Link } from "next/link";
 import Papa from "papaparse";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import Updateleads from "@/components/Updateleads";
 import { Input } from "@/components/ui/input";
 import LeadCard from "@/components/LeadCard";
 import CustomerCard from "@/components/CustomerCard";
@@ -19,8 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Sheet,
   SheetContent,
@@ -33,32 +29,14 @@ import {
   Users,
   TrendingUp,
   DollarSign,
-  Filter,
   Search,
-  Phone,
-  Mail,
-  Building2,
-  MapPin,
-  Star,
-  StarOff,
-  Eye,
-  Edit,
-  MoreHorizontal,
   Loader2,
   AlertCircle,
-  User,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { toast } from "react-toastify";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-  DropdownMenuContent,
-} from "@radix-ui/react-dropdown-menu";
 import { supabase } from "@/utils/supabase/client";
-import { Elsie } from "next/font/google";
 
 const summaryStats = {
   customers: { total: 1247, new: 89, growth: 12 },
@@ -85,18 +63,9 @@ const dealStatus = [
   "On-hold",
   "Abandoned",
 ];
-const rawSession = localStorage.getItem("session");
-const session = JSON.parse(rawSession);
-const userEmail = session.user.email;
-
-if (!userEmail) {
-  console.error("User email not found in session");
-}
 
 export default function CRM() {
-  const [activeTab, setActiveTab] = useState(
-    sessionStorage.getItem("activeTab") || "Customers"
-  );
+  const [activeTab, setActiveTab] = useState("Customers");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All statuses");
   const [sourceFilter, setSourceFilter] = useState("");
@@ -105,7 +74,8 @@ export default function CRM() {
   const [leadsData, setLeadsData] = useState([]);
   const [dealsData, setDealsData] = useState([]);
   const today = new Date();
-  sessionStorage.setItem("activeTab", activeTab);
+  const [session, setSession] = useState("");
+  const [userEmail, setUserEmail] = useState(null);
   const [customerFormData, setCustomerFormData] = useState({
     name: "",
     phone: "",
@@ -117,42 +87,52 @@ export default function CRM() {
     status: "",
     created_at: today,
   });
-  const [showUpdateLeads, setShowUpdateLeads] = useState(false);
   const [leadsFormData, setLeadsFormData] = useState({
-    name: "", //req
+    name: "",
     email: "",
-    phone: "", //req
+    phone: "",
     age: 18,
     linkedIn: "",
     industry: "",
     company: "",
     income: 0,
     website: "",
-    status: "", //req
+    status: "",
     source: "",
     address: "",
     description: "",
-    user_email: userEmail,
   });
+
   const [dealFormData, setDealFormData] = useState({
-    name: "", //req
+    name: "",
     email: "",
-    title: "", //req
-    phone: "", //req
+    title: "",
+    phone: "",
     company: "",
-    value: 0, //req
-    status: "", //req
+    value: 0,
+    status: "",
     priority: "Low",
     closeDate: today,
     owner: "",
     source: "",
     description: "",
-    user_email: userEmail,
   });
+
   const [errors, setErrors] = useState({});
   const [customerLoading, setCustomerLoading] = useState(false);
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [dealsLoading, setDealsLoading] = useState(false);
+
+  useEffect(() => {
+    const getSession = () => {
+      const sessionJSON = JSON.parse(localStorage.getItem("session"));
+      setSession(sessionJSON);
+      setUserEmail(sessionJSON.user.email);
+      setActiveTab(sessionStorage.getItem("activeTab"));
+    };
+
+    getSession();
+  }, []);
 
   const ErrorMessage = ({ error }) =>
     error && (
@@ -262,12 +242,11 @@ export default function CRM() {
       setErrors(errors);
       return;
     } else {
-      const session = localStorage.getItem("session");
       const req = await fetch("/api/addCustomer", {
         method: "POST",
         body: JSON.stringify({
           ...customerFormData,
-          session: JSON.parse(session),
+          session: session,
         }),
       });
 
@@ -276,6 +255,14 @@ export default function CRM() {
           autoClose: 3000,
           position: "top-right",
         });
+
+        console.log(req.json());
+
+        const updatedCustomer = await req.json();
+        setCustomersData((prevCustomers) => [
+          ...prevCustomers,
+          updatedCustomer,
+        ]);
         setCustomerFormData({
           name: "",
           phone: "",
@@ -287,7 +274,7 @@ export default function CRM() {
           status: "",
           created_at: "",
         });
-        window.location.reload(); // refresh once right now
+        window.location.reload();
       } else {
         toast.error("Error in Adding Customer", {
           position: "top-right",
@@ -326,12 +313,11 @@ export default function CRM() {
       setErrors(errors);
       return;
     } else {
-      const session = localStorage.getItem("session");
       const req = await fetch("/api/addLeads", {
         method: "POST",
         body: JSON.stringify({
           ...leadsFormData,
-          session: JSON.parse(session),
+          session: session,
         }),
       });
 
@@ -340,6 +326,11 @@ export default function CRM() {
           autoClose: 3000,
           position: "top-right",
         });
+
+        console.log(req);
+        const updatedLead = await req.json();
+        console.log(updatedLead);
+        setLeadsData((prevLeads) => [...prevLeads, updatedLead]);
         setLeadsFormData({
           name: "",
           phone: "",
@@ -352,7 +343,7 @@ export default function CRM() {
           created_at: "",
           user_email: userEmail,
         });
-        window.location.reload(); // refresh once right now
+        window.location.reload();
       } else {
         toast.error("Error in Adding Leads", {
           position: "top-right",
@@ -410,12 +401,11 @@ export default function CRM() {
       setErrors(errors);
       return;
     } else {
-      const session = localStorage.getItem("session");
       const req = await fetch("/api/addDeals", {
         method: "POST",
         body: JSON.stringify({
           ...dealFormData,
-          session: JSON.parse(session),
+          session: session,
         }),
       });
 
@@ -424,6 +414,9 @@ export default function CRM() {
           autoClose: 3000,
           position: "top-right",
         });
+        const updatedDeal = await req.json();
+        setDealsData((prevDeals) => [...prevDeals, updatedDeal]);
+
         setDealFormData({
           name: "",
           phone: "",
@@ -437,7 +430,7 @@ export default function CRM() {
           closeDate: "",
           user_email: userEmail,
         });
-        window.location.reload(); // refresh once right now
+        window.location.reload();
       } else {
         toast.error("Error in Adding Deal", {
           position: "top-right",
@@ -467,7 +460,7 @@ export default function CRM() {
         const { data, error } = await supabase
           .from(activeTab)
           .insert(results.data);
-        window.location.reload(); // refresh once right now
+        window.location.reload();
         if (error) {
           console.error("Error inserting data:", error);
         } else {
@@ -1859,7 +1852,10 @@ export default function CRM() {
 
       <Tabs
         value={activeTab}
-        onValueChange={setActiveTab}
+        onValueChange={(e) => {
+          setActiveTab(e);
+          sessionStorage.setItem("activeTab", e);
+        }}
         className="space-y-6"
       >
         <TabsList className="grid w-full grid-cols-3 backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border border-white/20">
@@ -1998,6 +1994,7 @@ export default function CRM() {
                               <LeadCard
                                 key={l.id}
                                 lead={l}
+                                setData={setLeadsData}
                                 onChange={() => {
                                   fetchLeads();
                                 }}
