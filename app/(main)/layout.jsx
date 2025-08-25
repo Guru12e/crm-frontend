@@ -62,6 +62,7 @@ export default function Layout({ children }) {
       router.push("/");
     }
   }, []);
+
   const toggleExpanded = (name) => {
     setExpandedItems((prev) =>
       prev.includes(name)
