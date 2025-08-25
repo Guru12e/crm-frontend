@@ -15,7 +15,9 @@ function SheetTrigger({ ...props }) {
 }
 
 function SheetClose({ ...props }) {
-  return <SheetPrimitive.Close data-slot="sheet-close" {...props} />;
+  return (
+    <SheetPrimitive.Close id="sheet-close" data-slot="sheet-close" {...props} />
+  );
 }
 
 function SheetPortal({ ...props }) {

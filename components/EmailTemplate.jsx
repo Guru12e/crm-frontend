@@ -16,7 +16,7 @@ import {
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { supabase } from "@/utils/supabase/client";
 import { Input } from "./ui/input";
-import { DialogTitle } from "./ui/dialog";
+import { DialogClose, DialogTitle } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
 
 // Toolbar button
@@ -51,7 +51,7 @@ const Dropdown = ({ options, onChange, value }) => (
   </div>
 );
 
-export default function ComposeDialog({ lead, open, onOpenChange }) {
+export default function ComposeDialog({ email, onOpenChange }) {
   const [isMaximized, setIsMaximized] = useState(false);
   const [fontSize, setFontSize] = useState("14px");
   const fileInputRef = useRef(null);
@@ -61,22 +61,10 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
   const [form, setForm] = useState({
     from_email: parsedUser["email"],
     refresh_token: parsedUser["refresh_token"],
-    to_email: lead.email || "",
+    to_email: email || "",
     subject: "",
     body: "",
   });
-  const fetchLeadData = async (leadId) => {
-    try {
-      if (lead.email != form.to_email) {
-        const { error } = await supabase
-          .from("leads")
-          .update({ email: form.to_email })
-          .eq("id", leadId);
-      }
-    } catch (error) {
-      console.error("Error fetching lead data:", error);
-    }
-  };
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -93,7 +81,6 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
       if (data.success) {
         alert("✅ Email sent successfully!");
         setOpen(false);
-        fetchLeadData(lead.id);
         setForm({ from_email: "", to_email: "", subject: "", body: "" });
       } else {
         console.log("❌ Failed:", data.error);
@@ -126,10 +113,8 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
       Array.from(e.target.files).map((f) => f.name)
     );
 
-  // If minimized → show only a bar
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
       <DialogContent
         className={`fixed bottom-0 right-0 p-0 shadow-2xl rounded-t-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 flex flex-col transition-all duration-300 ease-in-out ${
           isMaximized
@@ -137,7 +122,6 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
             : "w-full md:w-[550px] h-[60vh] md:h-auto"
         }`}
       >
-        {/* Header */}
         <DialogHeader className="bg-gray-600 dark:bg-gray-900 text-white px-4 py-2 flex justify-between rounded-t-lg">
           <div className="flex justify-between text-center space-x-2">
             <Label className="text-sm">New Message</Label>
@@ -148,12 +132,11 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
               >
                 <Maximize2 size={16} />
               </button>
-              <button
-                className="p-1 hover:bg-gray-600 rounded"
-                onClick={() => onOpenChange(false)}
-              >
-                <X size={16} />
-              </button>
+              <DialogClose asChild>
+                <button className="p-1 hover:bg-gray-600 rounded">
+                  <X size={16} />
+                </button>
+              </DialogClose>
             </div>
           </div>
         </DialogHeader>
@@ -241,6 +224,6 @@ export default function ComposeDialog({ lead, open, onOpenChange }) {
           </footer>
         </div>
       </DialogContent>
-    </Dialog>
+    </>
   );
 }

@@ -36,7 +36,7 @@ const ErrorMessage = ({ error }) => {
   );
 };
 
-export default function Deals(deal_id) {
+export default function UpdateDeals(deal_id) {
   const [loading, setLoading] = useState(false);
   const [DealsData, setDealsData] = useState({});
   const [errors, setErrors] = useState({ newProduct: {} });

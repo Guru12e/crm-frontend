@@ -371,7 +371,6 @@ export default function leads(lead_id) {
       }
     }
   };
-  console.log("Helloo", openActivities);
   const Activities = ["Meeting", "Email", "Call", "Product Demo", "Task"];
   return (
     <div className="flex flex-col">

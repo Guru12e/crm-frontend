@@ -16,6 +16,7 @@ import {
   Upload,
   UploadCloud,
   LucideUpload,
+  Eye,
 } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -85,167 +86,183 @@ export default function LeadCard({ lead, setId, onChange }) {
   };
 
   return (
-    <Card className="backdrop-blur-sm bg-white/70 h-auto w-full sm:max-w-md md:max-w-lg lg:max-w-sm z-0 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group mx-auto">
-      <CardContent className="p-3 pt-4">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-          <div className="flex items-start space-x-0 flex-1 min-w-0">
-            <div>
-              <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-              />
-            </div>
-            <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
-              <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xl font-semibold">
-                {lead.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <Sheet>
-                <SheetTrigger asChild key={lead.id}>
-                  <Button className="mt-1 text-base sm:text-lg font-semibold text-slate-900 dark:text-white break-words bg-transparent hover:bg-transparent cursor-pointer hover:text-blue-500 ">
+    <>
+      <Card className="backdrop-blur-sm bg-white/70 h-auto w-full sm:max-w-md md:max-w-lg lg:max-w-sm z-0 hover:scale-103 hover:shadow-lg dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-1000 group mx-auto cursor-pointer">
+        <CardContent className="p-3 pt-4">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <SheetTrigger asChild key={lead.id}>
+              <div className="flex items-start space-x-0 flex-1 min-w-0">
+                <div>
+                  <ToastContainer
+                    position="top-right"
+                    autoClose={5000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                  />
+                </div>
+                <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
+                  <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xl font-semibold">
+                    {lead.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <Label className="mt-1 ml-2 text-base sm:text-lg font-semibold text-slate-900 dark:text-white break-words bg-transparent hover:bg-transparent">
                     {lead.name}
-                  </Button>
-                </SheetTrigger>
-                <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] md:min-w-[85vw] min-w-screen ">
-                  <SheetHeader>
-                    <SheetTitle>Lead Data</SheetTitle>
-                    <SheetDescription>
-                      <Updateleads lead_id={lead.id} />
-                    </SheetDescription>
-                  </SheetHeader>
-                </SheetContent>
-              </Sheet>
-              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 break-words">
-                {lead.contact}
-              </p>
+                  </Label>
+                  <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 break-words">
+                    {lead.contact}
+                  </p>
+                </div>
+              </div>
+            </SheetTrigger>
+            <div className="flex mt-1 sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2">
+              <div className="text-left">
+                <Badge
+                  variant={
+                    lead.status === "New"
+                      ? "default"
+                      : lead.status === "In progress"
+                      ? "secondary"
+                      : lead.status === "Contact Attempted"
+                      ? "secondary"
+                      : lead.status === "Contacted"
+                      ? "secondary"
+                      : lead.status === "Meeting Booked"
+                      ? "info"
+                      : lead.status === "Qualified"
+                      ? "success"
+                      : lead.status === "Unqualified"
+                      ? "destructive"
+                      : "secondary"
+                  }
+                >
+                  {lead.status}
+                </Badge>
+              </div>
             </div>
           </div>
-          <div className="flex mt-1 sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2">
-            <div className="text-left">
-              <Badge
-                variant={
-                  lead.status === "New"
-                    ? "default"
-                    : lead.status === "In progress"
-                    ? "secondary"
-                    : lead.status === "Contact Attempted"
-                    ? "secondary"
-                    : lead.status === "Contacted"
-                    ? "secondary"
-                    : lead.status === "Meeting Booked"
-                    ? "info"
-                    : lead.status === "Qualified"
-                    ? "success"
-                    : lead.status === "Unqualified"
-                    ? "destructive"
-                    : "secondary"
-                }
-              >
-                {lead.status}
-              </Badge>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-100">
-          <div className="flex items-center justify-around gap-4">
-            <div>
-              <Button
-                size="sm"
-                variant="outline"
-                className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
-                onClick={() => setEmail(true)}
-              >
-                <Mail className="h-4 w-4 mr-1" />
-                Email
-              </Button>
-              <EmailTemplate lead={lead} open={email} onOpenChange={setEmail} />
-              <Button
-                size="sm"
-                variant="outline"
-                className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
-              >
-                <Phone className="h-4 w-4 mr-1" />
-                Call
-              </Button>
-            </div>
-            <div>
-              <Dialog open={open} onOpenChange={setOpen}>
-                <DropdownMenu className="relative">
-                  <DropdownMenuTrigger asChild>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-100">
+            <div className="flex items-center justify-around gap-4">
+              <div>
+                <Dialog>
+                  <DialogTrigger asChild>
                     <Button
                       size="sm"
-                      className={`bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none cursor-pointer ${
-                        lead.status === "Qualified" ? "hidden" : "block"
-                      } `}
-                      onClick={() => setId(lead.id)}
+                      variant="outline"
+                      className="bg-white/50 cursor-pointer dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
+                      onClick={() => setEmail(true)}
                     >
-                      Update Status
+                      <Mail className="h-4 w-4 mr-1" />
+                      Email
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-48 absolute top-[100%] bg-gray-700 text-white transform translate-x-[38%] translate-y-[-80%] z-1000 rounded-lg p-2 mt-2">
-                    {leadStatus.map((statu) => (
-                      <DialogTrigger asChild key={statu}>
-                        <DropdownMenuItem
-                          className="cursor-pointer border-b border-gray-300"
-                          key={statu}
-                          onClick={() => {
-                            setNewState(statu);
-                            setOpen(true);
-                          }}
-                        >
-                          {statu}
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                    ))}
-                  </DropdownMenuContent>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Status Info</DialogTitle>
-                      <DialogDescription>
-                        You are currently updating the status from{" "}
-                        <span className="font-semibold">{lead.status}</span> to{" "}
-                        <span className="font-semibold">{newState}</span>.
-                        <>
-                          <Textarea
-                            placeholder="Explain in  detail about the actions performed in this stage. Along with reason for updating the status"
-                            className="mt-1"
-                            onChange={(e) => setDescription(e.target.value)}
-                          />
-                        </>
-                      </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
+                  </DialogTrigger>
+
+                  <EmailTemplate
+                    email={lead.email}
+                    open={email}
+                    onOpenChange={setEmail}
+                  />
+                </Dialog>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
+                >
+                  <Phone className="h-4 w-4 mr-1" />
+                  Call
+                </Button>
+                <SheetTrigger asChild>
+                  <button className="bg-white/50 dark:bg-slate-800/50 border p-1 rounded cursor-pointer hover:scale-105 transition-transform border-black/10 flex-1 sm:flex-none">
+                    <Eye className="h-4 w-4" />
+                  </button>
+                </SheetTrigger>
+              </div>
+
+              <div>
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DropdownMenu className="relative">
+                    <DropdownMenuTrigger asChild>
                       <Button
-                        type="submit"
-                        onClick={() => {
-                          handleStatusUpdate();
-                          setOpen(false);
-                          onChange();
-                        }}
-                        className="border cursor-pointer border-green-500 bg-transparent hover:bg-green-200 hover:text-green-700 text-green-500"
+                        size="sm"
+                        className={`bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none cursor-pointer ${
+                          lead.status === "Qualified" ? "hidden" : "block"
+                        } `}
+                        onClick={() => setId(lead.id)}
                       >
-                        <LucideUpload className="h-4 w-4 mr-2" />
                         Update Status
                       </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </DropdownMenu>
-              </Dialog>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-48 absolute top-[100%] bg-gray-700 text-white transform translate-x-[38%] translate-y-[-80%] z-1000 rounded-lg p-2 mt-2">
+                      {leadStatus.map((statu) => (
+                        <DialogTrigger asChild key={statu}>
+                          <DropdownMenuItem
+                            className="cursor-pointer border-b border-gray-300"
+                            key={statu}
+                            onClick={() => {
+                              setNewState(statu);
+                              setOpen(true);
+                            }}
+                          >
+                            {statu}
+                          </DropdownMenuItem>
+                        </DialogTrigger>
+                      ))}
+                    </DropdownMenuContent>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Status Info</DialogTitle>
+                        <DialogDescription>
+                          You are currently updating the status from{" "}
+                          <span className="font-semibold">{lead.status}</span>{" "}
+                          to <span className="font-semibold">{newState}</span>.
+                          <>
+                            <Textarea
+                              placeholder="Explain in  detail about the actions performed in this stage. Along with reason for updating the status"
+                              className="mt-1"
+                              onChange={(e) => setDescription(e.target.value)}
+                            />
+                          </>
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <Button
+                          type="submit"
+                          onClick={() => {
+                            handleStatusUpdate();
+                            setOpen(false);
+                            onChange();
+                          }}
+                          className="border cursor-pointer border-green-500 bg-transparent hover:bg-green-200 hover:text-green-700 text-green-500"
+                        >
+                          <LucideUpload className="h-4 w-4 mr-2" />
+                          Update Status
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </DropdownMenu>
+                </Dialog>
+              </div>
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] md:min-w-[85vw] min-w-screen ">
+        <SheetHeader>
+          <SheetTitle>Lead Data</SheetTitle>
+          <SheetDescription>
+            <Updateleads lead_id={lead.id} />
+          </SheetDescription>
+        </SheetHeader>
+      </SheetContent>
+    </>
   );
 }
