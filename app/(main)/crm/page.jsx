@@ -37,7 +37,6 @@ import { Label } from "@/components/ui/label";
 import { toast } from "react-toastify";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/utils/supabase/client";
-import leads from "@/components/Updateleads";
 
 const summaryStats = {
   customers: { total: 1247, new: 89, growth: 12 },
