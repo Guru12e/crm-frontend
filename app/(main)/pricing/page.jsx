@@ -124,13 +124,25 @@ export default function PricingPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const addProduct = () => {
+  const addProduct = async () => {
     if (!validateNewProduct()) return;
 
     const productToAdd = { ...newProduct, id: Date.now().toString() };
     setProducts([...products, productToAdd]);
-    setNewProduct({ name: "", category: "", price: "", description: "" });
+    setNewProduct({
+      name: "",
+      category: "",
+      price: "",
+      description: "",
+      stock: "",
+    });
     setErrors({ newProduct: {} });
+    const { error } = await supabase
+      .from("Users")
+      .update({ ...companyData, products: [...products, productToAdd] })
+      .eq("email", userEmail)
+      .select("*")
+      .single();
   };
 
   const removeProduct = (id) => {
@@ -155,9 +167,6 @@ export default function PricingPage() {
   const handleUpdateDB = async () => {
     setLoading(true);
     const dataToUpdate = {
-      companyName: companyData.companyName,
-      companyDescription: companyData.companyDescription,
-      companyWebsite: companyData.companyWebsite,
       products: products,
     };
     const { data: companyDetails, error: companyDetailsError } = await supabase
@@ -165,44 +174,14 @@ export default function PricingPage() {
       .select("*")
       .eq("email", userEmail)
       .single();
-    console.log(companyDetails);
-    console.log("Company data:", companyData);
-    const noChanges =
-      companyDetails.companyName === companyData.companyName &&
-      companyDetails.companyDescription === companyData.companyDescription &&
-      companyDetails.companyWebsite === companyData.companyWebsite &&
-      isEqual(companyDetails.products, companyData.products);
+
+    const noChanges = companyDetails.products === companyData.products;
 
     if (noChanges) {
       toast.info("No changes detected.", { position: "top-right" });
       setLoading(false);
       return;
     } else {
-      if (icpData) {
-        const { error } = await supabase
-          .from("ICP")
-          .delete()
-          .eq("user_email", userEmail);
-
-        if (error) {
-          console.error("Error deleting ICP data:", error);
-        }
-      }
-      const res = await fetch("/api/ICP", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          user_email: userEmail,
-          description: companyData,
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        console.log(data);
-        setResult(data.output);
-      }
-
       const { error } = await supabase
         .from("Users")
         .update(dataToUpdate)
@@ -366,7 +345,7 @@ export default function PricingPage() {
       </div>
 
       <div className="bg-gray-50 min-h-screen p-8">
-        <div className="bg-white shadow-lg rounded-2xl mt-10 p-6 mb-8">
+        <div className="bg-white shadow-lg rounded-2xl mt-1 p-6 mb-8">
           <h2 className="text-2xl font-bold mb-6 text-gray-800">
             Available Products
           </h2>
@@ -374,100 +353,116 @@ export default function PricingPage() {
           {products.length === 0 ? (
             <p className="text-gray-500">No products available</p>
           ) : (
-            <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-gradient-to-r from-blue-50 to-blue-100 text-gray-700">
-                    <th className="border-b p-3 text-left">Name</th>
-                    <th className="border-b p-3 text-center">Stock</th>
-                    <th className="border-b p-3 text-center">Price</th>
-                    <th className="border-b p-3 text-center">Category</th>
-                    <th className="border-b p-3 text-center">Description</th>
-                    <th className="border-b p-3 text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {products.map((p, idx) => (
-                    <tr
-                      key={p.id || idx}
-                      className="odd:bg-white even:bg-gray-50 hover:bg-blue-50 transition-colors"
-                    >
-                      <td className="p-3">
-                        <input
-                          type="text"
-                          value={p.name}
-                          onChange={(e) => {
-                            const updated = [...products];
-                            updated[idx].name = e.target.value;
-                            setProducts(updated);
-                          }}
-                          className="border rounded-lg p-1 w-full focus:ring-2 focus:ring-blue-400"
-                        />
-                      </td>
-                      <td className="p-3 text-center">
-                        <input
-                          type="number"
-                          value={p.stock}
-                          onChange={(e) => {
-                            const updated = [...products];
-                            updated[idx].stock = e.target.value;
-                            setProducts(updated);
-                          }}
-                          className="border rounded-lg p-1 w-20 text-center focus:ring-2 focus:ring-blue-400"
-                        />
-                      </td>
-                      <td className="p-3 text-center">
-                        <input
-                          type="text"
-                          value={
-                            Array.isArray(p.price) ? p.price.join("-") : p.price
-                          }
-                          onChange={(e) => {
-                            const updated = [...products];
-                            updated[idx].price = e.target.value.includes("-")
-                              ? e.target.value.split("-").map(Number)
-                              : Number(e.target.value);
-                            setProducts(updated);
-                          }}
-                          className="border rounded-lg p-1 w-24 text-center focus:ring-2 focus:ring-blue-400"
-                        />
-                      </td>
-                      <td className="p-3 text-center">
-                        <input
-                          type="text"
-                          value={p.category}
-                          onChange={(e) => {
-                            const updated = [...products];
-                            updated[idx].category = e.target.value;
-                            setProducts(updated);
-                          }}
-                          className="border rounded-lg p-1 w-full text-center focus:ring-2 focus:ring-blue-400"
-                        />
-                      </td>
-                      <td className="p-3 text-center">
-                        <input
-                          type="text"
-                          value={p.description}
-                          onChange={(e) => {
-                            const updated = [...products];
-                            updated[idx].description = e.target.value;
-                            setProducts(updated);
-                          }}
-                          className="border rounded-lg p-1 w-full text-center focus:ring-2 focus:ring-blue-400"
-                        />
-                      </td>
-                      <td className="p-3 text-center">
-                        <button
-                          onClick={() => removeProduct(idx)}
-                          className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg flex items-center justify-center mx-auto transition"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="grid grid-cols-1 gap-6">
+              {products.map((product, idx) => (
+                <Card
+                  key={product.id}
+                  className="shadow-sm hover:shadow-md transition rounded-xl border"
+                >
+                  <CardContent className="p-5 h-[40vh] flex flex-col gap-2">
+                    {/* Name */}
+                    <div className="flex gap-4">
+                      <Label className="text-sm font-medium text-gray-600 w-[20vh]">
+                        Name
+                      </Label>
+                      <Input
+                        type="text"
+                        value={product.name}
+                        onChange={(e) => {
+                          const updated = [...products];
+                          updated[idx].name = e.target.value;
+                          handleProductChange(updated);
+                        }}
+                        className="mt-1 w-[80vh] border rounded-lg p-2  focus:ring-2 focus:ring-blue-400"
+                      />
+                    </div>
+
+                    {/* Stock */}
+                    <div className="flex gap-4">
+                      <label className="text-sm font-medium text-gray-600 w-[20vh]">
+                        Stock
+                      </label>
+                      <Input
+                        type="number"
+                        value={product.stock}
+                        onChange={(e) => {
+                          const updated = [...products];
+                          updated[idx].stock = e.target.value;
+                          handleProductChange(updated);
+                        }}
+                        className="mt-1 w-[80vh] border rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
+                      />
+                    </div>
+
+                    {/* Price */}
+                    <div className="flex gap-4">
+                      <label className="text-sm font-medium text-gray-600 w-[20vh]">
+                        Price
+                      </label>
+                      <Input
+                        type="text"
+                        value={
+                          Array.isArray(product.price)
+                            ? product.price.join("-")
+                            : product.price
+                        }
+                        onChange={(e) => {
+                          const updated = [...products];
+                          updated[idx].price = e.target.value.includes("-")
+                            ? e.target.value.split("-").map(Number)
+                            : Number(e.target.value);
+                          handleProductChange(updated);
+                        }}
+                        className="mt-1 border rounded-lg p-2 w-[80vh] focus:ring-2 focus:ring-blue-400"
+                      />
+                    </div>
+
+                    {/* Category */}
+                    <div className="flex gap-4">
+                      <label className="text-sm font-medium text-gray-600 w-[20vh]">
+                        Category
+                      </label>
+                      <Input
+                        type="text"
+                        value={product.category}
+                        onChange={(e) => {
+                          const updated = [...products];
+                          updated[idx].category = e.target.value;
+                          handleProductChange(updated);
+                        }}
+                        className="mt-1 border rounded-lg p-2 w-[80vh] focus:ring-2 focus:ring-blue-400"
+                      />
+                    </div>
+
+                    {/* Description */}
+                    <div className="flex gap-4">
+                      <label className="text-sm font-medium text-gray-600 w-[20vh]">
+                        Description
+                      </label>
+                      <Input
+                        type="text"
+                        value={product.description}
+                        onChange={(e) => {
+                          const updated = [...products];
+                          updated[idx].description = e.target.value;
+                          handleProductChange(updated);
+                        }}
+                        className="mt-1 border rounded-lg p-2 w-[80vh] focus:ring-2 focus:ring-blue-400"
+                      />
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() => removeProduct(product.id)}
+                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg flex items-center gap-2 transition"
+                      >
+                        <Trash2 className="w-4 h-4" /> Remove
+                      </button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           )}
         </div>

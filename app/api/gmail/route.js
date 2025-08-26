@@ -25,6 +25,8 @@ export async function POST(req) {
       `From: ${from_email}`,
       `To: ${to_email}`,
       `Subject: ${subject}`,
+      "MIME-Version: 1.0",
+      "Content-Type: text/html; charset=UTF-8",
       "",
       body,
     ];
@@ -33,7 +35,8 @@ export async function POST(req) {
     const encodedMessage = Buffer.from(message)
       .toString("base64")
       .replace(/\+/g, "-")
-      .replace(/\//g, "_");
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
 
     const res = await gmail.users.messages.send({
       userId: "me",
