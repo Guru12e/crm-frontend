@@ -100,7 +100,8 @@ export default function CustomerCard({ customer, onChange }) {
                   </DialogTrigger>
 
                   <EmailTemplate
-                    type="customer"
+                    type="Customers"
+                    id={customer.id}
                     email={customer.email}
                     open={email}
                     onOpenChange={setEmail}

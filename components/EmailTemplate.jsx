@@ -53,16 +53,17 @@ const Dropdown = ({ options, onChange, value }) => (
   </div>
 );
 
-export default function EmailTemplate({ email, onOpenChange }) {
+export default function EmailTemplate({ id, type, email, onOpenChange }) {
   const [isMaximized, setIsMaximized] = useState(false);
   const [fontSize, setFontSize] = useState("14px");
   const fileInputRef = useRef(null);
   const [message, setMessage] = useState({});
   const user = localStorage.getItem("user");
   const parsedUser = JSON.parse(user);
+  const userEmail = parsedUser.email;
   const [form, setForm] = useState({
-    from_email: parsedUser["email"],
-    refresh_token: parsedUser["refresh_token"],
+    from_email: userEmail || "",
+    refresh_token: parsedUser.refresh_token,
     to_email: email || "",
     subject: "",
     body: "",
@@ -72,7 +73,8 @@ export default function EmailTemplate({ email, onOpenChange }) {
   };
   const handleSendEmail = async () => {
     try {
-      console.log("Sending email with form data:", form);
+      console.log(type);
+      console.log(form);
       const res = await fetch("/api/gmail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -83,10 +85,22 @@ export default function EmailTemplate({ email, onOpenChange }) {
       if (data.success) {
         toast.success("✅ Email sent successfully!");
 
+        const { data, error_1 } = await supabase
+          .from(type)
+          .select("*")
+          .eq("id", id)
+          .eq("user_email", userEmail)
+          .maybeSingle();
+        console.log(data);
+        const oldMessages = Array.isArray(data?.messages) ? data.messages : [];
+        if (error_1) {
+          console.error("Error fetching email:", error_1);
+        }
         const { error } = await supabase
           .from(type)
-          .update({ ...prev, messages: [...messages, message] })
-          .eq("email", email);
+          .update({ ...data, messages: [...oldMessages, message] })
+          .eq("email", email)
+          .eq("user_email", userEmail);
         if (error) {
           console.error("Error updating email:", error);
         } else {

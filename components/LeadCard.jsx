@@ -222,7 +222,8 @@ export default function LeadCard({ lead, setId, onChange }) {
                   </DialogTrigger>
 
                   <EmailTemplate
-                    type="lead"
+                    type="Leads"
+                    id={lead.id}
                     email={lead.email}
                     open={email}
                     onOpenChange={setEmail}

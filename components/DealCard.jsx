@@ -261,7 +261,8 @@ export default function DealCard({ deal, setId, onChange }) {
                 </DialogTrigger>
 
                 <EmailTemplate
-                  type="deal"
+                  type="Deals"
+                  id={deal.id}
                   email={deal.email}
                   open={email}
                   onOpenChange={setEmail}
