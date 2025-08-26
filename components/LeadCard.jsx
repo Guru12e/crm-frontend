@@ -70,6 +70,27 @@ export default function LeadCard({ lead, setId, onChange }) {
       })
       .eq("id", lead.id);
 
+    if (lead.status === "Qualified") {
+      const { error } = await supabase.from("Deals").insert({
+        name: LeadsData.name,
+        phone: LeadsData.number,
+        email: LeadsData.email,
+        linkedIn: LeadsData.linkedIn,
+        location: LeadsData.location,
+        status: "New",
+        created_at: today.toISOString().split("T")[0],
+        closeDate: today.toISOString().split("T")[0],
+        user_email: LeadsData.userEmail,
+      });
+      if (error) {
+        console.error("Error moving lead to deal:", error);
+        toast.error("Error moving lead to deal");
+      } else {
+        toast.success("Lead moved to deal successfully");
+        onChange();
+      }
+    }
+
     if (error) {
       console.error("Error updating lead:", error);
       toast.error("Error updating lead");
