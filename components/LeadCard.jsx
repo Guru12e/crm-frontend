@@ -247,13 +247,6 @@ export default function LeadCard({ lead, setId, onChange }) {
                   <Phone className="h-4 w-4 mr-1" />
                   Call
                 </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
 
                 <Dialog>
                   <DialogTrigger asChild>
