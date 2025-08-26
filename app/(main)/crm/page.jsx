@@ -480,8 +480,9 @@ export default function CRM() {
             price: dealFormData.value,
             location: dealFormData.location,
             purchase_history: {
-              product: dealProducts.map((prod) => prod.value),
+              product: dealFormData.products,
               price: dealFormData.value,
+              purchase_date: today.toISOString().split("T")[0],
             },
             industry: dealFormData.industry,
             status: "Active",
@@ -518,6 +519,7 @@ export default function CRM() {
                   {
                     product: dealFormData.products,
                     price: dealFormData.value,
+                    purchase_date: today.toISOString().split("T")[0],
                   },
                 ],
               })

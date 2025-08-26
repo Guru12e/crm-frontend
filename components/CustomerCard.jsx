@@ -11,7 +11,14 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { SheetTrigger } from "./ui/sheet";
+import {
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTrigger,
+} from "./ui/sheet";
+import { Label } from "radix-ui";
+import UpdateCustomer from "./UpdateCustomer";
 
 export default function CustomerCard({ customer }) {
   return (
@@ -91,9 +98,11 @@ export default function CustomerCard({ customer }) {
               </Button>
             </div>
             <div className="flex space-x-2 justify-center sm:justify-end">
-              <Button size="sm" variant="ghost" className="p-2">
-                <Eye className="h-4 w-4" />
-              </Button>
+              <SheetTrigger asChild>
+                <Label size="sm" variant="ghost" className="p-2">
+                  <Eye className="h-4 w-4" />
+                </Label>
+              </SheetTrigger>
               <Button size="sm" variant="ghost" className="p-2">
                 <Edit className="h-4 w-4" />
               </Button>
@@ -104,6 +113,14 @@ export default function CustomerCard({ customer }) {
           </div>
         </CardContent>
       </Card>
+      <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] md:min-w-[85vw] min-w-screen ">
+        <SheetHeader>
+          <SheetTitle>Deal Data</SheetTitle>
+          <SheetDescription>
+            <UpdateCustomer customer_id={deal.id} onChange={onChange} />
+          </SheetDescription>
+        </SheetHeader>
+      </SheetContent>
     </Sheet>
   );
 }

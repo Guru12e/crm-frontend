@@ -81,11 +81,12 @@ export default function DealCard({ deal, setId, onChange }) {
           purchase_history: {
             product: deal.product,
             price: deal.value,
+            purchase_date: today,
           },
           industry: deal.industry,
           status: "Active",
-          created_at: today.toISOString().split("T")[0],
-          user_email: userEmail,
+          created_at: today,
+          user_email: deal.user_email,
         };
         const { data, error } = await supabase
           .from("customers")

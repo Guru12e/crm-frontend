@@ -66,7 +66,7 @@ const ErrorMessage = ({ error }) => {
   );
 };
 
-export default function Deals(deal_id, onChange) {
+export default function UpdateDeals(deal_id, onChange) {
   const today = new Date().toISOString().split("T")[0];
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -363,32 +363,67 @@ export default function Deals(deal_id, onChange) {
           "Data updated permanently. All changes made are permanent.",
           { position: "top-right" }
         );
-        if (DealsData.status === "Closed-won") {
+        if (deal.status === "Closed-won") {
           const customerData = {
-            name: DealsData.name,
-            email: DealsData.email,
-            phone: DealsData.number,
-            linkedIn: DealsData.linkedIn,
-            location: DealsData.location,
-            industry: DealsData.industry,
-            status: DealsData.status,
+            name: deal.name,
+            phone: deal.phone,
+            email: deal.email,
+            linkedIn: deal.linkedIn,
+            price: deal.value,
+            location: deal.location,
+            purchase_history: {
+              product: deal.product,
+              price: deal.value,
+              purchase_date: today,
+            },
+            industry: deal.industry,
+            status: "Active",
             created_at: today,
-            user_email: DealsData.user_email,
+            user_email: deal.user_email,
           };
-          const { error } = await supabase
-            .from("Customers")
-            .insert([customerData]);
-
+          const { data, error } = await supabase
+            .from("customers")
+            .select("*")
+            .eq("email", deal.email)
+            .eq("user_email", deal.user_email)
+            .maybeSingle();
           if (error) {
-            console.error("Error creating customer:", error);
-            toast.error("Error creating customer");
-          } else {
-            toast.success("Customer created successfully");
+            console.error("Error checking existing customer:", error);
           }
+          if (!data) {
+            await fetch("/api/addCustomer", {
+              method: "POST",
+              body: JSON.stringify({
+                ...customerData,
+                session: session,
+              }),
+            });
+          } else {
+            const { error } = await supabase
+              .from("customers")
+              .update({
+                ...customerData,
+                price: data.price + deal.value,
+                status: "Active",
+                created_at: data.created_at,
+                purchase_history: [
+                  ...data.purchase_history,
+                  {
+                    product: deal.product,
+                    price: deal.value,
+                  },
+                ],
+              })
+              .eq("email", deal.email)
+              .eq("user_email", userEmail);
+            if (error) {
+              console.error("Error updating existing customer:", error);
+            }
+          }
+          onChange();
         }
         localStorage.removeItem("companyDataCache");
         setLoading(false);
-        await fetchDealData();
       }
     }
   };

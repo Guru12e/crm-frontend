@@ -66,7 +66,7 @@ const ErrorMessage = ({ error }) => {
   );
 };
 
-export default function Customer(customer_id) {
+export default function UpdateCustomer(customer_id, onChange) {
   const today = new Date().toISOString().split("T")[0];
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
