@@ -351,26 +351,28 @@ export default function Campaigns() {
           <Link key={c.id} href={`/campaigns/${c.name}`} className="block">
             <Card className="shadow-sm hover:shadow-md rounded-2xl border hover:scale-105 hover:shadow-lg border-gray-200 transition bg-white cursor-pointer h-full">
               <CardContent className="p-5 flex flex-col h-full">
-                {/* Title */}
-                <h3 className="font-semibold text-xl text-gray-900 mb-2">
-                  {c.name}
-                </h3>
+                <div className="border border-blue-200 dark:border-blue-800 rounded-lg p-4 bg-blue-50/50 dark:bg-blue-900/20">
+                  {/* Title */}
+                  <h3 className="font-semibold text-xl text-gray-900 mb-2">
+                    {c.name}
+                  </h3>
 
-                {/* Subject */}
-                <p className="text-sm text-gray-500 mb-3">{c.subject}</p>
+                  {/* Subject */}
+                  <p className="text-sm text-gray-500 mb-3">{c.subject}</p>
 
-                {/* Body */}
-                <p className="text-sm text-gray-700 line-clamp-3 flex-grow leading-relaxed">
-                  {c.body}
-                </p>
+                  {/* Body */}
+                  <p className="text-sm text-gray-700 line-clamp-3 flex-grow leading-relaxed">
+                    {c.body}
+                  </p>
 
-                {/* Audience */}
-                <div className="mt-4 text-sm text-gray-500">
-                  {c.audience?.length > 0 ? (
-                    <p>{c.audience.length} recipients</p>
-                  ) : (
-                    <p className="text-gray-400">No recipients</p>
-                  )}
+                  {/* Audience */}
+                  <div className="mt-4 text-sm text-gray-500">
+                    {c.audience?.length > 0 ? (
+                      <p>{c.audience.length} recipients</p>
+                    ) : (
+                      <p className="text-gray-400">No recipients</p>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>

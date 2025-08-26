@@ -17,6 +17,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Card, CardContent } from "@/components/ui/card";
 
 const ErrorMessage = ({ error }) => {
   if (!error) return null;
@@ -212,13 +213,13 @@ export default function PricingPage() {
                 Pricing and Inventory
               </h1>
               <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">
-                Manage pricing and inventory with comprehensive filtering
+                Manage pricing and inventory
               </p>
             </div>
             <SheetTrigger as Child>
-              <Label className="bg-gradient-to-r px-3 py-2 rounded-xl from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white w-full ">
+              <Button className="bg-gradient-to-r px-4 py-5 rounded-xl from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white w-full ">
                 Add New Product
-              </Label>
+              </Button>
             </SheetTrigger>
           </div>
           <SheetContent>
@@ -345,7 +346,7 @@ export default function PricingPage() {
       </div>
 
       <div className="bg-gray-50 min-h-screen p-8">
-        <div className="bg-white shadow-lg rounded-2xl mt-1 p-6 mb-8">
+        <div className="bg-white shadow-lg rounded-2xl p-6 mb-8">
           <h2 className="text-2xl font-bold mb-6 text-gray-800">
             Available Products
           </h2>
@@ -359,106 +360,108 @@ export default function PricingPage() {
                   key={product.id}
                   className="shadow-sm hover:shadow-md transition rounded-xl border"
                 >
-                  <CardContent className="p-5 h-[40vh] flex flex-col gap-2">
-                    {/* Name */}
-                    <div className="flex gap-4">
-                      <Label className="text-sm font-medium text-gray-600 w-[20vh]">
-                        Name
-                      </Label>
-                      <Input
-                        type="text"
-                        value={product.name}
-                        onChange={(e) => {
-                          const updated = [...products];
-                          updated[idx].name = e.target.value;
-                          handleProductChange(updated);
-                        }}
-                        className="mt-1 w-[80vh] border rounded-lg p-2  focus:ring-2 focus:ring-blue-400"
-                      />
-                    </div>
+                  <CardContent className=" h-[40vh] flex flex-col gap-2">
+                    <div className="border border-blue-200 dark:border-blue-800 rounded-lg p-4 bg-blue-50/50 dark:bg-blue-900/20">
+                      {/* Name */}
+                      <div className="flex gap-4">
+                        <Label className="text-sm font-medium text-gray-600 w-[20vh]">
+                          Name
+                        </Label>
+                        <Input
+                          type="text"
+                          value={product.name}
+                          onChange={(e) => {
+                            const updated = [...products];
+                            updated[idx].name = e.target.value;
+                            handleProductChange(updated);
+                          }}
+                          className="mt-1 w-[80vh] border rounded-lg p-2  focus:ring-2 focus:ring-blue-400"
+                        />
+                      </div>
 
-                    {/* Stock */}
-                    <div className="flex gap-4">
-                      <label className="text-sm font-medium text-gray-600 w-[20vh]">
-                        Stock
-                      </label>
-                      <Input
-                        type="number"
-                        value={product.stock}
-                        onChange={(e) => {
-                          const updated = [...products];
-                          updated[idx].stock = e.target.value;
-                          handleProductChange(updated);
-                        }}
-                        className="mt-1 w-[80vh] border rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
-                      />
-                    </div>
+                      {/* Stock */}
+                      <div className="flex gap-4">
+                        <label className="text-sm font-medium text-gray-600 w-[20vh]">
+                          Stock
+                        </label>
+                        <Input
+                          type="number"
+                          value={product.stock}
+                          onChange={(e) => {
+                            const updated = [...products];
+                            updated[idx].stock = e.target.value;
+                            handleProductChange(updated);
+                          }}
+                          className="mt-1 w-[80vh] border rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
+                        />
+                      </div>
 
-                    {/* Price */}
-                    <div className="flex gap-4">
-                      <label className="text-sm font-medium text-gray-600 w-[20vh]">
-                        Price
-                      </label>
-                      <Input
-                        type="text"
-                        value={
-                          Array.isArray(product.price)
-                            ? product.price.join("-")
-                            : product.price
-                        }
-                        onChange={(e) => {
-                          const updated = [...products];
-                          updated[idx].price = e.target.value.includes("-")
-                            ? e.target.value.split("-").map(Number)
-                            : Number(e.target.value);
-                          handleProductChange(updated);
-                        }}
-                        className="mt-1 border rounded-lg p-2 w-[80vh] focus:ring-2 focus:ring-blue-400"
-                      />
-                    </div>
+                      {/* Price */}
+                      <div className="flex gap-4">
+                        <label className="text-sm font-medium text-gray-600 w-[20vh]">
+                          Price
+                        </label>
+                        <Input
+                          type="text"
+                          value={
+                            Array.isArray(product.price)
+                              ? product.price.join("-")
+                              : product.price
+                          }
+                          onChange={(e) => {
+                            const updated = [...products];
+                            updated[idx].price = e.target.value.includes("-")
+                              ? e.target.value.split("-").map(Number)
+                              : Number(e.target.value);
+                            handleProductChange(updated);
+                          }}
+                          className="mt-1 border rounded-lg p-2 w-[80vh] focus:ring-2 focus:ring-blue-400"
+                        />
+                      </div>
 
-                    {/* Category */}
-                    <div className="flex gap-4">
-                      <label className="text-sm font-medium text-gray-600 w-[20vh]">
-                        Category
-                      </label>
-                      <Input
-                        type="text"
-                        value={product.category}
-                        onChange={(e) => {
-                          const updated = [...products];
-                          updated[idx].category = e.target.value;
-                          handleProductChange(updated);
-                        }}
-                        className="mt-1 border rounded-lg p-2 w-[80vh] focus:ring-2 focus:ring-blue-400"
-                      />
-                    </div>
+                      {/* Category */}
+                      <div className="flex gap-4">
+                        <label className="text-sm font-medium text-gray-600 w-[20vh]">
+                          Category
+                        </label>
+                        <Input
+                          type="text"
+                          value={product.category}
+                          onChange={(e) => {
+                            const updated = [...products];
+                            updated[idx].category = e.target.value;
+                            handleProductChange(updated);
+                          }}
+                          className="mt-1 border rounded-lg p-2 w-[80vh] focus:ring-2 focus:ring-blue-400"
+                        />
+                      </div>
 
-                    {/* Description */}
-                    <div className="flex gap-4">
-                      <label className="text-sm font-medium text-gray-600 w-[20vh]">
-                        Description
-                      </label>
-                      <Input
-                        type="text"
-                        value={product.description}
-                        onChange={(e) => {
-                          const updated = [...products];
-                          updated[idx].description = e.target.value;
-                          handleProductChange(updated);
-                        }}
-                        className="mt-1 border rounded-lg p-2 w-[80vh] focus:ring-2 focus:ring-blue-400"
-                      />
-                    </div>
+                      {/* Description */}
+                      <div className="flex gap-4">
+                        <label className="text-sm font-medium text-gray-600 w-[20vh]">
+                          Description
+                        </label>
+                        <Input
+                          type="text"
+                          value={product.description}
+                          onChange={(e) => {
+                            const updated = [...products];
+                            updated[idx].description = e.target.value;
+                            handleProductChange(updated);
+                          }}
+                          className="mt-1 border rounded-lg p-2 w-[80vh] focus:ring-2 focus:ring-blue-400"
+                        />
+                      </div>
 
-                    {/* Actions */}
-                    <div className="flex justify-end">
-                      <button
-                        onClick={() => removeProduct(product.id)}
-                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg flex items-center gap-2 transition"
-                      >
-                        <Trash2 className="w-4 h-4" /> Remove
-                      </button>
+                      {/* Actions */}
+                      <div className="flex justify-end">
+                        <button
+                          onClick={() => removeProduct(product.id)}
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg flex items-center gap-2 transition"
+                        >
+                          <Trash2 className="w-4 h-4" /> Remove
+                        </button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
