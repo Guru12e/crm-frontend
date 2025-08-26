@@ -20,14 +20,19 @@ export async function POST(req) {
         closeDate: data.closeDate,
         source: data.source,
         priority: data.priority,
+        products: data.products,
         user_email: data.session.user.email,
       })
       .select("*");
 
-    if (error) {
-      console.error(error);
-      return NextResponse.json("error", { status: 400 });
+    if (error.message.includes("duplicate key value")) {
+      return NextResponse.json("error", { status: 404 });
     }
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
     return NextResponse.json(deal, { status: 200 });
   } catch (err) {
     console.error(err);
