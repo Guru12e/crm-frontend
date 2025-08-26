@@ -138,39 +138,39 @@ export default function LeadCard({ lead, setId, onChange }) {
       <Card className="backdrop-blur-sm bg-white/70 h-auto w-full sm:max-w-md md:max-w-lg lg:max-w-sm z-0 hover:scale-103 hover:shadow-lg dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-1000 group mx-auto cursor-pointer">
         <CardContent className="p-3 pt-4">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            <SheetTrigger asChild key={lead.id}>
-              <div className="flex items-start space-x-0 flex-1 min-w-0">
-                <div>
-                  <ToastContainer
-                    position="top-right"
-                    autoClose={5000}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                  />
-                </div>
-                <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
-                  <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xl font-semibold">
-                    {lead.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
+            <div className="flex items-start space-x-0 flex-1 min-w-0">
+              <div>
+                <ToastContainer
+                  position="top-right"
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                />
+              </div>
+              <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
+                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xl font-semibold">
+                  {lead.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <SheetTrigger asChild key={lead.id}>
                   <Label className="mt-2 ml-2 text-base sm:text-lg font-semibold text-slate-900 dark:text-white break-words bg-transparent hover:bg-transparent">
                     {lead.name}
                   </Label>
-                  <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 break-words">
-                    {lead.contact}
-                  </p>
-                </div>
+                </SheetTrigger>
+                <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 break-words">
+                  {lead.contact}
+                </p>
               </div>
-            </SheetTrigger>
+            </div>
             <Badge
               variant={lead.source === "Email" ? "Qualified" : "hidden"}
               className={`mt-3 ${
