@@ -32,11 +32,16 @@ import {
   Search,
   Loader2,
   AlertCircle,
+  ChevronsUpDown,
+  CheckIcon,
+  ChevronsUpDownIcon,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { toast } from "react-toastify";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/utils/supabase/client";
+import MultipleSelector from "@/components/ui/multiselect";
+import { set } from "lodash";
 
 const summaryStats = {
   customers: { total: 1247, new: 89, growth: 12 },
@@ -66,6 +71,7 @@ const dealStatus = [
 
 export default function CRM() {
   const [activeTab, setActiveTab] = useState("Customers");
+  const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All statuses");
   const [sourceFilter, setSourceFilter] = useState("");
@@ -76,11 +82,15 @@ export default function CRM() {
   const today = new Date();
   const [session, setSession] = useState("");
   const [userEmail, setUserEmail] = useState(null);
+  const [dealProducts, setDealProducts] = useState([]);
+  const [otherValue, setOtherValue] = useState("");
+
   const [customerFormData, setCustomerFormData] = useState({
     name: "",
     phone: "",
     email: "",
     linkedIn: "",
+    price: 0,
     location: "",
     website: "",
     industry: "",
@@ -113,6 +123,7 @@ export default function CRM() {
     status: "",
     priority: "Low",
     closeDate: today,
+    products: [],
     owner: "",
     source: "",
     description: "",
@@ -128,8 +139,15 @@ export default function CRM() {
       const sessionJSON = JSON.parse(localStorage.getItem("session"));
       setSession(sessionJSON);
       setUserEmail(sessionJSON.user.email);
-      setActiveTab(sessionStorage.getItem("activeTab"));
+      setActiveTab(sessionStorage.getItem("activeTab") || "Customers");
     };
+    const user = JSON.parse(localStorage.getItem("user"));
+    setProducts(
+      user?.products?.map((product) => ({
+        value: product.name,
+        label: product.name,
+      })) || []
+    );
 
     getSession();
   }, []);
@@ -194,9 +212,19 @@ export default function CRM() {
   };
 
   useEffect(() => {
-    fetchCustomers();
-    fetchLeads();
-    fetchDeals();
+    if (userEmail) {
+      fetchCustomers();
+      fetchLeads();
+      fetchDeals();
+    }
+
+    const intervalId = setInterval(() => {
+      fetchCustomers();
+      fetchLeads();
+      fetchDeals();
+    }, 60000);
+
+    return () => clearInterval(intervalId);
   }, [userEmail]);
 
   const handleCustomerSubmit = async (e) => {
@@ -205,13 +233,15 @@ export default function CRM() {
     let isValid = true;
     if (!customerFormData.name) {
       errors.name = "Name is required";
+      toast.error("Name is required");
       isValid = false;
     } else {
       errors.name = "";
     }
 
     if (!customerFormData.number) {
-      errors.number = "Number is Required";
+      errors.number = "Phone Number is Required";
+      toast.error("Phone Number is Required");
       isValid = false;
     } else {
       errors.number = "";
@@ -231,7 +261,8 @@ export default function CRM() {
 
     if (customerFormData.linkedIn) {
       if (!customerFormData.linkedIn.includes("https://www.linkedin.com/")) {
-        errors.linkedIn = "Linked Url Required";
+        errors.linkedIn = "LinkedIn Url Required";
+        toast.error("LinkedIn Url Required");
         isValid = false;
       } else {
         errors.linkedIn = "";
@@ -240,6 +271,10 @@ export default function CRM() {
     if (!isValid) {
       setCustomerLoading(false);
       setErrors(errors);
+      toast.error("Please fix the errors in the form", {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     } else {
       const req = await fetch("/api/addCustomer", {
@@ -256,8 +291,6 @@ export default function CRM() {
           position: "top-right",
         });
 
-        console.log(req.json());
-
         const updatedCustomer = await req.json();
         setCustomersData((prevCustomers) => [
           ...prevCustomers,
@@ -268,13 +301,14 @@ export default function CRM() {
           phone: "",
           email: "",
           linkedIn: "",
+          price: 0,
           location: "",
           website: "",
           industry: "",
           status: "",
           created_at: "",
         });
-        window.location.reload();
+        await fetchCustomers();
       } else {
         toast.error("Error in Adding Customer", {
           position: "top-right",
@@ -288,76 +322,99 @@ export default function CRM() {
   const handleLeadsSubmit = async (e) => {
     e.preventDefault();
     setLeadsLoading(true);
+
+    let newErrors = {};
     let isValid = true;
+
     if (!leadsFormData.name) {
-      errors.leadName = "Name is required";
+      newErrors.leadName = "Name is required";
       isValid = false;
-    } else {
-      errors.leadName = "";
     }
     if (!leadsFormData.phone) {
-      errors.leadPhone = "Phone is required";
+      newErrors.leadPhone = "Phone is required";
       isValid = false;
-    } else {
-      errors.leadPhone = "";
     }
     if (!leadsFormData.status) {
-      errors.leadStatus = "Status is required";
+      newErrors.leadStatus = "Status is required";
       isValid = false;
-    } else {
-      errors.leadStatus = "";
     }
+
+    setErrors(newErrors);
 
     if (!isValid) {
       setLeadsLoading(false);
-      setErrors(errors);
       return;
-    } else {
-      const req = await fetch("/api/addLeads", {
+    }
+
+    const req = await fetch("/api/addLeads", {
+      method: "POST",
+      body: JSON.stringify({ ...leadsFormData, session }),
+    });
+
+    if (leadsFormData.status === "Qualified") {
+      const leadToDeal = {
+        name: leadsFormData.name,
+        phone: leadsFormData.phone,
+        email: leadsFormData.email,
+        linkedIn: leadsFormData.linkedIn,
+        location: leadsFormData.location,
+        status: "New",
+        created_at: today.toISOString().split("T")[0],
+        closeDate: today.toISOString().split("T")[0],
+        user_email: userEmail,
+      };
+
+      await fetch("/api/addDeals", {
         method: "POST",
-        body: JSON.stringify({
-          ...leadsFormData,
-          session: session,
-        }),
+        body: JSON.stringify({ ...leadToDeal, session }),
       });
 
-      if (req.status == 200) {
-        toast.success("Lead Added", {
+      if (req.status === 200) {
+        toast.success("Deal Added Since Lead is Qualified", {
           autoClose: 3000,
           position: "top-right",
         });
-
-        console.log(req);
-        const updatedLead = await req.json();
-        console.log(updatedLead);
-        setLeadsData((prevLeads) => [...prevLeads, updatedLead]);
-        setLeadsFormData({
-          name: "",
-          phone: "",
-          email: "",
-          linkedIn: "",
-          location: "",
-          job: "",
-          jobRole: "",
-          status: "",
-          created_at: "",
-          user_email: userEmail,
-        });
-        window.location.reload();
+        await fetchDeals();
       } else {
-        toast.error("Error in Adding Leads", {
+        toast.error("Error in Adding Deal", {
           position: "top-right",
           autoClose: 3000,
         });
       }
-
-      setLeadsLoading(false);
     }
+
+    if (req.status === 200) {
+      toast.success("Lead Added", { autoClose: 3000, position: "top-right" });
+      const updatedLead = await req.json();
+      setLeadsData((prevLeads) => [...prevLeads, updatedLead]);
+      setLeadsFormData({
+        name: "",
+        phone: "",
+        email: "",
+        linkedIn: "",
+        location: "",
+        website: "",
+        industry: "",
+        status: "",
+        created_at: "",
+        user_email: userEmail,
+      });
+      await fetchLeads();
+    } else {
+      toast.error("Error in Adding Leads", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+
+    setLeadsLoading(false);
   };
 
   const handleDealsSubmit = async (e) => {
     e.preventDefault();
     setDealsLoading(true);
+    dealFormData.products = dealProducts.map((prod) => prod.value);
+    console.log(dealFormData);
     let isValid = true;
     if (!dealFormData.name) {
       errors.dealName = "Name is required";
@@ -414,6 +471,66 @@ export default function CRM() {
           autoClose: 3000,
           position: "top-right",
         });
+        if (dealFormData.status === "Closed-won") {
+          const customerData = {
+            name: dealFormData.name,
+            phone: dealFormData.phone,
+            email: dealFormData.email,
+            linkedIn: dealFormData.linkedIn,
+            price: dealFormData.value,
+            location: dealFormData.location,
+            purchase_history: {
+              product: dealFormData.products,
+              price: dealFormData.value,
+              purchase_date: today.toISOString().split("T")[0],
+            },
+            industry: dealFormData.industry,
+            status: "Active",
+            created_at: today.toISOString().split("T")[0],
+            user_email: userEmail,
+          };
+          const { data, error } = await supabase
+            .from("customers")
+            .select("*")
+            .eq("email", dealFormData.email)
+            .eq("user_email", userEmail)
+            .maybeSingle();
+          if (error) {
+            console.error("Error checking existing customer:", error);
+          }
+          if (!data) {
+            await fetch("/api/addCustomer", {
+              method: "POST",
+              body: JSON.stringify({
+                ...customerData,
+                session: session,
+              }),
+            });
+          } else {
+            const { error } = await supabase
+              .from("customers")
+              .update({
+                ...customerData,
+                price: data.price + dealFormData.value,
+                status: "Active",
+                created_at: data.created_at,
+                purchase_history: [
+                  ...data.purchase_history,
+                  {
+                    product: dealFormData.products,
+                    price: dealFormData.value,
+                    purchase_date: today.toISOString().split("T")[0],
+                  },
+                ],
+              })
+              .eq("email", dealFormData.email)
+              .eq("user_email", userEmail);
+            if (error) {
+              console.error("Error updating existing customer:", error);
+            }
+          }
+          await fetchCustomers();
+        }
         const updatedDeal = await req.json();
         setDealsData((prevDeals) => [...prevDeals, updatedDeal]);
 
@@ -430,7 +547,7 @@ export default function CRM() {
           closeDate: "",
           user_email: userEmail,
         });
-        window.location.reload();
+        await fetchDeals();
       } else {
         toast.error("Error in Adding Deal", {
           position: "top-right",
@@ -460,7 +577,6 @@ export default function CRM() {
         const { data, error } = await supabase
           .from(activeTab)
           .insert(results.data);
-        window.location.reload();
         if (error) {
           console.error("Error inserting data:", error);
         } else {
@@ -918,16 +1034,16 @@ export default function CRM() {
                       <Input
                         id="number"
                         type="text"
-                        value={customerFormData.number}
+                        value={customerFormData.phone}
                         onChange={(e) =>
-                          updateCustomerFormData("number", e.target.value)
+                          updateCustomerFormData("phone", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.number ? "border-red-500" : ""
+                          errors.phone ? "border-red-500" : ""
                         }`}
                         placeholder="+91 12345 67890"
                       />
-                      <ErrorMessage error={errors.number} />
+                      <ErrorMessage error={errors.phone} />
                     </div>
                     <div>
                       <Label
@@ -1016,16 +1132,16 @@ export default function CRM() {
                       <Input
                         id="address"
                         type="url"
-                        value={customerFormData.address}
+                        value={customerFormData.location}
                         onChange={(e) =>
-                          updateCustomerFormData("address", e.target.value)
+                          updateCustomerFormData("location", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.address ? "border-red-500" : ""
+                          errors.location ? "border-red-500" : ""
                         }`}
                         placeholder="Customer Address"
                       />
-                      <ErrorMessage error={errors.address} />
+                      <ErrorMessage error={errors.location} />
                     </div>
                     <div>
                       <Label
@@ -1726,6 +1842,43 @@ export default function CRM() {
                         </Select>
                         <ErrorMessage error={errors.priority} />
                       </div>
+                      <div className="flex w-full flex-col gap-3 p-4 max-w-sm">
+                        <label className="font-medium text-sm">
+                          Select Products
+                        </label>
+
+                        <MultipleSelector
+                          commandProps={{
+                            label: "Select Products",
+                          }}
+                          value={dealProducts}
+                          onChange={setDealProducts}
+                          defaultOptions={products.concat({
+                            value: "Other",
+                            label: "Other",
+                          })}
+                          placeholder="Select Products"
+                          hideClearAllButton
+                          hidePlaceholderWhenSelected
+                          emptyIndicator={
+                            <p className="text-center text-sm">
+                              No results found
+                            </p>
+                          }
+                        />
+
+                        {dealProducts.find(
+                          (prod) => prod.value === "Other"
+                        ) && (
+                          <Input
+                            type="text"
+                            placeholder="Please specify the product"
+                            className="mt-2"
+                            value={otherValue}
+                            onChange={(e) => setOtherValue(e.target.value)}
+                          />
+                        )}
+                      </div>
                       <div>
                         <Label
                           htmlFor="value"
@@ -1959,7 +2112,11 @@ export default function CRM() {
                   customer.status === statusFilter
               )
               .map((customer) => (
-                <CustomerCard key={customer.id} customer={customer} />
+                <CustomerCard
+                  key={customer.id}
+                  customer={customer}
+                  onChange={fetchCustomers}
+                />
               ))}
           </div>
         </TabsContent>

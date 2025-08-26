@@ -18,6 +18,8 @@ import { supabase } from "@/utils/supabase/client";
 import { Input } from "./ui/input";
 import { DialogClose, DialogTitle } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
+import { set } from "lodash";
+import { toast } from "react-toastify";
 
 // Toolbar button
 const ToolbarButton = ({ children, onClick }) => (
@@ -51,11 +53,11 @@ const Dropdown = ({ options, onChange, value }) => (
   </div>
 );
 
-export default function ComposeDialog({ email, onOpenChange }) {
+export default function EmailTemplate({ email, onOpenChange }) {
   const [isMaximized, setIsMaximized] = useState(false);
   const [fontSize, setFontSize] = useState("14px");
   const fileInputRef = useRef(null);
-
+  const [message, setMessage] = useState({});
   const user = localStorage.getItem("user");
   const parsedUser = JSON.parse(user);
   const [form, setForm] = useState({
@@ -76,14 +78,24 @@ export default function ComposeDialog({ email, onOpenChange }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-
+      setMessage({ subject: form.subject, body: form.body });
       const data = await res.json();
       if (data.success) {
-        alert("✅ Email sent successfully!");
-        setOpen(false);
+        toast.success("✅ Email sent successfully!");
+
+        const { error } = await supabase
+          .from(type)
+          .update({ ...prev, messages: [...messages, message] })
+          .eq("email", email);
+        if (error) {
+          console.error("Error updating email:", error);
+        } else {
+          console.log("Email updated successfully");
+        }
+        onOpenChange();
         setForm({ from_email: "", to_email: "", subject: "", body: "" });
       } else {
-        console.log("❌ Failed:", data.error);
+        toast.error("❌ Failed to send email.");
       }
     } catch (err) {
       console.error("Error:", err);

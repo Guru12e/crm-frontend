@@ -5,13 +5,7 @@ import { supabase } from "@/utils/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
-  Save,
-  Upload,
   Plus,
-  Trash2,
-  Package,
-  AlertCircle,
-  Sheet,
   Calendar,
   Phone,
   Mail,
@@ -33,13 +27,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "./ui/sheet";
-import {
   Select,
   SelectItem,
   SelectTrigger,
@@ -55,18 +42,8 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "./ui/dialog";
-import { set } from "lodash";
-const ErrorMessage = ({ error }) => {
-  if (!error) return null;
-  return (
-    <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-      <AlertCircle className="w-4 h-4" />
-      {error}
-    </p>
-  );
-};
 
-export default function Deals(deal_id) {
+export default function UpdateDeals(deal_id, onChange) {
   const today = new Date().toISOString().split("T")[0];
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -118,8 +95,6 @@ export default function Deals(deal_id) {
   useEffect(() => {
     fetchDealData();
   }, [deal_id]);
-
-  console.log("DealsData:", DealsData);
 
   const allEvents = [
     // open activities
@@ -185,6 +160,15 @@ export default function Deals(deal_id) {
     description: "",
     date: "",
   });
+  const dealStatus = [
+    "New",
+    "Proposal Sent",
+    "Negotiation",
+    "Closed-won",
+    "Closed-lost",
+    "On-hold",
+    "Abandoned",
+  ];
   const updateActivitiesFormData = (field, value) => {
     setActivitiesFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -216,6 +200,7 @@ export default function Deals(deal_id) {
         position: "top-right",
         zIndex: 9999,
       });
+      await fetchDealData();
     }
   };
 
@@ -238,6 +223,7 @@ export default function Deals(deal_id) {
         position: "top-right",
         zIndex: 9999,
       });
+      onChange();
     }
   };
   const handleEditActivity = (activityId, field, value) => {
@@ -269,6 +255,7 @@ export default function Deals(deal_id) {
         zIndex: 9999,
       });
       setOpenActivities(updatedActivities);
+      onChange();
     }
 
     setLoading(false);
@@ -303,6 +290,7 @@ export default function Deals(deal_id) {
         position: "top-right",
         zIndex: 9999,
       });
+      onChange();
     }
   };
 
@@ -327,8 +315,6 @@ export default function Deals(deal_id) {
       .select("*")
       .eq("id", deal_id.deal_id)
       .single();
-    console.log(dealDetails);
-    console.log("deal data:", DealsData);
     const noChanges =
       dealDetails.name === DealsData.name &&
       dealDetails.email === DealsData.email &&
@@ -361,9 +347,67 @@ export default function Deals(deal_id) {
           "Data updated permanently. All changes made are permanent.",
           { position: "top-right" }
         );
+        if (deal.status === "Closed-won") {
+          const customerData = {
+            name: deal.name,
+            phone: deal.phone,
+            email: deal.email,
+            linkedIn: deal.linkedIn,
+            price: deal.value,
+            location: deal.location,
+            purchase_history: {
+              product: deal.product,
+              price: deal.value,
+              purchase_date: today,
+            },
+            industry: deal.industry,
+            status: "Active",
+            created_at: today,
+            user_email: deal.user_email,
+          };
+          const { data, error } = await supabase
+            .from("customers")
+            .select("*")
+            .eq("email", deal.email)
+            .eq("user_email", deal.user_email)
+            .maybeSingle();
+          if (error) {
+            console.error("Error checking existing customer:", error);
+          }
+          if (!data) {
+            await fetch("/api/addCustomer", {
+              method: "POST",
+              body: JSON.stringify({
+                ...customerData,
+                session: session,
+              }),
+            });
+          } else {
+            const { error } = await supabase
+              .from("customers")
+              .update({
+                ...customerData,
+                price: data.price + deal.value,
+                status: "Active",
+                created_at: data.created_at,
+                purchase_history: [
+                  ...data.purchase_history,
+                  {
+                    product: deal.product,
+                    price: deal.value,
+                  },
+                ],
+              })
+              .eq("email", deal.email)
+              .eq("user_email", userEmail);
+            if (error) {
+              console.error("Error updating existing customer:", error);
+            }
+          }
+          onChange();
+        }
         localStorage.removeItem("companyDataCache");
         setLoading(false);
-        fetchDealData();
       }
     }
   };
@@ -488,6 +532,7 @@ export default function Deals(deal_id) {
           </Label>
           <Input
             className="bg-white"
+            type="date"
             id="closeDate"
             placeholder="Deal close date"
             value={DealsData.closeDate || ""}
@@ -495,28 +540,67 @@ export default function Deals(deal_id) {
           />
         </div>
         <div>
-          <Label className={"mb-4 text-gray-600"} htmlFor="status">
-            Deal status
+          <Label
+            htmlFor="status"
+            className="mb-2 text-slate-700 dark:text-slate-300"
+          >
+            Deal Status
           </Label>
-          <Input
-            className="bg-white"
-            id="status"
-            placeholder="Your Deal status"
-            value={DealsData.status || ""}
-            onChange={(e) => handleDealChange("status", e.target.value)}
-          />
+          <Select
+            value={DealsData.status}
+            onValueChange={(value) => handleDealChange("status", value)}
+          >
+            <SelectTrigger
+              className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white`}
+            >
+              <SelectValue placeholder="Select Deal Status" />
+            </SelectTrigger>
+            <SelectContent>
+              {dealStatus.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {status}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div>
-          <Label className={"mb-4 text-gray-600"} htmlFor="dealSource">
-            Deal source
+          <Label
+            htmlFor="source"
+            className="mb-2 text-slate-700 dark:text-slate-300"
+          >
+            Deal Source
           </Label>
-          <Input
-            className="bg-white"
-            id="dealSource"
-            placeholder="Your Deal source"
-            value={DealsData.source || ""}
-            onChange={(e) => handleDealChange("source", e.target.value)}
-          />
+          <Select
+            value={DealsData.source}
+            onValueChange={(value) => handleDealChange("source", value)}
+          >
+            <SelectTrigger
+              className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white`}
+            >
+              <SelectValue
+                placeholder={DealsData.source || "Select Deal Source"}
+              />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Advertisement">Advertisement</SelectItem>
+              <SelectItem value="Cold call">Cold call</SelectItem>
+              <SelectItem value="Employee referral">
+                Employee referral
+              </SelectItem>
+              <SelectItem value="External referral">
+                External referral
+              </SelectItem>
+              <SelectItem value="Sales email alias">
+                Sales email alias
+              </SelectItem>
+              <SelectItem value="Chat">Chat</SelectItem>
+              <SelectItem value="Facebook">Facebook</SelectItem>
+              <SelectItem value="Web Research">Web Research</SelectItem>
+              <SelectItem value="X(Twitter)">X(Twitter)</SelectItem>
+              <SelectItem value="Public relations">Public relations</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="md:col-span-3">
           <Label className={"mb-4 text-gray-600"} htmlFor="description">
@@ -1009,7 +1093,7 @@ export default function Deals(deal_id) {
       </Card>
       <Card className="bg-transparent text-gray-600 border-0">
         <CardHeader className="flex items-center justify-between">
-          <CardTitle>Last Messages</CardTitle>
+          <CardTitle>Latest Messages</CardTitle>
         </CardHeader>
 
         <CardContent>

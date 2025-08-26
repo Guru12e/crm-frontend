@@ -66,12 +66,13 @@ const ErrorMessage = ({ error }) => {
   );
 };
 
-export default function Customer(customer_id) {
+export default function UpdateCustomer(customer_id, onChange) {
   const today = new Date().toISOString().split("T")[0];
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [CustomerData, setCustomerData] = useState({});
   const [messages, setMessages] = useState([]);
+  const [purchaseHistory, setPurchaseHistory] = useState([]);
   const [errors, setErrors] = useState({ newProduct: {} });
 
   const handleCustomerChange = (field, value) => {
@@ -88,6 +89,8 @@ export default function Customer(customer_id) {
       console.error("Error fetching customer data:", error);
     } else {
       setCustomerData(data);
+      setMessages(data.messages || []);
+      setPurchaseHistory(data.purchaseHistory || []);
     }
   };
   useEffect(() => {
@@ -277,16 +280,30 @@ export default function Customer(customer_id) {
           />
         </div>
         <div>
-          <Label className={"mb-4 text-gray-600"} htmlFor="status">
-            Customer status
+          <Label
+            htmlFor="status"
+            className="mb-2 text-slate-700 dark:text-slate-300"
+          >
+            Customer Status
           </Label>
-          <Input
-            className="bg-white"
-            id="status"
-            placeholder="Customer status"
-            value={CustomerData.status || ""}
-            onChange={(e) => handleCustomerChange("status", e.target.value)}
-          />
+          <Select
+            value={CustomerData.status}
+            onValueChange={(value) => handleCustomerChange("status", value)}
+            className={errors.status ? "border-red-500" : ""}
+          >
+            <SelectTrigger
+              className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
+                errors.status ? "border-red-500" : ""
+              }`}
+            >
+              <SelectValue placeholder="Select Customer Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Active">Active</SelectItem>
+              <SelectItem value="Inactive">Inactive</SelectItem>
+              <SelectItem value="At Risk">At Risk</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <Label className={"mb-4 text-gray-600"} htmlFor="address">
@@ -333,6 +350,112 @@ export default function Customer(customer_id) {
           <Plus className="w-4 h-4 mr-2" /> Update Customer Data
         </Button>
       </div>
+      <Card className="bg-transparent text-gray-600 border-0">
+        <CardHeader className="flex items-center justify-between">
+          <CardTitle>Purchase History</CardTitle>
+        </CardHeader>
+
+        <CardContent>
+          <Card className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm">
+            <CardContent>
+              {purchaseHistory.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+                    <thead className="bg-gray-50 dark:bg-slate-700/50">
+                      <tr>
+                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider">
+                          Purchase Date
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider">
+                          Price
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-slate-300 uppercase tracking-wider">
+                          Products Purchased
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
+                      {purchaseHistory.map((purchase, idx) => (
+                        <tr
+                          key={idx}
+                          className="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors"
+                        >
+                          <td className="px-4 py-3 text-sm text-gray-900 dark:text-slate-100">
+                            {purchase.purchase_date}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-900 dark:text-slate-100">
+                            {purchase.price}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300">
+                            {purchase.product}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-center py-6 text-slate-500 dark:text-slate-400">
+                  <BookmarkPlus className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p className="text-sm">
+                    No purchase history yet. Products purchased by{" "}
+                    {CustomerData.name} will appear here.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </CardContent>
+      </Card>
+      <Card className="bg-transparent text-gray-600 border-0">
+        <CardHeader className="flex items-center justify-between">
+          <CardTitle>Latest Messages</CardTitle>
+        </CardHeader>
+
+        <CardContent>
+          {messages && messages.length > 0 ? (
+            <div className="space-y-3">
+              {messages.slice(-5).map((msg, idx) => (
+                <Card
+                  key={idx}
+                  className={`rounded-xl shadow-sm border ${
+                    msg.type === "customer"
+                      ? "border-blue-400 bg-blue-50 dark:bg-slate-800/50"
+                      : "border-green-400 bg-green-50 dark:bg-slate-800/50"
+                  }`}
+                >
+                  <CardContent className="p-3">
+                    {/* Sender Type */}
+                    <div className="flex items-center justify-between mb-2">
+                      <span
+                        className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                          msg.type === "customer"
+                            ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                            : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                        }`}
+                      >
+                        {msg.type === "customer" ? "Customer" : "Assistant"}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {new Date(msg.timestamp).toLocaleString()}
+                      </span>
+                    </div>
+
+                    {/* Message Content */}
+                    <p className="text-sm text-slate-800 dark:text-slate-100 whitespace-pre-wrap break-words">
+                      {msg.message}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-6 text-slate-500 dark:text-slate-400">
+              <p className="text-sm">No messages found.</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

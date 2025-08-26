@@ -8,16 +8,7 @@ import {
   SheetHeader,
   SheetContent,
 } from "./ui/sheet";
-import {
-  MapPin,
-  Building2,
-  Mail,
-  Phone,
-  Upload,
-  UploadCloud,
-  LucideUpload,
-  Eye,
-} from "lucide-react";
+import { Mail, Phone, LucideUpload, Eye, Trash2 } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import {
@@ -29,7 +20,7 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 import Updateleads from "./Updateleads";
 import { supabase } from "@/utils/supabase/client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import {
   Dialog,
@@ -53,10 +44,12 @@ export default function LeadCard({ lead, setId, onChange }) {
     "Qualified",
     "Unqualified",
   ];
+
   const [newState, setNewState] = useState("");
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState(false);
   const [description, setDescription] = useState("");
+
   const handleStatusUpdate = async () => {
     const stage_history = lead.stage_history || [];
     const length = stage_history.length;
@@ -82,6 +75,40 @@ export default function LeadCard({ lead, setId, onChange }) {
       toast.error("Error updating lead");
     } else {
       toast.success("Lead updated successfully");
+      onChange();
+    }
+  };
+
+  const handleDeleteLead = async (leadId) => {
+    const { error } = await supabase.from("Leads").delete().eq("id", leadId);
+
+    if (error) {
+      console.error("Error deleting lead:", error);
+      toast.error("Error deleting lead");
+    } else {
+      toast.success("Lead deleted successfully");
+      onChange();
+    }
+  };
+
+  const handleMoveToDeal = async (lead) => {
+    const { error } = await supabase.from("Deals").insert({
+      name: lead.name,
+      phone: lead.phone,
+      email: lead.email,
+      linkedIn: lead.linkedIn,
+      location: lead.location,
+      status: "New",
+      created_at: today.toISOString().split("T")[0],
+      closeDate: today.toISOString().split("T")[0],
+      user_email: lead.userEmail,
+    });
+    if (error) {
+      console.error("Error moving lead to deal:", error);
+      toast.error("Error moving lead to deal");
+    } else {
+      toast.success("Lead moved to deal successfully");
+      onChange();
     }
   };
 
@@ -114,7 +141,7 @@ export default function LeadCard({ lead, setId, onChange }) {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <Label className="mt-1 ml-2 text-base sm:text-lg font-semibold text-slate-900 dark:text-white break-words bg-transparent hover:bg-transparent">
+                  <Label className="mt-2 ml-2 text-base sm:text-lg font-semibold text-slate-900 dark:text-white break-words bg-transparent hover:bg-transparent">
                     {lead.name}
                   </Label>
                   <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 break-words">
@@ -123,7 +150,15 @@ export default function LeadCard({ lead, setId, onChange }) {
                 </div>
               </div>
             </SheetTrigger>
-            <div className="flex mt-1 sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2">
+            <Badge
+              variant={lead.source === "Email" ? "Qualified" : "hidden"}
+              className={`mt-3 ${
+                lead.source === "Email" ? "visible" : "invisible"
+              }`}
+            >
+              Automated
+            </Badge>
+            <div className="flex mt-2 sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2">
               <div className="text-left">
                 <Badge
                   variant={
@@ -166,6 +201,7 @@ export default function LeadCard({ lead, setId, onChange }) {
                   </DialogTrigger>
 
                   <EmailTemplate
+                    type="lead"
                     email={lead.email}
                     open={email}
                     onOpenChange={setEmail}
@@ -180,10 +216,45 @@ export default function LeadCard({ lead, setId, onChange }) {
                   Call
                 </Button>
                 <SheetTrigger asChild>
-                  <button className="bg-white/50 dark:bg-slate-800/50 border p-1 rounded cursor-pointer hover:scale-105 transition-transform border-black/10 flex-1 sm:flex-none">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
+                  >
                     <Eye className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </SheetTrigger>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Delete Lead</DialogTitle>
+                      <DialogDescription>
+                        Are you sure you want to delete this lead?
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <Button
+                        type="submit"
+                        onClick={() => {
+                          handleDeleteLead(lead.id);
+                          setOpen(false);
+                          onChange();
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
 
               <div>
@@ -209,6 +280,9 @@ export default function LeadCard({ lead, setId, onChange }) {
                             onClick={() => {
                               setNewState(statu);
                               setOpen(true);
+                              if (newState === "Qualified") {
+                                handleMoveToDeal(lead);
+                              }
                             }}
                           >
                             {statu}
@@ -259,7 +333,7 @@ export default function LeadCard({ lead, setId, onChange }) {
         <SheetHeader>
           <SheetTitle>Lead Data</SheetTitle>
           <SheetDescription>
-            <Updateleads lead_id={lead.id} />
+            <Updateleads lead_id={lead.id} onChange={onChange} />
           </SheetDescription>
         </SheetHeader>
       </SheetContent>
