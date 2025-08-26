@@ -18,7 +18,7 @@ import { supabase } from "@/utils/supabase/client";
 import { Input } from "./ui/input";
 import { DialogClose, DialogTitle } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
-import { set } from "lodash";
+import { set, times } from "lodash";
 import { toast } from "react-toastify";
 
 // Toolbar button
@@ -80,7 +80,11 @@ export default function EmailTemplate({ id, type, email, onOpenChange }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      setMessage({ subject: form.subject, body: form.body });
+      setMessage({
+        message: form.subject.concat(" - ", form.body),
+        type: "User-Sent",
+        timestamp: new Date().toISOString().split("T")[0],
+      });
       const data = await res.json();
       if (data.success) {
         toast.success("✅ Email sent successfully!");

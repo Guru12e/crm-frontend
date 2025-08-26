@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,54 +17,235 @@ import {
   ToggleRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const onboardingData = { rate: 87, change: +12 };
-const leadsData = { converted: 234, change: +8 };
-const dealsData = { won: 156, change: +15 };
-
-const dealClassification = [
-  { name: "Hot", value: 40, color: "bg-red-500" },
-  { name: "Warm", value: 35, color: "bg-yellow-500" },
-  { name: "Cold", value: 25, color: "bg-blue-500" },
-];
-
-const customerSources = [
-  { name: "Calls", value: 120 },
-  { name: "Organic", value: 98 },
-  { name: "Campaigns", value: 145 },
-  { name: "Email", value: 87 },
-  { name: "Referrals", value: 65 },
-];
-
-const revenueData = [
-  { month: "Jan", revenue: 45000, deals: 12 },
-  { month: "Feb", revenue: 52000, deals: 15 },
-  { month: "Mar", revenue: 48000, deals: 13 },
-  { month: "Apr", revenue: 61000, deals: 18 },
-  { month: "May", revenue: 55000, deals: 16 },
-  { month: "Jun", revenue: 67000, deals: 19 },
-];
-
-const upcomingMeetings = [
-  { time: "10:00 AM", client: "Acme Corp", type: "Demo" },
-  { time: "2:30 PM", client: "TechStart Inc", type: "Follow-up" },
-  { time: "4:00 PM", client: "Global Solutions", type: "Proposal" },
-];
-
-const activeDeals = [
-  { company: "Enterprise Co", value: "$45,000", stage: "Negotiation" },
-  { company: "StartupXYZ", value: "$12,000", stage: "Proposal" },
-  { company: "MegaCorp", value: "$89,000", stage: "Demo" },
-];
-
-const priorityTasks = [
-  { task: "Follow up with Enterprise Co", priority: "high" },
-  { task: "Prepare demo for TechStart", priority: "medium" },
-  { task: "Update CRM records", priority: "low" },
-  { task: "Send proposal to MegaCorp", priority: "high" },
-];
+import { supabase } from "@/utils/supabase/client";
 
 export default function Home() {
+  const [leads, setLeads] = useState([]);
+  const [deals, setDeals] = useState([]);
+  const fetchData = async () => {
+    const { data: leadsData, error: leadsError } = await supabase
+      .from("Leads")
+      .select("*")
+      .eq("user_email", userEmail);
+    console.log(leadsData);
+    const { data: dealsData, error: dealsError } = await supabase
+      .from("Deals")
+      .select("*")
+      .eq("user_email", userEmail);
+    console.log(dealsData);
+    const { data: customersData, error: customersError } = await supabase
+      .from("Customers")
+      .select("*")
+      .eq("user_email", userEmail);
+    console.log(customersData);
+    if (leadsError) console.error("Error fetching leads:", leadsError);
+    if (dealsError) console.error("Error fetching deals:", dealsError);
+    if (customersError)
+      console.error("Error fetching customers:", customersError);
+    setLeads(leadsData);
+    setDeals(dealsData);
+    setCustomers(customersData);
+  };
+  const [customers, setCustomers] = useState([]);
+  const [userEmail, setUserEmail] = useState("");
+  const [session, setSession] = useState(null);
+  useEffect(() => {
+    const getSession = () => {
+      const sessionJSON = JSON.parse(localStorage.getItem("session"));
+      setSession(sessionJSON);
+      setUserEmail(sessionJSON.user.email);
+    };
+
+    getSession();
+  }, []);
+  const fetchCustomers = async () => {
+    const { data: customersData } = await supabase
+      .from("Customers")
+      .select("*")
+      .eq("user_email", !userEmail ? "undefined" : userEmail)
+      .order("created_at", { ascending: false });
+    if (customersData) {
+      setCustomers(customersData);
+    } else {
+      console.error("Error fetching customers");
+    }
+  };
+
+  const fetchLeads = async () => {
+    const { data: leadsData } = await supabase
+      .from("Leads")
+      .select("*")
+      .eq("user_email", !userEmail ? "undefined" : userEmail)
+      .order("created_at", { ascending: false });
+    if (leadsData) {
+      setLeads(leadsData);
+    } else {
+      console.error("Error fetching leads");
+    }
+  };
+
+  const fetchDeals = async () => {
+    const { data: dealsData } = await supabase
+      .from("Deals")
+      .select("*")
+      .eq("user_email", !userEmail ? "undefined" : userEmail)
+      .order("created_at", { ascending: false });
+    if (dealsData) {
+      setDeals(dealsData);
+    } else {
+      console.error("Error fetching deals");
+    }
+  };
+
+  useEffect(() => {
+    if (userEmail) {
+      fetchCustomers();
+      fetchLeads();
+      fetchDeals();
+    }
+
+    const intervalId = setInterval(() => {
+      fetchCustomers();
+      fetchLeads();
+      fetchDeals();
+    }, 60000);
+    return () => clearInterval(intervalId);
+  }, [userEmail]);
+
+  const QualifiedLeads = leads.filter(
+    (lead) => lead.status === "Qualified"
+  ).length;
+
+  const onboardingData = {
+    rate: (QualifiedLeads / leads.length) * 100,
+    change: +12,
+  };
+
+  const customerEmails = new Set(customers.map((c) => c.email));
+  const commonEmails = leads
+    .filter((lead) => customerEmails.has(lead.email))
+    .map((lead) => lead.email);
+
+  const leadsData = { converted: commonEmails.length, change: +8 };
+
+  const dealsWon = deals.filter((deal) => deal.status === "Closed-won").length;
+  const dealsData = { won: dealsWon, change: +15 };
+
+  const dealClassification = [
+    {
+      name: "New",
+      value: deals.filter((deal) => deal.status === "New").length,
+      color: "bg-red-500",
+    },
+    {
+      name: "Proposal Sent",
+      value: deals.filter((deal) => deal.status === "Proposal Sent").length,
+      color: "bg-yellow-500",
+    },
+    {
+      name: "Negotiation",
+      value: deals.filter((deal) => deal.status === "Negotiation").length,
+      color: "bg-blue-500",
+    },
+    {
+      name: "Closed Won",
+      value: deals.filter((deal) => deal.status === "Closed-won").length,
+      color: "bg-green-500",
+    },
+    {
+      name: "Closed Lost",
+      value: deals.filter((deal) => deal.status === "Closed-lost").length,
+      color: "bg-gray-500",
+    },
+    {
+      name: "Meeting Booked",
+      value: deals.filter((deal) => deal.status === "Meeting Booked").length,
+      color: "bg-purple-500",
+    },
+    {
+      name: "On Hold",
+      value: deals.filter((deal) => deal.status === "On-hold").length,
+      color: "bg-pink-500",
+    },
+    {
+      name: "Abandoned",
+      value: deals.filter((deal) => deal.status === "Abandoned").length,
+      color: "bg-teal-500",
+    },
+  ];
+
+  console.log(customers);
+
+  const leadSources = [
+    {
+      name: "Advertisement",
+      value: leads.filter((c) => c.source === "Advertisement").length,
+    },
+    {
+      name: "Cold call",
+      value: leads.filter((c) => c.source === "Cold call").length,
+    },
+    {
+      name: "Employee referral",
+      value: leads.filter((c) => c.source === "Employee referral").length,
+    },
+    {
+      name: "External referral",
+      value: leads.filter((c) => c.source === "External referral").length,
+    },
+    {
+      name: "Sales email alias",
+      value: leads.filter((c) => c.source === "Sales email alias").length,
+    },
+    {
+      name: "Chat",
+      value: leads.filter((c) => c.source === "Chat").length,
+    },
+    {
+      name: "Facebook",
+      value: leads.filter((c) => c.source === "Facebook").length,
+    },
+    {
+      name: "Web Research",
+      value: leads.filter((c) => c.source === "Web Research").length,
+    },
+    {
+      name: "X(Twitter)",
+      value: leads.filter((c) => c.source === "X(Twitter)").length,
+    },
+    {
+      name: "Public relations",
+      value: leads.filter((c) => c.source === "Public relations").length,
+    },
+  ];
+
+  const revenueData = [
+    { month: "Jan", revenue: 45000, deals: 12 },
+    { month: "Feb", revenue: 52000, deals: 15 },
+    { month: "Mar", revenue: 48000, deals: 13 },
+    { month: "Apr", revenue: 61000, deals: 18 },
+    { month: "May", revenue: 55000, deals: 16 },
+    { month: "Jun", revenue: 67000, deals: 19 },
+  ];
+
+  const upcomingMeetings = [
+    { time: "10:00 AM", client: "Acme Corp", type: "Demo" },
+    { time: "2:30 PM", client: "TechStart Inc", type: "Follow-up" },
+    { time: "4:00 PM", client: "Global Solutions", type: "Proposal" },
+  ];
+
+  const activeDeals = [
+    { company: "Enterprise Co", value: "$45,000", stage: "Negotiation" },
+    { company: "StartupXYZ", value: "$12,000", stage: "Proposal" },
+    { company: "MegaCorp", value: "$89,000", stage: "Demo" },
+  ];
+
+  const priorityTasks = [
+    { task: "Follow up with Enterprise Co", priority: "high" },
+    { task: "Prepare demo for TechStart", priority: "medium" },
+    { task: "Update CRM records", priority: "low" },
+    { task: "Send proposal to MegaCorp", priority: "high" },
+  ];
   const [chartsMode, setChartsMode] = useState("graphic");
 
   const MetricCard = ({ title, value, change, icon: Icon }) => (
@@ -176,7 +357,7 @@ export default function Home() {
   };
 
   const BarChartSVG = () => {
-    const maxValue = Math.max(...customerSources.map((s) => s.value));
+    const maxValue = Math.max(...leadSources.map((s) => s.value));
 
     return (
       <div className="h-64">
@@ -188,7 +369,7 @@ export default function Home() {
             </linearGradient>
           </defs>
 
-          {customerSources.map((source, index) => {
+          {leadSources.map((source, index) => {
             const barHeight = (source.value / maxValue) * 160;
             const barWidth = 50;
             const x = index * 75 + 25;
@@ -435,7 +616,7 @@ export default function Home() {
               <BarChartSVG />
             ) : (
               <div className="space-y-2">
-                {customerSources.map((source, index) => (
+                {leadSources.map((source, index) => (
                   <div
                     key={index}
                     className="flex justify-between items-center py-2 border-b border-slate-200 dark:border-slate-700 last:border-b-0"

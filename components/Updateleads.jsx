@@ -373,8 +373,8 @@ export default function Updateleads(lead_id, onChange) {
             linkedIn: LeadsData.linkedIn,
             location: LeadsData.location,
             status: "New",
-            created_at: today.toISOString().split("T")[0],
-            closeDate: today.toISOString().split("T")[0],
+            created_at: today,
+            closeDate: today,
             user_email: LeadsData.userEmail,
           });
           if (error) {
