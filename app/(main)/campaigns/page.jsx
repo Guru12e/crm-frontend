@@ -20,7 +20,7 @@ export default function Campaigns() {
   const [customers, setCustomers] = useState([]);
   const [leads, setLeads] = useState([]);
   const [deals, setDeals] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
   const [user, setUser] = useState(null);
 
