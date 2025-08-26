@@ -161,11 +161,21 @@ export default function LeadCard({ lead, setId, onChange }) {
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <SheetTrigger asChild key={lead.id}>
-                  <Label className="mt-2 ml-2 text-base sm:text-lg font-semibold text-slate-900 dark:text-white break-words bg-transparent hover:bg-transparent">
-                    {lead.name}
-                  </Label>
-                </SheetTrigger>
+                <Sheet>
+                  <SheetTrigger asChild key={lead.id}>
+                    <Label className="mt-2 ml-2 text-base sm:text-lg font-semibold text-slate-900 dark:text-white break-words bg-transparent hover:bg-transparent">
+                      {lead.name}
+                    </Label>
+                  </SheetTrigger>
+                  <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] md:min-w-[85vw] min-w-screen ">
+                    <SheetHeader>
+                      <SheetTitle>Lead Data</SheetTitle>
+                      <SheetDescription>
+                        <Updateleads lead_id={lead.id} onChange={onChange} />
+                      </SheetDescription>
+                    </SheetHeader>
+                  </SheetContent>
+                </Sheet>
                 <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 break-words">
                   {lead.contact}
                 </p>
@@ -237,15 +247,14 @@ export default function LeadCard({ lead, setId, onChange }) {
                   <Phone className="h-4 w-4 mr-1" />
                   Call
                 </Button>
-                <SheetTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </SheetTrigger>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
+
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button
@@ -350,15 +359,6 @@ export default function LeadCard({ lead, setId, onChange }) {
           </div>
         </CardContent>
       </Card>
-
-      <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] md:min-w-[85vw] min-w-screen ">
-        <SheetHeader>
-          <SheetTitle>Lead Data</SheetTitle>
-          <SheetDescription>
-            <Updateleads lead_id={lead.id} onChange={onChange} />
-          </SheetDescription>
-        </SheetHeader>
-      </SheetContent>
     </>
   );
 }
