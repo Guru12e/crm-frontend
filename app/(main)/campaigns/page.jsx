@@ -359,7 +359,7 @@ export default function Campaigns() {
         ) : (
           campaigns.map((c) => (
             <Link key={c.id} href={`/campaigns/${c.name}`} className="block">
-              <Card className="shadow-sm hover:shadow-md rounded-2xl border hover:scale-105 hover:shadow-lg border-gray-200 transition bg-white cursor-pointer h-full">
+              <Card className="shadow-sm  rounded-2xl border hover:scale-105 hover:shadow-lg border-gray-200 transition bg-white cursor-pointer h-full">
                 <CardContent className="p-5 flex flex-col h-full">
                   <div className="border border-blue-200 dark:border-blue-800 rounded-lg p-4 bg-blue-50/50 dark:bg-blue-900/20">
                     {/* Title */}
