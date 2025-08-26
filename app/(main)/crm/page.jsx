@@ -2112,7 +2112,11 @@ export default function CRM() {
                   customer.status === statusFilter
               )
               .map((customer) => (
-                <CustomerCard key={customer.id} customer={customer} />
+                <CustomerCard
+                  key={customer.id}
+                  customer={customer}
+                  onChange={fetchCustomers}
+                />
               ))}
           </div>
         </TabsContent>

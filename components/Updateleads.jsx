@@ -517,28 +517,69 @@ export default function Updateleads(lead_id, onChange) {
           />
         </div>
         <div>
-          <Label className={"mb-4 text-gray-600"} htmlFor="status">
-            Lead status
+          <Label
+            htmlFor="status"
+            className="mb-2 text-slate-700 dark:text-slate-300"
+          >
+            Lead Status
           </Label>
-          <Input
-            className="bg-white"
-            id="status"
-            placeholder="Your Lead status"
-            value={LeadsData.status || ""}
-            onChange={(e) => handleLeadChange("status", e.target.value)}
-          />
+          <Select
+            value={LeadsData.status}
+            onValueChange={(value) => handleLeadChange("status", value)}
+          >
+            <SelectTrigger
+              className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white `}
+            >
+              <SelectValue placeholder="Select Lead Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="New">New</SelectItem>
+              <SelectItem value="In progress">In progress</SelectItem>
+              <SelectItem value="Contact Attempted">
+                Contact Attempted
+              </SelectItem>
+              <SelectItem value="Contacted">Contacted</SelectItem>
+              <SelectItem value="Qualified">Qualified</SelectItem>
+              <SelectItem value="Unqualified">Unqualified</SelectItem>
+              <SelectItem value="Meeting Booked">Meeting Booked</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div>
-          <Label className={"mb-4 text-gray-600"} htmlFor="leadSource">
-            Lead source
+          <Label
+            htmlFor="source"
+            className="mb-2 text-slate-700 dark:text-slate-300"
+          >
+            Lead Source
           </Label>
-          <Input
-            className="bg-white"
-            id="leadSource"
-            placeholder="Your Lead source"
-            value={LeadsData.source || ""}
-            onChange={(e) => handleLeadChange("source", e.target.value)}
-          />
+          <Select
+            value={LeadsData.source}
+            onValueChange={(value) => handleLeadChange("source", value)}
+          >
+            <SelectTrigger
+              className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white`}
+            >
+              <SelectValue placeholder="Select Lead Source" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Advertisement">Advertisement</SelectItem>
+              <SelectItem value="Cold call">Cold call</SelectItem>
+              <SelectItem value="Employee referral">
+                Employee referral
+              </SelectItem>
+              <SelectItem value="External referral">
+                External referral
+              </SelectItem>
+              <SelectItem value="Sales email alias">
+                Sales email alias
+              </SelectItem>
+              <SelectItem value="Chat">Chat</SelectItem>
+              <SelectItem value="Facebook">Facebook</SelectItem>
+              <SelectItem value="Web Research">Web Research</SelectItem>
+              <SelectItem value="X(Twitter)">X(Twitter)</SelectItem>
+              <SelectItem value="Public relations">Public relations</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <Label className={"mb-4 text-gray-600"} htmlFor="leadAddress">
@@ -1043,7 +1084,7 @@ export default function Updateleads(lead_id, onChange) {
       </Card>
       <Card className="bg-transparent text-gray-600 border-0">
         <CardHeader className="flex items-center justify-between">
-          <CardTitle>Last Messages</CardTitle>
+          <CardTitle>Latest Messages</CardTitle>
         </CardHeader>
 
         <CardContent>

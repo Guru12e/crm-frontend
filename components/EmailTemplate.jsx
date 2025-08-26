@@ -53,7 +53,7 @@ const Dropdown = ({ options, onChange, value }) => (
   </div>
 );
 
-export default function ComposeDialog({ email, onOpenChange }) {
+export default function EmailTemplate({ email, onOpenChange }) {
   const [isMaximized, setIsMaximized] = useState(false);
   const [fontSize, setFontSize] = useState("14px");
   const fileInputRef = useRef(null);
