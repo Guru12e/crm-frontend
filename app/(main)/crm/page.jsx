@@ -32,11 +32,16 @@ import {
   Search,
   Loader2,
   AlertCircle,
+  ChevronsUpDown,
+  CheckIcon,
+  ChevronsUpDownIcon,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { toast } from "react-toastify";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/utils/supabase/client";
+import MultipleSelector from "@/components/ui/multiselect";
+import { set } from "lodash";
 
 const summaryStats = {
   customers: { total: 1247, new: 89, growth: 12 },
@@ -66,6 +71,7 @@ const dealStatus = [
 
 export default function CRM() {
   const [activeTab, setActiveTab] = useState("Customers");
+  const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All statuses");
   const [sourceFilter, setSourceFilter] = useState("");
@@ -76,11 +82,15 @@ export default function CRM() {
   const today = new Date();
   const [session, setSession] = useState("");
   const [userEmail, setUserEmail] = useState(null);
+  const [dealProducts, setDealProducts] = useState([]);
+  const [otherValue, setOtherValue] = useState("");
+
   const [customerFormData, setCustomerFormData] = useState({
     name: "",
     phone: "",
     email: "",
     linkedIn: "",
+    price: 0,
     location: "",
     website: "",
     industry: "",
@@ -113,6 +123,7 @@ export default function CRM() {
     status: "",
     priority: "Low",
     closeDate: today,
+    products: [],
     owner: "",
     source: "",
     description: "",
@@ -130,6 +141,13 @@ export default function CRM() {
       setUserEmail(sessionJSON.user.email);
       setActiveTab(sessionStorage.getItem("activeTab") || "Customers");
     };
+    const user = JSON.parse(localStorage.getItem("user"));
+    setProducts(
+      user?.products?.map((product) => ({
+        value: product.name,
+        label: product.name,
+      })) || []
+    );
 
     getSession();
   }, []);
@@ -273,8 +291,6 @@ export default function CRM() {
           position: "top-right",
         });
 
-        console.log(req.json());
-
         const updatedCustomer = await req.json();
         setCustomersData((prevCustomers) => [
           ...prevCustomers,
@@ -285,6 +301,7 @@ export default function CRM() {
           phone: "",
           email: "",
           linkedIn: "",
+          price: 0,
           location: "",
           website: "",
           industry: "",
@@ -396,6 +413,8 @@ export default function CRM() {
   const handleDealsSubmit = async (e) => {
     e.preventDefault();
     setDealsLoading(true);
+    dealFormData.products = dealProducts.map((prod) => prod.value);
+    console.log(dealFormData);
     let isValid = true;
     if (!dealFormData.name) {
       errors.dealName = "Name is required";
@@ -458,19 +477,56 @@ export default function CRM() {
             phone: dealFormData.phone,
             email: dealFormData.email,
             linkedIn: dealFormData.linkedIn,
+            price: dealFormData.value,
             location: dealFormData.location,
+            purchase_history: {
+              product: dealProducts.map((prod) => prod.value),
+              price: dealFormData.value,
+            },
             industry: dealFormData.industry,
             status: "Active",
             created_at: today.toISOString().split("T")[0],
             user_email: userEmail,
           };
-          await fetch("/api/addCustomer", {
-            method: "POST",
-            body: JSON.stringify({
-              ...customerData,
-              session: session,
-            }),
-          });
+          const { data, error } = await supabase
+            .from("customers")
+            .select("*")
+            .eq("email", dealFormData.email)
+            .eq("user_email", userEmail)
+            .maybeSingle();
+          if (error) {
+            console.error("Error checking existing customer:", error);
+          }
+          if (!data) {
+            await fetch("/api/addCustomer", {
+              method: "POST",
+              body: JSON.stringify({
+                ...customerData,
+                session: session,
+              }),
+            });
+          } else {
+            const { error } = await supabase
+              .from("customers")
+              .update({
+                ...customerData,
+                price: data.price + dealFormData.value,
+                status: "Active",
+                created_at: data.created_at,
+                purchase_history: [
+                  ...data.purchase_history,
+                  {
+                    product: dealFormData.products,
+                    price: dealFormData.value,
+                  },
+                ],
+              })
+              .eq("email", dealFormData.email)
+              .eq("user_email", userEmail);
+            if (error) {
+              console.error("Error updating existing customer:", error);
+            }
+          }
           await fetchCustomers();
         }
         const updatedDeal = await req.json();
@@ -976,16 +1032,16 @@ export default function CRM() {
                       <Input
                         id="number"
                         type="text"
-                        value={customerFormData.number}
+                        value={customerFormData.phone}
                         onChange={(e) =>
-                          updateCustomerFormData("number", e.target.value)
+                          updateCustomerFormData("phone", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.number ? "border-red-500" : ""
+                          errors.phone ? "border-red-500" : ""
                         }`}
                         placeholder="+91 12345 67890"
                       />
-                      <ErrorMessage error={errors.number} />
+                      <ErrorMessage error={errors.phone} />
                     </div>
                     <div>
                       <Label
@@ -1074,16 +1130,16 @@ export default function CRM() {
                       <Input
                         id="address"
                         type="url"
-                        value={customerFormData.address}
+                        value={customerFormData.location}
                         onChange={(e) =>
-                          updateCustomerFormData("address", e.target.value)
+                          updateCustomerFormData("location", e.target.value)
                         }
                         className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.address ? "border-red-500" : ""
+                          errors.location ? "border-red-500" : ""
                         }`}
                         placeholder="Customer Address"
                       />
-                      <ErrorMessage error={errors.address} />
+                      <ErrorMessage error={errors.location} />
                     </div>
                     <div>
                       <Label
@@ -1783,6 +1839,43 @@ export default function CRM() {
                           </SelectContent>
                         </Select>
                         <ErrorMessage error={errors.priority} />
+                      </div>
+                      <div className="flex w-full flex-col gap-3 p-4 max-w-sm">
+                        <label className="font-medium text-sm">
+                          Select Products
+                        </label>
+
+                        <MultipleSelector
+                          commandProps={{
+                            label: "Select Products",
+                          }}
+                          value={dealProducts}
+                          onChange={setDealProducts}
+                          defaultOptions={products.concat({
+                            value: "Other",
+                            label: "Other",
+                          })}
+                          placeholder="Select Products"
+                          hideClearAllButton
+                          hidePlaceholderWhenSelected
+                          emptyIndicator={
+                            <p className="text-center text-sm">
+                              No results found
+                            </p>
+                          }
+                        />
+
+                        {dealProducts.find(
+                          (prod) => prod.value === "Other"
+                        ) && (
+                          <Input
+                            type="text"
+                            placeholder="Please specify the product"
+                            className="mt-2"
+                            value={otherValue}
+                            onChange={(e) => setOtherValue(e.target.value)}
+                          />
+                        )}
                       </div>
                       <div>
                         <Label

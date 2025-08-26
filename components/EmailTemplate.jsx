@@ -33,8 +33,6 @@ const ToolbarButton = ({ children, onClick }) => (
   </button>
 );
 
-const [message, setMessage] = useState({});
-
 // Dropdown
 const Dropdown = ({ options, onChange, value }) => (
   <div className="relative inline-block">
@@ -59,7 +57,7 @@ export default function ComposeDialog({ email, onOpenChange }) {
   const [isMaximized, setIsMaximized] = useState(false);
   const [fontSize, setFontSize] = useState("14px");
   const fileInputRef = useRef(null);
-
+  const [message, setMessage] = useState({});
   const user = localStorage.getItem("user");
   const parsedUser = JSON.parse(user);
   const [form, setForm] = useState({
@@ -80,11 +78,11 @@ export default function ComposeDialog({ email, onOpenChange }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-
+      setMessage({ subject: form.subject, body: form.body });
       const data = await res.json();
       if (data.success) {
         toast.success("✅ Email sent successfully!");
-        setMessage({ subject: form.subject, body: form.body });
+
         const { error } = await supabase
           .from(type)
           .update({ ...prev, messages: [...messages, message] })

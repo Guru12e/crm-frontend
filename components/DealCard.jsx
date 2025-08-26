@@ -70,31 +70,65 @@ export default function DealCard({ deal, setId, onChange }) {
       console.error("Error updating deal:", error);
       toast.error("Error updating deal");
     } else {
-      toast.success("Deal updated successfully");
-      if (newState === "Closed-won") {
+      if (deal.status === "Closed-won") {
         const customerData = {
           name: deal.name,
-          email: deal.email,
           phone: deal.phone,
+          email: deal.email,
           linkedIn: deal.linkedIn,
+          price: deal.value,
           location: deal.location,
+          purchase_history: {
+            product: deal.product,
+            price: deal.value,
+          },
           industry: deal.industry,
-          status: deal.status,
-          created_at: today,
-          user_email: deal.user_email,
+          status: "Active",
+          created_at: today.toISOString().split("T")[0],
+          user_email: userEmail,
         };
-        const { error } = await supabase
-          .from("Customers")
-          .insert([customerData]);
-
+        const { data, error } = await supabase
+          .from("customers")
+          .select("*")
+          .eq("email", deal.email)
+          .eq("user_email", deal.user_email)
+          .maybeSingle();
         if (error) {
-          console.error("Error creating customer:", error);
-          toast.error("Error creating customer");
-        } else {
-          toast.success("Customer created successfully");
+          console.error("Error checking existing customer:", error);
         }
+        if (!data) {
+          await fetch("/api/addCustomer", {
+            method: "POST",
+            body: JSON.stringify({
+              ...customerData,
+              session: session,
+            }),
+          });
+        } else {
+          const { error } = await supabase
+            .from("customers")
+            .update({
+              ...customerData,
+              price: data.price + deal.value,
+              status: "Active",
+              created_at: data.created_at,
+              purchase_history: [
+                ...data.purchase_history,
+                {
+                  product: deal.product,
+                  price: deal.value,
+                },
+              ],
+            })
+            .eq("email", deal.email)
+            .eq("user_email", userEmail);
+          if (error) {
+            console.error("Error updating existing customer:", error);
+          }
+        }
+        onChange();
       }
-      onChange();
+      toast.success("Deal updated successfully");
     }
   };
 
