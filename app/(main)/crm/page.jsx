@@ -90,7 +90,7 @@ export default function CRM() {
     phone: "",
     email: "",
     linkedIn: "",
-    price: 0,
+    price: "",
     location: "",
     website: "",
     industry: "",
@@ -233,15 +233,12 @@ export default function CRM() {
     let isValid = true;
     if (!customerFormData.name) {
       errors.name = "Name is required";
-      toast.error("Name is required");
       isValid = false;
     } else {
       errors.name = "";
     }
-
-    if (!customerFormData.number) {
+    if (!customerFormData.phone) {
       errors.number = "Phone Number is Required";
-      toast.error("Phone Number is Required");
       isValid = false;
     } else {
       errors.number = "";
@@ -253,6 +250,7 @@ export default function CRM() {
     } else {
       errors.status = "";
     }
+
     if (!customerFormData.created_at) {
       customerFormData.created_at = today;
       errors.created_at = "";
@@ -268,13 +266,10 @@ export default function CRM() {
         errors.linkedIn = "";
       }
     }
+
     if (!isValid) {
       setCustomerLoading(false);
       setErrors(errors);
-      toast.error("Please fix the errors in the form", {
-        position: "top-right",
-        autoClose: 3000,
-      });
       return;
     } else {
       const req = await fetch("/api/addCustomer", {
@@ -284,6 +279,14 @@ export default function CRM() {
           session: session,
         }),
       });
+
+      if (req.status == 404) {
+        toast.error("Email Already Exists", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        return;
+      }
 
       if (req.status == 200) {
         toast.success("Customer Added", {
@@ -465,6 +468,15 @@ export default function CRM() {
           session: session,
         }),
       });
+
+      if (req.status == 404) {
+        toast.error("Email Already Found", {
+          autoClose: 3000,
+          position: "top-right",
+        });
+
+        return;
+      }
 
       if (req.status == 200) {
         toast.success("Deal Added", {
@@ -1131,7 +1143,7 @@ export default function CRM() {
                       </Label>
                       <Input
                         id="address"
-                        type="url"
+                        type="text"
                         value={customerFormData.location}
                         onChange={(e) =>
                           updateCustomerFormData("location", e.target.value)
@@ -1181,7 +1193,7 @@ export default function CRM() {
                       </Label>
                       <Input
                         id="price"
-                        type="url"
+                        type="number"
                         value={customerFormData.price}
                         onChange={(e) =>
                           updateCustomerFormData("price", e.target.value)
@@ -2104,7 +2116,7 @@ export default function CRM() {
         </Card>
 
         <TabsContent value="Customers" className="space-y-6">
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid sm:grid-cols-2 gap-6">
             {customersData
               .filter(
                 (customer) =>

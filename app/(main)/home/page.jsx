@@ -483,7 +483,7 @@ export default function Home() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2  gap-4 sm:gap-6">
         <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -532,48 +532,6 @@ export default function Home() {
                 <div className="text-sm font-bold text-green-600">
                   {deal.value}
                 </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <BarChart3 className="w-5 h-5 mr-2" />
-              Priority List
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {priorityTasks.map((task, index) => (
-              <div
-                key={index}
-                className="flex items-center space-x-3 p-3 rounded-lg bg-white/50 dark:bg-slate-700/50"
-              >
-                <div
-                  className={cn(
-                    "w-3 h-3 rounded-full",
-                    task.priority === "high"
-                      ? "bg-red-500"
-                      : task.priority === "medium"
-                      ? "bg-yellow-500"
-                      : "bg-white"
-                  )}
-                ></div>
-                <div className="flex-1">
-                  <div className="text-sm font-medium">{task.task}</div>
-                </div>
-                <Badge
-                  variant={
-                    task.priority === "high"
-                      ? "destructive"
-                      : task.priority === "medium"
-                      ? "default"
-                      : "secondary"
-                  }
-                >
-                  {task.priority}
-                </Badge>
               </div>
             ))}
           </CardContent>

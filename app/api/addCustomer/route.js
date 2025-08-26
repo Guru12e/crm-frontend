@@ -7,7 +7,7 @@ export async function POST(request) {
 
     if (
       !formData.name ||
-      !formData.number ||
+      !formData.phone ||
       !formData.status ||
       !formData.session
     ) {
@@ -44,6 +44,14 @@ export async function POST(request) {
           user_email: formData.session.user.email,
         })
         .select("*");
+
+      if (companyError.message.includes("duplicate key value")) {
+        return NextResponse.json(
+          { error: `Failed to insert company: ${companyError.message}` },
+          { status: 404 }
+        );
+      }
+
       if (companyError) {
         return NextResponse.json(
           { error: `Failed to insert company: ${companyError.message}` },
