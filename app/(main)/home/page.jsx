@@ -177,26 +177,26 @@ export default function Home() {
   console.log(customers);
 
   const leadSources = [
-    {
-      name: "Advertisement",
-      value: leads.filter((c) => c.source === "Advertisement").length,
-    },
-    {
-      name: "Cold call",
-      value: leads.filter((c) => c.source === "Cold call").length,
-    },
-    {
-      name: "Employee referral",
-      value: leads.filter((c) => c.source === "Employee referral").length,
-    },
+    // {
+    //   name: "Advertisement",
+    //   value: leads.filter((c) => c.source === "Advertisement").length,
+    // },
+    // {
+    //   name: "Cold call",
+    //   value: leads.filter((c) => c.source === "Cold call").length,
+    // },
+    // {
+    //   name: "Employee referral",
+    //   value: leads.filter((c) => c.source === "Employee referral").length,
+    // },
     {
       name: "External referral",
       value: leads.filter((c) => c.source === "External referral").length,
     },
-    {
-      name: "Sales email alias",
-      value: leads.filter((c) => c.source === "Sales email alias").length,
-    },
+    // {
+    //   name: "Sales email alias",
+    //   value: leads.filter((c) => c.source === "Sales email alias").length,
+    // },
     {
       name: "Chat",
       value: leads.filter((c) => c.source === "Chat").length,
@@ -205,10 +205,10 @@ export default function Home() {
       name: "Facebook",
       value: leads.filter((c) => c.source === "Facebook").length,
     },
-    {
-      name: "Web Research",
-      value: leads.filter((c) => c.source === "Web Research").length,
-    },
+    // {
+    //   name: "Web Research",
+    //   value: leads.filter((c) => c.source === "Web Research").length,
+    // },
     {
       name: "X(Twitter)",
       value: leads.filter((c) => c.source === "X(Twitter)").length,
