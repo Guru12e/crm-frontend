@@ -204,7 +204,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen p-8">
       <div className="flex flex-col sm:flex-row sm:justify-left sm:items-center">
         <Sheet>
           <div className="flex justify-between items-center w-screen">
@@ -345,26 +345,28 @@ export default function PricingPage() {
         </Sheet>
       </div>
 
-      <div className="bg-gray-50 min-h-screen p-8">
-        <div className="bg-white shadow-lg rounded-2xl p-6 mb-8">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">
+      <div className="min-h-screen p-8">
+        <div className="shadow-lg rounded-2xl p-6 mb-8">
+          <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">
             Available Products
           </h2>
 
           {products.length === 0 ? (
-            <p className="text-gray-500">No products available</p>
+            <p className="text-slate-500 dark:text-white">
+              No products available
+            </p>
           ) : (
             <div className="grid grid-cols-1 gap-6">
               {products.map((product, idx) => (
                 <Card
                   key={product.id}
-                  className="shadow-sm hover:shadow-md transition rounded-xl border"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800/30"
                 >
-                  <CardContent className=" h-[40vh] flex flex-col gap-2">
-                    <div className="border border-blue-200 dark:border-blue-800 rounded-lg p-4 bg-blue-50/50 dark:bg-blue-900/20">
+                  <CardContent className=" h-[40vh] flex flex-col gap-2 ">
+                    <div className="flex flex-col gap-2">
                       {/* Name */}
                       <div className="flex gap-4">
-                        <Label className="text-sm font-medium text-gray-600 w-[20vh]">
+                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Name
                         </Label>
                         <Input
@@ -375,13 +377,13 @@ export default function PricingPage() {
                             updated[idx].name = e.target.value;
                             handleProductChange(updated);
                           }}
-                          className="mt-1 w-[80vh] border rounded-lg p-2  focus:ring-2 focus:ring-blue-400"
+                          className="mt-1 w-[110vh] border rounded-lg p-2  focus:ring-2 focus:ring-blue-400"
                         />
                       </div>
 
                       {/* Stock */}
                       <div className="flex gap-4">
-                        <label className="text-sm font-medium text-gray-600 w-[20vh]">
+                        <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Stock
                         </label>
                         <Input
@@ -392,13 +394,13 @@ export default function PricingPage() {
                             updated[idx].stock = e.target.value;
                             handleProductChange(updated);
                           }}
-                          className="mt-1 w-[80vh] border rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
+                          className="mt-1 w-[110vh] border rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
                         />
                       </div>
 
                       {/* Price */}
                       <div className="flex gap-4">
-                        <label className="text-sm font-medium text-gray-600 w-[20vh]">
+                        <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Price
                         </label>
                         <Input
@@ -415,13 +417,13 @@ export default function PricingPage() {
                               : Number(e.target.value);
                             handleProductChange(updated);
                           }}
-                          className="mt-1 border rounded-lg p-2 w-[80vh] focus:ring-2 focus:ring-blue-400"
+                          className="mt-1 border rounded-lg p-2 w-[110vh] focus:ring-2 focus:ring-blue-400"
                         />
                       </div>
 
                       {/* Category */}
                       <div className="flex gap-4">
-                        <label className="text-sm font-medium text-gray-600 w-[20vh]">
+                        <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Category
                         </label>
                         <Input
@@ -432,13 +434,13 @@ export default function PricingPage() {
                             updated[idx].category = e.target.value;
                             handleProductChange(updated);
                           }}
-                          className="mt-1 border rounded-lg p-2 w-[80vh] focus:ring-2 focus:ring-blue-400"
+                          className="mt-1 border rounded-lg p-2 w-[110vh] focus:ring-2 focus:ring-blue-400"
                         />
                       </div>
 
                       {/* Description */}
                       <div className="flex gap-4">
-                        <label className="text-sm font-medium text-gray-600 w-[20vh]">
+                        <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Description
                         </label>
                         <Input
@@ -449,12 +451,12 @@ export default function PricingPage() {
                             updated[idx].description = e.target.value;
                             handleProductChange(updated);
                           }}
-                          className="mt-1 border rounded-lg p-2 w-[80vh] focus:ring-2 focus:ring-blue-400"
+                          className="mt-1 border rounded-lg p-2 w-[110vh] focus:ring-2 focus:ring-blue-400"
                         />
                       </div>
 
                       {/* Actions */}
-                      <div className="flex justify-end">
+                      <div className="flex justify-end mt-3 w-full">
                         <button
                           onClick={() => removeProduct(product.id)}
                           className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg flex items-center gap-2 transition"

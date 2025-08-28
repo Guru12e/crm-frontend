@@ -106,7 +106,7 @@ export default function Layout({ children }) {
         <div className="flex h-full flex-col backdrop-blur-xl bg-white/40 dark:bg-sky-900/90 border-r border-teal/30 dark:border-sky-700/50">
           <div className="flex h-16 items-center justify-between px-4">
             {sidebarOpen && (
-              <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-gradient-to-r from-teal-500 to-sky-700 dark:from-teal-200 dark:to-sky-300 bg-clip-text text-transparent">
                 GTM Engine
               </span>
             )}
@@ -207,7 +207,7 @@ export default function Layout({ children }) {
       >
         <div className="flex h-full flex-col backdrop-blur-xl bg-white/40 dark:bg-sky-900/90 border-r border-white/30 dark:border-slate-700/50">
           <div className="flex h-16 items-center justify-between px-4">
-            <span className="text-xl font-bold bg-gradient-to-r from-sky-700 to-teal-500 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-sky-700 to-teal-500 dark:from-teal-200 dark:to-sky-300 bg-clip-text text-transparent">
               GTM Engine
             </span>
             <Button
