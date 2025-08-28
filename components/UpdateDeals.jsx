@@ -727,7 +727,7 @@ export default function UpdateDeals(deal_id, onChange) {
                       className="mt-4 border-green-500 bg-white text-green-500 hover:bg-green-50 hover:text-green-700"
                     >
                       <ArrowRightToLine />
-                      Update Activity
+                      Add Activity
                     </Button>
                   </div>
                 </DialogContent>
