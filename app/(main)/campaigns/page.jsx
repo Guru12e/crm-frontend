@@ -361,7 +361,7 @@ export default function Campaigns() {
             <Link key={c.id} href={`/campaigns/${c.name}`} className="block">
               <Card className="shadow-sm  rounded-2xl border hover:scale-105 hover:shadow-lg  bg-white/70 dark:bg-slate-800/50  border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 cursor-pointer h-full">
                 <CardContent className="p-5 flex flex-col h-full">
-                  <div className="border border-blue-200 dark:border-blue-800 rounded-lg p-4 bg-blue-50/50 dark:bg-blue-900/20">
+                  <div className="border border-teal-200 dark:border-sky-800 rounded-lg p-4 bg-sky-50/50 dark:bg-blue-900/20">
                     {/* Title */}
                     <h3 className="font-semibold text-xl text-gray-900 mb-2">
                       {c.name}
