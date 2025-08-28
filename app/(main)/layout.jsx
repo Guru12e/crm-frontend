@@ -85,7 +85,7 @@ export default function Layout({ children }) {
   return (
     <div
       className={cn(
-        "min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800",
+        "min-h-screen bg-gradient-to-r from-teal-800/10 to-sky-500/10 dark:from-teal-900 dark:to-blue-800",
         darkMode && "dark"
       )}
     >
@@ -103,10 +103,10 @@ export default function Layout({ children }) {
           "hidden sm:block"
         )}
       >
-        <div className="flex h-full flex-col backdrop-blur-xl bg-white/90 dark:bg-slate-900/90 border-r border-white/30 dark:border-slate-700/50">
+        <div className="flex h-full flex-col backdrop-blur-xl bg-white/40 dark:bg-sky-900/90 border-r border-teal/30 dark:border-sky-700/50">
           <div className="flex h-16 items-center justify-between px-4">
             {sidebarOpen && (
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
                 GTM Engine
               </span>
             )}
@@ -114,7 +114,7 @@ export default function Layout({ children }) {
               variant="ghost"
               size="sm"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 hover:bg-white/30 dark:hover:bg-slate-800/50"
+              className="p-2 hover:bg-teal/30 dark:hover:bg-slate-800/50"
             >
               <Menu className="h-4 w-4" />
             </Button>
@@ -135,8 +135,8 @@ export default function Layout({ children }) {
                     className={cn(
                       "flex items-center cursor-pointer rounded-lg px-2 py-2 text-sm font-medium transition-all",
                       isActive
-                        ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-600 dark:text-blue-400"
-                        : "text-slate-700 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-800/50"
+                        ? "bg-gradient-to-r from-teal-500 to-sky-500 text-purple-600 dark:text-blue-400"
+                        : "text-slate-700 dark:text-slate-300 hover:bg-teal/50 dark:hover:bg-sky-800/50"
                     )}
                     onClick={() => handleItemClick(item)}
                   >
@@ -184,7 +184,7 @@ export default function Layout({ children }) {
                             "block rounded-md px-3 py-2 text-sm transition-all",
                             location.pathname === subpage.href
                               ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                              : "text-slate-600 dark:text-slate-400 hover:bg-white/30 dark:hover:bg-slate-800/30"
+                              : "text-slate-600 dark:text-slate-400 hover:bg-teal/30 dark:hover:bg-sky-800/30"
                           )}
                         >
                           {subpage.name}
@@ -205,16 +205,16 @@ export default function Layout({ children }) {
           mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex h-full flex-col backdrop-blur-xl bg-white/90 dark:bg-slate-900/90 border-r border-white/30 dark:border-slate-700/50">
+        <div className="flex h-full flex-col backdrop-blur-xl bg-white/40 dark:bg-sky-900/90 border-r border-white/30 dark:border-slate-700/50">
           <div className="flex h-16 items-center justify-between px-4">
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-sky-700 to-teal-500 bg-clip-text text-transparent">
               GTM Engine
             </span>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setMobileSidebarOpen(false)}
-              className="p-2 hover:bg-white/30 dark:hover:bg-slate-800/50"
+              className="p-2 hover:bg-teal/30 dark:hover:bg-sky-800/50"
             >
               <Menu className="h-4 w-4" />
             </Button>
@@ -235,8 +235,8 @@ export default function Layout({ children }) {
                     className={cn(
                       "flex items-center cursor-pointer rounded-lg px-2 py-2 text-sm font-medium transition-all",
                       isActive
-                        ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-600 dark:text-blue-400"
-                        : "text-slate-700 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-800/50"
+                        ? "bg-gradient-to-r from-teal-800/20 to-blue-500/20 text-blue-600 dark:text-blue-400"
+                        : "text-slate-700 dark:text-slate-300 hover:bg-teal/50 dark:hover:bg-sky-800/50"
                     )}
                     onClick={() => handleItemClick(item)}
                   >
@@ -283,7 +283,7 @@ export default function Layout({ children }) {
                             "block rounded-md px-3 py-2 text-sm transition-all",
                             location.pathname === subpage.href
                               ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                              : "text-slate-600 dark:text-slate-400 hover:bg-white/30 dark:hover:bg-slate-800/30"
+                              : "text-slate-600 dark:text-slate-400 hover:bg-teal/30 dark:hover:bg-sky-800/30"
                           )}
                         >
                           {subpage.name}
@@ -305,13 +305,13 @@ export default function Layout({ children }) {
           "max-sm:ml-0"
         )}
       >
-        <div className="sticky top-0 z-40 backdrop-blur-xl bg-white/90 dark:bg-slate-900/90 border-b border-white/30 dark:border-slate-700/50">
+        <div className="sticky top-0 z-40 backdrop-blur-xl bg-white/40 dark:bg-sky-900/90 border-b border-teal/30 dark:border-sky-700/50">
           <div className="flex h-16 items-center justify-end px-4 sm:px-6">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setMobileSidebarOpen(true)}
-              className="p-2 hover:bg-white/30 dark:hover:bg-slate-800/50 sm:hidden"
+              className="p-2 hover:bg-teal/30 dark:hover:bg-sky-800/50 sm:hidden"
             >
               <Menu className="h-5 w-5" />
             </Button>
@@ -323,7 +323,7 @@ export default function Layout({ children }) {
                     placeholder="Search..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-white/50 dark:bg-slate-800/50 border-white/30 dark:border-slate-700/50 text-sm w-full"
+                    className="pl-10 bg-teal/50 dark:bg-sky-800/50 border-teal/30 dark:border-sky-700/50 text-sm w-full"
                   />
                 </div>
               </div>
@@ -355,7 +355,7 @@ export default function Layout({ children }) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="hidden sm:flex items-center space-x-2 hover:bg-white/30 dark:hover:bg-slate-800/50 whitespace-nowrap"
+                className="hidden sm:flex items-center space-x-2 hover:bg-white/30 dark:hover:bg-sky-800/50 whitespace-nowrap"
               >
                 <HelpCircle className="h-4 w-4 cursor-pointer" />
                 <span className="hidden md:inline cursor-pointer">
@@ -365,7 +365,7 @@ export default function Layout({ children }) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="sm:hidden p-2 hover:bg-white/30 dark:hover:bg-slate-800/50"
+                className="sm:hidden p-2 hover:bg-white/30 dark:hover:bg-sky-800/50"
               >
                 <HelpCircle className="h-4 w-4" />
               </Button>
@@ -373,7 +373,7 @@ export default function Layout({ children }) {
                 variant="ghost"
                 size="sm"
                 onClick={toggleTheme}
-                className="p-2 hover:bg-white/30 dark:hover:bg-slate-800/50 cursor-pointer"
+                className="p-2 hover:bg-white/30 dark:hover:bg-sky-800/50 cursor-pointer"
               >
                 {darkMode ? (
                   <Sun className="h-5 w-5" />
@@ -394,9 +394,9 @@ export default function Layout({ children }) {
       <div className="fixed bottom-6 right-6 z-50">
         <Button
           size="lg"
-          className="h-14 w-14 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+          className="h-14 w-14 rounded-full bg-gradient-to-r from-teal-600 to-sky-600 hover:from-teal-700 hover:to-sky-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
         >
-          <Bot className="h-6 w-6" />
+          <Bot className="h-8 w-8" />
         </Button>
       </div>
     </div>

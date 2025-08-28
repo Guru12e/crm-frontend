@@ -192,7 +192,7 @@ export default function DealCard({ deal, setId, onChange }) {
                 <DropdownMenuTrigger asChild>
                   <Button
                     size="sm"
-                    className={`bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none cursor-pointer ${
+                    className={`bg-gradient-to-r from-sky-700 to-teal-500 text-white flex-1 sm:flex-none cursor-pointer ${
                       deal.status === "Closed-won" ||
                       deal.status === "Closed-lost"
                         ? "hidden"

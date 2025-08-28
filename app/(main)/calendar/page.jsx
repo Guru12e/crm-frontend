@@ -219,7 +219,7 @@ export default function Calendar() {
   };
 
   const MeetingCard = ({ meeting, isUpcoming = true }) => (
-    <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
+    <Card className="backdrop-blur-sm bg-teal-200/70 dark:bg-sky-800/50 border border-teal-200/50 dark:border-sky-700/20 hover:bg-teal-400/80 dark:hover:bg-sky-800/60 transition-all duration-300 group">
       <CardContent className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">

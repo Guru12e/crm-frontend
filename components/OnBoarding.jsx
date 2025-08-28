@@ -9,13 +9,13 @@ const OnBoarding = () => {
   return (
     <div className="relative min-h-screen overflow-hidden from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <div className="absolute inset-0">
-        <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-blue-400/20 to-purple-400/20 dark:from-blue-400/30 dark:to-purple-400/30 rounded-full mix-blend-multiply filter blur-xl animate-float"></div>
+        <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-teal-400/20 to-sky-400/20 dark:from-teal-400/30 dark:to-sky-400/30 rounded-full mix-blend-multiply filter blur-xl animate-float"></div>
         <div
-          className="absolute top-40 right-20 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-400/20 dark:from-purple-400/30 dark:to-pink-400/30 rounded-full mix-blend-multiply filter blur-xl animate-float"
+          className="absolute top-40 right-20 w-80 h-80 bg-gradient-to-r from-sky-400/20 to-teal-400/20 dark:from-sky-400/30 dark:to-teal-400/30 rounded-full mix-blend-multiply filter blur-xl animate-float"
           style={{ animationDelay: "2s" }}
         ></div>
         <div
-          className="absolute -bottom-8 left-40 w-80 h-80 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 dark:from-blue-400/30 dark:to-cyan-400/30 rounded-full mix-blend-multiply filter blur-xl animate-float"
+          className="absolute -bottom-8 left-40 w-80 h-80 bg-gradient-to-r from-cyan-400/20 to-teal-400/20 dark:from-cyan-400/30 dark:to-teal-400/30 rounded-full mix-blend-multiply filter blur-xl animate-float"
           style={{ animationDelay: "4s" }}
         ></div>
 
@@ -51,7 +51,7 @@ const OnBoarding = () => {
               <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
                 GTM Engine
               </h1>
-              <div className="w-20 h-1 bg-gradient-to-r from-blue-400 to-purple-400 mx-auto rounded-full"></div>
+              <div className="w-20 h-1 bg-gradient-to-r from-sky-700 to-teal-500 mx-auto rounded-full"></div>
             </div>
 
             <p className="text-lg text-slate-700 dark:text-slate-300 mb-8 leading-relaxed">

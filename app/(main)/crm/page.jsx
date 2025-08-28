@@ -655,7 +655,7 @@ export default function CRM() {
         <div className="flex sm:flex-col py-5 md:py-0 md:flex-row md:ml-auto">
           <Sheet>
             <SheetTrigger asChild>
-              <button className="bg-gradient-to-r px-3 py-2 rounded-xl from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white w-full md:ml-5">
+              <button className="bg-gradient-to-r px-3 py-2 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white w-full md:ml-5 cursor-pointer">
                 Upload {activeTab} CSV
               </button>
             </SheetTrigger>
@@ -735,7 +735,7 @@ export default function CRM() {
                           </h3>
                           <Button
                             onClick={() => fileInputRef.current.click()}
-                            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                            className="bg-gradient-to-r from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white cursor-pointer"
                           >
                             Choose File
                           </Button>
@@ -837,7 +837,7 @@ export default function CRM() {
                           </h3>
                           <Button
                             onClick={() => fileInputRef.current.click()}
-                            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                            className="bg-gradient-to-r from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white"
                           >
                             Choose File
                           </Button>
@@ -942,7 +942,7 @@ export default function CRM() {
                           </h3>
                           <Button
                             onClick={() => fileInputRef.current.click()}
-                            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                            className="bg-gradient-to-r from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white"
                           >
                             Choose File
                           </Button>
@@ -981,7 +981,7 @@ export default function CRM() {
 
         <Sheet>
           <SheetTrigger>
-            <div className="bg-gradient-to-r px-3 py-2 rounded-xl from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white w-full md:ml-5">
+            <div className="bg-gradient-to-r px-3 py-2 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white w-full md:ml-5">
               Add New {activeTab}
             </div>
           </SheetTrigger>
@@ -1252,8 +1252,8 @@ export default function CRM() {
                       onClick={handleCustomerSubmit}
                       className={`${
                         customerLoading
-                          ? "bg-gray-400 hover:bg-gray-500"
-                          : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                          ? "bg-purple-400 hover:bg-purple-500"
+                          : "bg-gradient-to-r from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600"
                       }  cursor-pointer text-white`}
                     >
                       {customerLoading && (
@@ -1608,8 +1608,8 @@ export default function CRM() {
                         onClick={handleLeadsSubmit}
                         className={`${
                           leadsLoading
-                            ? "bg-gray-400 hover:bg-gray-500"
-                            : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                            ? "bg-purple-400 hover:bg-purple-500"
+                            : "bg-gradient-to-r from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600"
                         }  cursor-pointer text-white`}
                       >
                         {leadsLoading && (
@@ -1959,8 +1959,8 @@ export default function CRM() {
                         onClick={handleDealsSubmit}
                         className={`${
                           dealsLoading
-                            ? "bg-gray-400 hover:bg-gray-500"
-                            : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                            ? "bg-purple-400 hover:bg-purple-500"
+                            : "bg-gradient-to-r from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600"
                         }  cursor-pointer text-white`}
                       >
                         {dealsLoading && (

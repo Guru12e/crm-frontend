@@ -158,7 +158,7 @@ export default function Campaigns() {
   if (loading) return <p className="p-6">Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-teal-100/70 dark:bg-sky-600/80 p-8 rounded-lg">
       <div className="flex flex-col sm:flex-row sm:justify-left sm:items-center">
         <Sheet>
           <div className="flex justify-between items-center w-screen">
@@ -171,7 +171,7 @@ export default function Campaigns() {
               </p>
             </div>
             <SheetTrigger as Child>
-              <Button className="bg-gradient-to-r px-3 py-2 rounded-xl from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white w-full ">
+              <Button className="bg-gradient-to-r px-3 py-2 rounded-xl from-teal-500 to-sky-500 hover:from-teal-600 hover:to-sky-600 text-white w-full ">
                 Create Campaign
               </Button>
             </SheetTrigger>
@@ -324,7 +324,7 @@ export default function Campaigns() {
                             { name: "", email: "" },
                           ])
                         }
-                        className="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300"
+                        className="bg-teal-200 px-3 py-1 rounded hover:bg-teal-300"
                       >
                         + Add More
                       </button>
@@ -333,7 +333,7 @@ export default function Campaigns() {
                     <div className="flex gap-4">
                       <button
                         onClick={handleSaveCampaign}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                        className="bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700"
                       >
                         Save Campaign
                       </button>
@@ -348,7 +348,7 @@ export default function Campaigns() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
         {campaigns.length === 0 ? (
-          <Card className="shadow-sm rounded-2xl border border-gray-200 bg-white flex flex-col items-center justify-center p-10 text-center">
+          <Card className="shadow-sm rounded-2xl border border-gray-200 bg-white/70 dark:bg-slate-800/80 flex flex-col items-center justify-center p-10 text-center">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
               No Campaigns Available
             </h3>
@@ -359,7 +359,7 @@ export default function Campaigns() {
         ) : (
           campaigns.map((c) => (
             <Link key={c.id} href={`/campaigns/${c.name}`} className="block">
-              <Card className="shadow-sm  rounded-2xl border hover:scale-105 hover:shadow-lg border-gray-200 transition bg-white cursor-pointer h-full">
+              <Card className="shadow-sm  rounded-2xl border hover:scale-105 hover:shadow-lg border-teal-200 transition bg-black/70 dark:bg-sky-700/50 cursor-pointer h-full">
                 <CardContent className="p-5 flex flex-col h-full">
                   <div className="border border-blue-200 dark:border-blue-800 rounded-lg p-4 bg-blue-50/50 dark:bg-blue-900/20">
                     {/* Title */}

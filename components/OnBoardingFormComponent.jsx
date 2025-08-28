@@ -310,15 +310,15 @@ export default function OnBoardingFormComponent({ session }) {
     );
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-teal-200 to-sky-200 dark:from-sky-900 dark:to-teal-800">
       <div className="absolute inset-0">
-        <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-blue-400/10 to-purple-400/10 dark:from-blue-400/20 dark:to-purple-400/20 rounded-full mix-blend-multiply filter blur-xl animate-float"></div>
+        <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-teal-400/10 to-sky-400/10 dark:from-teal-400/20 dark:to-sky-400/20 rounded-full mix-blend-multiply filter blur-xl animate-float"></div>
         <div
-          className="absolute top-40 right-20 w-80 h-80 bg-gradient-to-r from-purple-400/10 to-pink-400/10 dark:from-purple-400/20 dark:to-pink-400/20 rounded-full mix-blend-multiply filter blur-xl animate-float"
+          className="absolute top-40 right-20 w-80 h-80 bg-gradient-to-r from-sky-400/10 to-teal-400/10 dark:from-sky-400/20 dark:to-teal-400/20 rounded-full mix-blend-multiply filter blur-xl animate-float"
           style={{ animationDelay: "2s" }}
         ></div>
         <div
-          className="absolute -bottom-8 left-40 w-80 h-80 bg-gradient-to-r from-blue-400/10 to-cyan-400/10 dark:from-blue-400/20 dark:to-cyan-400/20 rounded-full mix-blend-multiply filter blur-xl animate-float"
+          className="absolute -bottom-8 left-40 w-80 h-80 bg-gradient-to-r from-cyan-400/10 to-teal-400/10 dark:from-cyan-400/20 dark:to-teal-400/20 rounded-full mix-blend-multiply filter blur-xl animate-float"
           style={{ animationDelay: "4s" }}
         ></div>
 
@@ -355,7 +355,7 @@ export default function OnBoardingFormComponent({ session }) {
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
                       currentSection >= section.id
-                        ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+                        ? "bg-gradient-to-r from-sky-700 to-teal-500 text-white"
                         : "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400"
                     }`}
                   >
@@ -781,8 +781,8 @@ export default function OnBoardingFormComponent({ session }) {
                   disabled={loading}
                   className={`${
                     loading
-                      ? "bg-gray-400 hover:bg-gray-500"
-                      : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                      ? "bg-purple-400 hover:bg-purple-500"
+                      : "bg-gradient-to-r from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600"
                   }  cursor-pointer text-white`}
                 >
                   {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}

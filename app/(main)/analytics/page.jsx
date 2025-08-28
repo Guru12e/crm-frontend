@@ -125,7 +125,7 @@ export default function Analytics() {
     };
 
     return (
-      <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+      <Card className="backdrop-blur-sm bg-teal-500/70 dark:bg-sky-800/50 border border-slate-200/50 dark:border-white/20">
         <CardContent className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div className="flex-1 min-w-0">
@@ -211,7 +211,7 @@ export default function Analytics() {
             </div>
             <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3">
               <div
-                className="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-500"
+                className="bg-gradient-to-r from-teal-500 to-sky-700 h-3 rounded-full transition-all duration-500"
                 style={{ width: `${(stage.value / 2500000) * 100}%` }}
               ></div>
             </div>

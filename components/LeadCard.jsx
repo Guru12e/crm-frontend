@@ -153,7 +153,7 @@ export default function LeadCard({ lead, setId, onChange }) {
                 />
               </div>
               <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
-                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xl font-semibold">
+                <AvatarFallback className="bg-gradient-to-r from-sky-700 to-teal-500 text-white text-xl font-semibold">
                   {lead.name
                     .split(" ")
                     .map((n) => n[0])
@@ -287,7 +287,7 @@ export default function LeadCard({ lead, setId, onChange }) {
                     <DropdownMenuTrigger asChild>
                       <Button
                         size="sm"
-                        className={`bg-gradient-to-r from-blue-500 to-purple-500 text-white flex-1 sm:flex-none cursor-pointer ${
+                        className={`bg-gradient-to-r from-sky-700 to-teal-500 text-white flex-1 sm:flex-none cursor-pointer ${
                           lead.status === "Qualified" ? "hidden" : "block"
                         } `}
                         onClick={() => setId(lead.id)}

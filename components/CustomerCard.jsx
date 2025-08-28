@@ -33,7 +33,7 @@ export default function CustomerCard({ customer, onChange }) {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
               <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
-                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm">
+                <AvatarFallback className="bg-gradient-to-r from-sky-700 to-teal-500 text-white text-sm">
                   {customer.name
                     .split(" ")
                     .map((n) => n[0])

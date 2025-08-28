@@ -34,7 +34,7 @@ export default function UserButton() {
     return (
       <Button variant="ghost" className="relative h-8 w-8 rounded-full">
         <Avatar asChild className="h-8 w-8">
-          <AvatarFallback className="bg-gradient-to-r bg-grey-400 text-black">
+          <AvatarFallback className="bg-gradient-to-r bg-teal-400 text-black">
             {user?.name?.charAt(0) || "U"}
           </AvatarFallback>
         </Avatar>
@@ -48,7 +48,7 @@ export default function UserButton() {
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
             <AvatarImage src={user?.image} alt="@user" />
-            <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+            <AvatarFallback className="bg-gradient-to-r from-teal-700 to-sky-600 text-white">
               {user?.name?.charAt(0) || "U"}
             </AvatarFallback>
           </Avatar>

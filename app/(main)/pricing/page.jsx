@@ -217,7 +217,7 @@ export default function PricingPage() {
               </p>
             </div>
             <SheetTrigger as Child>
-              <Button className="bg-gradient-to-r px-4 py-5 rounded-xl from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white w-full ">
+              <Button className="bg-gradient-to-r px-4 py-5 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white w-full ">
                 Add New Product
               </Button>
             </SheetTrigger>
@@ -328,8 +328,8 @@ export default function PricingPage() {
                       onClick={addProduct}
                       className={`${
                         loading
-                          ? "bg-gray-400 hover:bg-gray-500"
-                          : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                          ? "bg-purple-400 hover:bg-purple-500"
+                          : "bg-gradient-to-r from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600"
                       }  cursor-pointer text-white`}
                     >
                       {loading && (
