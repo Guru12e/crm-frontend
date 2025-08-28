@@ -97,8 +97,6 @@ export default function UpdateCustomer(customer_id, onChange) {
     fetchCustomerData();
   }, [customer_id]);
 
-  console.log("CustomerData:", CustomerData);
-
   const iconMap = {
     meeting: Calendar,
     call: Phone,
@@ -139,8 +137,6 @@ export default function UpdateCustomer(customer_id, onChange) {
         .select("*")
         .eq("id", customer_id.customer_id)
         .single();
-    console.log(customerDetails);
-    console.log("customer data:", CustomerData);
     const noChanges =
       customerDetails.name === CustomerData.name &&
       customerDetails.email === CustomerData.email &&

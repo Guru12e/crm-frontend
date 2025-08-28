@@ -414,7 +414,6 @@ export default function CRM() {
     e.preventDefault();
     setDealsLoading(true);
     dealFormData.products = dealProducts.map((prod) => prod.value);
-    console.log(dealFormData);
     let isValid = true;
     if (!dealFormData.name) {
       errors.dealName = "Name is required";
@@ -589,7 +588,10 @@ export default function CRM() {
         if (error) {
           console.error("Error inserting data:", error);
         } else {
-          console.log("Data inserted successfully:");
+          toast.success("Data inserted successfully:", {
+            position: "top-right",
+            autoClose: 3000,
+          });
         }
       },
     });

@@ -71,6 +71,7 @@ export default function LeadCard({ lead, setId, onChange }) {
       .eq("id", lead.id);
 
     if (lead.status === "Qualified") {
+      console.log("hello");
       const { error } = await supabase.from("Deals").insert({
         name: LeadsData.name,
         phone: LeadsData.number,

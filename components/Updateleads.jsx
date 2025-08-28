@@ -124,8 +124,6 @@ export default function Updateleads(lead_id, onChange) {
     fetchLeadData();
   }, [lead_id]);
 
-  console.log("LeadsData:", LeadsData);
-
   const allEvents = [
     // open activities
     ...openActivities.map((a) => ({
@@ -330,8 +328,6 @@ export default function Updateleads(lead_id, onChange) {
       .select("*")
       .eq("id", lead_id.lead_id)
       .single();
-    console.log(LeadDetails);
-    console.log("Lead data:", LeadsData);
     const noChanges =
       LeadDetails.name === LeadsData.name &&
       LeadDetails.email === LeadsData.email &&

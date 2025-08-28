@@ -58,7 +58,6 @@ export default function CompanyProfile() {
         const parsed = JSON.parse(cachedData);
         setCompanyData(parsed);
         setProducts(Array.isArray(parsed.products) ? parsed.products : []);
-        console.log("Loaded from cache:", parsed);
       } catch (error) {
         console.error("Failed to parse cached data:", error);
         localStorage.removeItem("companyDataCache");
@@ -92,8 +91,6 @@ export default function CompanyProfile() {
         );
         if (icpData) setIcpData(icpData);
 
-        console.log("Fetched company data:", data);
-        if (icpData) console.log("Fetched ICP data:", icpData);
         if (icpError) console.error("Error fetching ICP data:", icpError);
       } catch (err) {
         console.error("Error fetching data from Supabase:", err);
@@ -103,23 +100,8 @@ export default function CompanyProfile() {
     fetchData();
   }, [userEmail]);
 
-  // ✅ Log whenever state changes (no stale logs!)
-  useEffect(() => {
-    if (companyData && Object.keys(companyData).length > 0) {
-      console.log("Company data updated:", companyData);
-    }
-  }, [companyData]);
-
-  useEffect(() => {
-    if (icpData && Object.keys(icpData).length > 0) {
-      console.log("ICP data updated:", icpData);
-    }
-  }, [icpData]);
-
   useEffect(() => {
     const createICPEntry = async () => {
-      console.log("Creating ICP entry with:", { userEmail, companyData });
-
       const res = await fetch("/api/ICP", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -131,7 +113,6 @@ export default function CompanyProfile() {
 
       if (res.ok) {
         const data = await res.json();
-        console.log("ICP response:", data);
         setResult(data.output);
       } else {
         console.error("Error creating ICP entry:", res.statusText);
@@ -207,8 +188,6 @@ export default function CompanyProfile() {
       .select("*")
       .eq("email", userEmail)
       .single();
-    console.log(companyDetails);
-    console.log("Company data:", companyData);
     const noChanges =
       companyDetails.companyName === companyData.companyName &&
       companyDetails.companyDescription === companyData.companyDescription &&
@@ -241,7 +220,6 @@ export default function CompanyProfile() {
 
       if (res.ok) {
         const data = await res.json();
-        console.log(data);
         setResult(data.output);
       }
 

@@ -12,14 +12,11 @@ export default async function OnBoardingForm() {
   }
 
   const userEmail = session.user.email;
-  console.log(session);
-  console.log(userEmail);
   const { data: user, error } = await supabase
     .from("Users")
     .select("*")
     .eq("email", userEmail)
     .single();
-  console.log("User data:", user);
   if (!user) {
     return <OnBoardingFormComponent session={session} />;
   } else {

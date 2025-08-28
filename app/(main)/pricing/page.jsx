@@ -69,8 +69,6 @@ export default function PricingPage() {
           ? JSON.parse(data.products || "[]")
           : data.products || []
       );
-
-      console.log("Fetched company data:", data);
     } catch (err) {
       console.error("Error fetching data from Supabase:", err);
     }
@@ -85,7 +83,6 @@ export default function PricingPage() {
         const parsed = JSON.parse(cachedData);
         setCompanyData(parsed);
         setProducts(Array.isArray(parsed.products) ? parsed.products : []);
-        console.log("Loaded from cache:", parsed);
       } catch (error) {
         console.error("Failed to parse cached data:", error);
         localStorage.removeItem("companyDataCache");
@@ -97,11 +94,6 @@ export default function PricingPage() {
   }, [userEmail]);
 
   // ✅ Log whenever state changes (no stale logs!)
-  useEffect(() => {
-    if (companyData && Object.keys(companyData).length > 0) {
-      console.log("Company data updated:", companyData);
-    }
-  }, [companyData]);
 
   const handleCompanyChange = (field, value) => {
     setCompanyData((prev) => ({ ...prev, [field]: value }));

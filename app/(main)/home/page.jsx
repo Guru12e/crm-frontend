@@ -27,17 +27,14 @@ export default function Home() {
       .from("Leads")
       .select("*")
       .eq("user_email", userEmail);
-    console.log(leadsData);
     const { data: dealsData, error: dealsError } = await supabase
       .from("Deals")
       .select("*")
       .eq("user_email", userEmail);
-    console.log(dealsData);
     const { data: customersData, error: customersError } = await supabase
       .from("Customers")
       .select("*")
       .eq("user_email", userEmail);
-    console.log(customersData);
     if (leadsError) console.error("Error fetching leads:", leadsError);
     if (dealsError) console.error("Error fetching deals:", dealsError);
     if (customersError)
@@ -173,8 +170,6 @@ export default function Home() {
       color: "bg-teal-500",
     },
   ];
-
-  console.log(customers);
 
   const leadSources = [
     // {

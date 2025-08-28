@@ -267,8 +267,6 @@ export default function OnBoardingFormComponent({ session }) {
             body: JSON.stringify(formData),
           });
 
-          console.log(response);
-
           if (response.status === 200) {
             router.push("/home");
           } else {
