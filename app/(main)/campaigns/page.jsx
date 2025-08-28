@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowUpLeft, ArrowUpRight, Eye } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Tabs } from "@radix-ui/react-tabs";
+import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Campaigns() {
   const [campaigns, setCampaigns] = useState([]);
@@ -23,6 +25,8 @@ export default function Campaigns() {
   const [loading, setLoading] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
   const [user, setUser] = useState(null);
+  const [savedCampaigns, setSavedCampaigns] = useState([]);
+  const [sentCampaigns, setSentCampaigns] = useState([]);
 
   useEffect(() => {
     try {
@@ -71,6 +75,8 @@ export default function Campaigns() {
         setCustomers(customerData || []);
         setLeads(leadData || []);
         setDeals(dealData || []);
+        setSavedCampaigns(campaignData.filter((c) => c.status === "Saved"));
+        setSentCampaigns(campaignData.filter((c) => c.status === "Sent"));
         setCampaigns(campaignData || []);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -148,11 +154,29 @@ export default function Campaigns() {
       setSelectedContacts([]);
       setNewContacts([{ name: "", email: "" }]);
 
-      toast.success("Campaign saved successfully!");
+      toast.success("Campaign Saved successfully!");
     } catch (error) {
       console.error("Error saving campaign:", error);
       toast.error("An error occurred while saving the campaign.");
     }
+  };
+
+  const handleDuplicateCampaign = async (campaign) => {
+    const { error } = await supabase.from("Campaigns").insert({
+      ...campaign,
+      id: undefined,
+      status: "Saved",
+      name: campaign.name + " (Copy)",
+    });
+
+    if (error) {
+      toast.error("Failed to duplicate campaign: " + error.message);
+      return;
+    }
+
+    toast.success(
+      "Campaign duplicated successfully! You can view it in saved Campaigns tab."
+    );
   };
 
   if (loading) return <p className="p-6">Loading...</p>;
@@ -346,50 +370,86 @@ export default function Campaigns() {
         </Sheet>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-        {campaigns.length === 0 ? (
-          <Card className="shadow-sm rounded-2xl  bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 w-[75vw] h-[60vh] flex flex-col items-center justify-center p-10 text-center">
-            <h3 className="text-lg font-semibold  text-slate-900 dark:text-white mb-2">
+      <div className="mt-10">
+        {savedCampaigns.length === 0 && sentCampaigns.length === 0 ? (
+          <Card className="shadow-sm rounded-2xl bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 w-[75vw] h-[60vh] flex flex-col items-center justify-center p-10 text-center">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
               No Campaigns Available
             </h3>
-            <p className="text-sm  text-slate-600 dark:text-slate-400 mb-4">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               Start by creating your first campaign to reach your audience.
             </p>
           </Card>
         ) : (
-          campaigns.map((c) => (
-            <Link key={c.id} href={`/campaigns/${c.name}`} className="block">
-              <Card className="shadow-sm  rounded-2xl border hover:scale-105 hover:shadow-lg  bg-white/70 dark:bg-slate-800/50  border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 cursor-pointer h-full">
-                <CardContent className="p-5 flex flex-col h-full">
-                  <div className="border border-teal-200 dark:border-sky-800 rounded-lg p-4 bg-sky-50/50 dark:bg-blue-900/20">
-                    {/* Title */}
-                    <h3 className="font-semibold text-xl text-gray-900 mb-2">
-                      {c.name}
-                    </h3>
+          <Tabs defaultValue="Saved" className="w-full">
+            {/* Tab Header */}
+            <TabsList className="mb-6 w-full">
+              <TabsTrigger value="Saved">Saved Campaigns</TabsTrigger>
+              <TabsTrigger value="Sent">Sent Campaigns</TabsTrigger>
+            </TabsList>
 
-                    {/* Subject */}
-                    <p className="text-sm  text-slate-600 dark:text-slate-400 mb-3">
-                      {c.subject}
-                    </p>
+            {/* Saved Campaigns */}
+            <TabsContent value="Saved">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {savedCampaigns.map((c) => (
+                  <Link
+                    key={c.id}
+                    href={`/campaigns/${c.name}`}
+                    className="block"
+                  >
+                    <Card className="shadow-sm rounded-2xl border hover:scale-105 hover:shadow-lg bg-white/70 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20 cursor-pointer h-full">
+                      <CardContent className="p-5 flex flex-col h-full">
+                        <div className="border border-teal-200 dark:border-sky-800 rounded-lg p-4 bg-sky-50/50 dark:bg-blue-900/20">
+                          {/* Title */}
+                          <h3 className="font-semibold text-xl text-gray-900 mb-2">
+                            {c.name}
+                          </h3>
 
-                    {/* Body */}
-                    <p className="text-sm text-slate-900 dark:text-white line-clamp-3 flex-grow leading-relaxed">
-                      {c.body}
-                    </p>
+                          {/* Subject */}
+                          <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                            {c.subject}
+                          </p>
 
-                    {/* Audience */}
-                    <div className="mt-4 text-sm  text-slate-600 dark:text-slate-400">
-                      {c.audience?.length > 0 ? (
-                        <p>{c.audience.length} recipients</p>
-                      ) : (
-                        <p className="text-gray-400">No recipients</p>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))
+                          {/* Body */}
+                          <p className="text-sm text-slate-900 dark:text-white line-clamp-3 flex-grow leading-relaxed">
+                            {c.body}
+                          </p>
+
+                          {/* Audience */}
+                          <div className="mt-4 text-sm text-slate-600 dark:text-slate-400">
+                            {c.audience?.length > 0 ? (
+                              <p>{c.audience.length} recipients</p>
+                            ) : (
+                              <p className="text-gray-400">No recipients</p>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            </TabsContent>
+
+            {/* Sent Campaigns */}
+            <TabsContent value="Sent">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {sentCampaigns.map((c) => (
+                  <Card key={c.id}>
+                    <CardContent>
+                      <h3 className="font-semibold text-lg">{c.name}</h3>
+                      <p className="text-sm text-slate-600">{c.subject}</p>
+                      <div className="flex gap-2 mt-2">
+                        <Button onClick={() => handleDuplicateCampaign(c)}>
+                          Duplicate
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
         )}
       </div>
     </div>

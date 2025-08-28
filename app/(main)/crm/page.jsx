@@ -721,7 +721,7 @@ export default function CRM() {
                           <Button
                             variant="outline"
                             onClick={() =>
-                              window.open("/templates/customer_template.csv")
+                              window.open("/templates/customer_template.xlsx")
                             }
                           >
                             Download Sample CSV
@@ -1854,10 +1854,15 @@ export default function CRM() {
                         </Select>
                         <ErrorMessage error={errors.priority} />
                       </div>
-                      <div className="flex w-full flex-col gap-3 p-4 max-w-sm">
-                        <label className="font-medium text-sm">
-                          Select Products
-                        </label>
+                      <div>
+                        <div className="mb-2">
+                          <Label
+                            htmlFor="product"
+                            className="mb-2 text-slate-700 dark:text-slate-300"
+                          >
+                            Select Products
+                          </Label>
+                        </div>
 
                         <MultipleSelector
                           commandProps={{

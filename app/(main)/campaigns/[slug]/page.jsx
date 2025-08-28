@@ -3,14 +3,19 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import { decode } from "next-auth/jwt";
+import { Label } from "@radix-ui/react-dropdown-menu";
+import { Input } from "@/components/ui/input";
 
 export default function CampaignDetail({ params }) {
   const { slug } = React.use(params);
+  const name = decodeURIComponent(slug);
   const [campaign, setCampaign] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [userEmail, setUserEmail] = useState(null);
   const [user, setUser] = useState(null);
+  const [audience, setAudience] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -34,18 +39,22 @@ export default function CampaignDetail({ params }) {
       let { data, error } = await supabase
         .from("Campaigns")
         .select("*")
-        .eq("name", slug)
+        .eq("user_email", userEmail)
+        .eq("name", name)
         .single();
 
       if (error) {
         console.error("Error fetching campaign:", error);
       } else {
         setCampaign(data);
+        setAudience(data.audience || []);
       }
     };
 
     fetchCampaign();
-  }, [slug]);
+  }, [userEmail, name]);
+
+  console.log("Campaign data:", campaign);
 
   const handleSend = async () => {
     if (!campaign) return;
@@ -80,6 +89,61 @@ export default function CampaignDetail({ params }) {
     }
   };
 
+  const handleChange = (field, value) => {
+    setCampaign((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleAudience = (index, field, value) => {
+    setAudience((prev) => {
+      const newAudience = [...prev];
+      newAudience[index] = { ...newAudience[index], [field]: value };
+      setAudience(newAudience);
+      handleChange(`audience`, newAudience);
+    });
+  };
+
+  const handleAudienceChange = (index, value) => {
+    setAudience((prev) => {
+      const newAudience = [...prev];
+      newAudience[index] = value;
+      setAudience(newAudience);
+      handleChange(`audience`, newAudience);
+    });
+  };
+
+  const handleUpdate = async () => {
+    if (!campaign) return;
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const { error } = await supabase
+        .from("Campaigns")
+        .update({
+          subject,
+          body,
+          audience: audience
+            .split(",")
+            .map((email) => email.trim())
+            .filter((e) => e),
+        })
+        .eq("id", campaign.id)
+        .eq("user_email", userEmail);
+
+      if (error) {
+        setMessage("❌ Update failed: " + error.message);
+      } else {
+        setMessage("✅ Campaign updated successfully!");
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage("❌ Error updating campaign.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!campaign) {
     return <p className="p-6">Loading campaign details...</p>;
   }
@@ -89,18 +153,27 @@ export default function CampaignDetail({ params }) {
       <h1 className="text-2xl font-bold mb-4">{campaign.name}</h1>
 
       <div className="mb-4">
-        <p className="text-gray-600">
-          <span className="font-semibold">Subject:</span> {campaign.subject}
-        </p>
+        <Label className={"mb-4 text-gray-600"} htmlFor="subject">
+          Subject
+        </Label>
+        <Input
+          id="subject"
+          value={campaign.subject}
+          placeholder={campaign.subject}
+          onChange={(e) => handleChange("subject", e.target.value)}
+        />
       </div>
 
       <div className="mb-4">
-        <p className="text-gray-700">
-          <span className="font-semibold">Body:</span>
-        </p>
-        <div className="mt-2 p-3 border rounded-lg bg-gray-50">
-          {campaign.body}
-        </div>
+        <Label className={"mb-4 text-gray-600"} htmlFor="body">
+          Body
+        </Label>
+        <Input
+          id="body"
+          value={campaign.body}
+          placeholder={campaign.body}
+          onChange={(e) => handleChange("body", e.target.value)}
+        />
       </div>
 
       <div>
@@ -116,12 +189,30 @@ export default function CampaignDetail({ params }) {
                       email.success ? "text-green-600" : "text-red-600"
                     }
                   >
-                    {email.email} -{" "}
-                    {email.success ? "Sent" : `Failed: ${email.error}`}
+                    <Input
+                      value={email.email}
+                      id={`email-${idx}`}
+                      placeholder={email.email}
+                      onChange={(e) =>
+                        handleAudience(idx, "email", e.target.value)
+                      }
+                    />
+                    - {email.success ? "Sent" : `Failed: ${email.error}`}
                   </li>
                 );
               } else {
-                return <li key={idx}>{email}</li>;
+                return (
+                  <li key={idx}>
+                    <Input
+                      value={email}
+                      id={`email-${idx}`}
+                      placeholder={email}
+                      onChange={(e) =>
+                        handleAudienceChange(idx, e.target.value)
+                      }
+                    />
+                  </li>
+                );
               }
             })}
           </ul>
