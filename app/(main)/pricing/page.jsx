@@ -360,7 +360,7 @@ export default function PricingPage() {
               {products.map((product, idx) => (
                 <Card
                   key={product.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between border border-slate-200 dark:border-slate-700 rounded-lg bg-white/30 dark:bg-slate-800/30"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800/30"
                 >
                   <CardContent className=" h-[40vh] flex flex-col gap-2 ">
                     <div className="flex flex-col gap-2">
