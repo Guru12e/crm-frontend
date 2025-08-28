@@ -367,12 +367,9 @@ export default function CRM() {
         user_email: userEmail,
       };
 
-      await fetch("/api/addDeals", {
-        method: "POST",
-        body: JSON.stringify({ ...leadToDeal, session }),
-      });
+      const { error } = await supabase.from("Deals").insert(leadToDeal);
 
-      if (req.status === 200) {
+      if (!error) {
         toast.success("Deal Added Since Lead is Qualified", {
           autoClose: 3000,
           position: "top-right",
