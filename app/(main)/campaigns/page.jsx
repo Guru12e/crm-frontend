@@ -158,7 +158,7 @@ export default function Campaigns() {
   if (loading) return <p className="p-6">Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-teal-100/70 dark:bg-sky-600/80 p-8 rounded-lg">
+    <div className="min-h-screen  p-8 rounded-lg">
       <div className="flex flex-col sm:flex-row sm:justify-left sm:items-center">
         <Sheet>
           <div className="flex justify-between items-center w-screen">
@@ -348,18 +348,18 @@ export default function Campaigns() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
         {campaigns.length === 0 ? (
-          <Card className="shadow-sm rounded-2xl border border-gray-200 bg-white/70 dark:bg-slate-800/80 flex flex-col items-center justify-center p-10 text-center">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+          <Card className="shadow-sm rounded-2xl  bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 w-[75vw] h-[60vh] flex flex-col items-center justify-center p-10 text-center">
+            <h3 className="text-lg font-semibold  text-slate-900 dark:text-white mb-2">
               No Campaigns Available
             </h3>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm  text-slate-600 dark:text-slate-400 mb-4">
               Start by creating your first campaign to reach your audience.
             </p>
           </Card>
         ) : (
           campaigns.map((c) => (
             <Link key={c.id} href={`/campaigns/${c.name}`} className="block">
-              <Card className="shadow-sm  rounded-2xl border hover:scale-105 hover:shadow-lg border-teal-200 transition bg-black/70 dark:bg-sky-700/50 cursor-pointer h-full">
+              <Card className="shadow-sm  rounded-2xl border hover:scale-105 hover:shadow-lg  bg-white/70 dark:bg-slate-800/50  border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 cursor-pointer h-full">
                 <CardContent className="p-5 flex flex-col h-full">
                   <div className="border border-blue-200 dark:border-blue-800 rounded-lg p-4 bg-blue-50/50 dark:bg-blue-900/20">
                     {/* Title */}
@@ -368,15 +368,17 @@ export default function Campaigns() {
                     </h3>
 
                     {/* Subject */}
-                    <p className="text-sm text-gray-500 mb-3">{c.subject}</p>
+                    <p className="text-sm  text-slate-600 dark:text-slate-400 mb-3">
+                      {c.subject}
+                    </p>
 
                     {/* Body */}
-                    <p className="text-sm text-gray-700 line-clamp-3 flex-grow leading-relaxed">
+                    <p className="text-sm text-slate-900 dark:text-white line-clamp-3 flex-grow leading-relaxed">
                       {c.body}
                     </p>
 
                     {/* Audience */}
-                    <div className="mt-4 text-sm text-gray-500">
+                    <div className="mt-4 text-sm  text-slate-600 dark:text-slate-400">
                       {c.audience?.length > 0 ? (
                         <p>{c.audience.length} recipients</p>
                       ) : (
