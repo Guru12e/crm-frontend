@@ -16,6 +16,7 @@ import { ArrowUpLeft, ArrowUpRight, Eye } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs } from "@radix-ui/react-tabs";
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { create, set } from "lodash";
 
 export default function Campaigns() {
   const [campaigns, setCampaigns] = useState([]);
@@ -27,7 +28,14 @@ export default function Campaigns() {
   const [user, setUser] = useState(null);
   const [savedCampaigns, setSavedCampaigns] = useState([]);
   const [sentCampaigns, setSentCampaigns] = useState([]);
+  const [campaignsTab, setCampaignsTab] = useState("Saved");
 
+  useEffect(() => {
+    const storedTab = sessionStorage.getItem("campaignsTab");
+    if (storedTab) {
+      setCampaignsTab(storedTab);
+    }
+  }, []);
   useEffect(() => {
     try {
       const rawSession = localStorage.getItem("session");
@@ -43,47 +51,46 @@ export default function Campaigns() {
       console.error("Failed to parse session from localStorage:", error);
     }
   }, []);
+  const fetchData = async () => {
+    setLoading(true);
+
+    try {
+      const { data: customerData } = await supabase
+        .from("Customers")
+        .select("id, name, email, user_email")
+        .eq("user_email", userEmail);
+
+      const { data: leadData } = await supabase
+        .from("Leads")
+        .select("id, name, email, user_email")
+        .eq("user_email", userEmail);
+
+      const { data: dealData } = await supabase
+        .from("Deals")
+        .select("id, name, email, user_email")
+        .eq("user_email", userEmail);
+
+      const { data: campaignData } = await supabase
+        .from("Campaigns")
+        .select("*")
+        .eq("user_email", userEmail)
+        .order("created_at", { ascending: false });
+
+      setCustomers(customerData || []);
+      setLeads(leadData || []);
+      setDeals(dealData || []);
+      setSavedCampaigns(campaignData.filter((c) => c.status === "Saved"));
+      setSentCampaigns(campaignData.filter((c) => c.status === "Sent"));
+      setCampaigns(campaignData || []);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!userEmail) return;
-
-    const fetchData = async () => {
-      setLoading(true);
-
-      try {
-        const { data: customerData } = await supabase
-          .from("Customers")
-          .select("id, name, email, user_email")
-          .eq("user_email", userEmail);
-
-        const { data: leadData } = await supabase
-          .from("Leads")
-          .select("id, name, email, user_email")
-          .eq("user_email", userEmail);
-
-        const { data: dealData } = await supabase
-          .from("Deals")
-          .select("id, name, email, user_email")
-          .eq("user_email", userEmail);
-
-        const { data: campaignData } = await supabase
-          .from("Campaigns")
-          .select("*")
-          .eq("user_email", userEmail)
-          .order("created_at", { ascending: false });
-
-        setCustomers(customerData || []);
-        setLeads(leadData || []);
-        setDeals(dealData || []);
-        setSavedCampaigns(campaignData.filter((c) => c.status === "Saved"));
-        setSentCampaigns(campaignData.filter((c) => c.status === "Sent"));
-        setCampaigns(campaignData || []);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
 
     fetchData();
   }, [userEmail]);
@@ -166,7 +173,9 @@ export default function Campaigns() {
       ...campaign,
       id: undefined,
       status: "Saved",
+      audience: campaign.audience.map((a) => a.email),
       name: campaign.name + " (Copy)",
+      created_at: new Date().toISOString().split("T")[0],
     });
 
     if (error) {
@@ -177,6 +186,9 @@ export default function Campaigns() {
     toast.success(
       "Campaign duplicated successfully! You can view it in saved Campaigns tab."
     );
+
+    await fetchData();
+    setCampaignsTab("Saved");
   };
 
   if (loading) return <p className="p-6">Loading...</p>;
@@ -381,7 +393,14 @@ export default function Campaigns() {
             </p>
           </Card>
         ) : (
-          <Tabs defaultValue="Saved" className="w-full">
+          <Tabs
+            value={campaignsTab}
+            onValueChange={(e) => {
+              setCampaignsTab(e);
+              sessionStorage.setItem("campaignsTab", e);
+            }}
+            className="w-full"
+          >
             {/* Tab Header */}
             <TabsList className="mb-6 w-full">
               <TabsTrigger value="Saved">Saved Campaigns</TabsTrigger>
@@ -437,7 +456,9 @@ export default function Campaigns() {
                 {sentCampaigns.map((c) => (
                   <Card key={c.id}>
                     <CardContent>
-                      <h3 className="font-semibold text-lg">{c.name}</h3>
+                      <Link href={`/campaigns/${c.name}`}>
+                        <h3 className="font-semibold text-lg">{c.name}</h3>
+                      </Link>
                       <p className="text-sm text-slate-600">{c.subject}</p>
                       <div className="flex gap-2 mt-2">
                         <Button onClick={() => handleDuplicateCampaign(c)}>
