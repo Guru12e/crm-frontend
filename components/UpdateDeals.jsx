@@ -43,7 +43,12 @@ import {
   DialogFooter,
 } from "./ui/dialog";
 
-export default function UpdateDeals(deal_id, onChange) {
+export default function UpdateDeals(
+  deal_id,
+  onChange,
+  fetchCustomers,
+  fetchDeals
+) {
   const today = new Date().toISOString().split("T")[0];
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -327,7 +332,79 @@ export default function UpdateDeals(deal_id, onChange) {
       dealDetails.source === DealsData.source &&
       dealDetails.description === DealsData.description &&
       dealDetails.open_activities === openActivities;
+    if (dealDetails.status != DealsData.status) {
+      const current_history = {
+        old_status: dealDetails.status,
+        new_status: DealsData.status,
+        start_date: start_date.split("T")[0],
+        end_date: new Date().toISOString().split("T")[0],
+        state_description: "",
+      };
+      DealsData.stage_history = [...stageHistory, current_history];
 
+      if (DealsData.status === "Closed-won") {
+        console.log(deal);
+        const customerData = {
+          name: deal.name,
+          phone: deal.number,
+          email: deal.email,
+          linkedIn: deal.linkedIn,
+          price: deal.value,
+          location: deal.location,
+          purchase_history: {
+            product: deal.product,
+            price: deal.value,
+            purchase_date: today,
+          },
+          industry: deal.industry,
+          status: "Active",
+          created_at: today,
+          user_email: deal.user_email,
+        };
+
+        const { data, error } = await supabase
+          .from("Customers")
+          .select("*")
+          .eq("email", deal.email)
+          .eq("user_email", deal.user_email)
+          .maybeSingle();
+        if (error) {
+          console.error("Error checking existing customer:", error);
+        }
+        if (!data) {
+          await fetch("/api/addCustomer", {
+            method: "POST",
+            body: JSON.stringify({
+              ...customerData,
+              session: session,
+            }),
+          });
+        } else {
+          const { error } = await supabase
+            .from("customers")
+            .update({
+              ...customerData,
+              price: data.price + deal.value,
+              status: "Active",
+              created_at: data.created_at,
+              purchase_history: [
+                ...data.purchase_history,
+                {
+                  product: deal.product,
+                  price: deal.value,
+                },
+              ],
+            })
+            .eq("email", deal.email)
+            .eq("user_email", deal.user_email);
+          if (error) {
+            console.error("Error updating existing customer:", error);
+          }
+        }
+        await fetchCustomers();
+        await fetchDeals();
+      }
+    }
     if (noChanges) {
       toast.info("No changes detected.", { position: "top-right" });
       return;
@@ -789,19 +866,9 @@ export default function UpdateDeals(deal_id, onChange) {
                                   }
                                 />
                                 <div className="grid grid-cols-3 gap-4 mt-5">
-                                  <Dialog
-                                    open={activityToDelete === activity.id}
-                                    onOpenChange={() =>
-                                      setActivityToDelete(null)
-                                    }
-                                  >
+                                  <Dialog>
                                     <DialogTrigger asChild>
-                                      <Button
-                                        className="border-2 border-red-500 bg-white text-red-500 hover:bg-red-50 hover:text-red-700"
-                                        onClick={() =>
-                                          setActivityToDelete(activity.id)
-                                        }
-                                      >
+                                      <Button className="border-2 border-red-500 cursor-pointer bg-white text-red-500 hover:bg-red-50 hover:text-red-700">
                                         <Delete />
                                         Delete Activity
                                       </Button>

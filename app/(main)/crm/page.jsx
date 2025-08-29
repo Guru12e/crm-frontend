@@ -749,6 +749,8 @@ export default function CRM() {
                             .filter((lead) => lead.status === leadState)
                             .map((l) => (
                               <LeadCard
+                                fetchLeads={fetchLeads}
+                                fetchDeals={fetchDeals}
                                 key={l.id}
                                 lead={l}
                                 setData={setLeadsData}

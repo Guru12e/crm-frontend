@@ -203,7 +203,7 @@ export default function Updateleads(lead_id, onChange) {
       .eq("id", lead_id.lead_id);
     if (error) {
       console.error("Error updating activity:", error);
-      toast.error("Error updating activity!", { position: "top-right" });
+      toast.error("Error updating activity!");
     } else {
       await fetchLeadData();
       setActivitiesFormData({ title: "", description: "", date: "" });
@@ -225,7 +225,7 @@ export default function Updateleads(lead_id, onChange) {
       .eq("id", lead_id.lead_id);
     if (error) {
       console.error("Error removing activity:", error);
-      toast.error("Error removing activity!", { position: "top-right" });
+      toast.error("Error removing activity!");
     } else {
       await fetchLeadData();
       toast.success("Activity removed successfully!", {
@@ -288,7 +288,7 @@ export default function Updateleads(lead_id, onChange) {
       .eq("id", lead_id.lead_id);
     if (error) {
       console.error("Error closing activity:", error);
-      toast.error("Error closing activity!", { position: "top-right" });
+      toast.error("Error closing activity!");
     } else {
       await fetchLeadData();
       toast.success("Activity closed successfully!", {
@@ -337,7 +337,7 @@ export default function Updateleads(lead_id, onChange) {
       LeadDetails.open_activities === openActivities;
 
     if (noChanges) {
-      toast.info("No changes detected.", { position: "top-right" });
+      toast.info("No changes detected.");
       return;
     } else {
       const { error } = await supabase
@@ -347,7 +347,7 @@ export default function Updateleads(lead_id, onChange) {
 
       if (error) {
         console.error("Error updating database:", error);
-        toast.error("Error updating database!", { position: "top-right" });
+        toast.error("Error updating database!");
       } else {
         toast.success(
           "Data updated permanently. All changes made are permanent.",
@@ -770,19 +770,9 @@ export default function Updateleads(lead_id, onChange) {
                                   }
                                 />
                                 <div className="grid grid-cols-3 gap-4 mt-5">
-                                  <Dialog
-                                    open={activityToDelete === activity.id}
-                                    onOpenChange={() =>
-                                      setActivityToDelete(null)
-                                    }
-                                  >
+                                  <Dialog>
                                     <DialogTrigger asChild>
-                                      <Button
-                                        className="border-2 border-red-500 bg-white text-red-500 hover:bg-red-50 hover:text-red-700"
-                                        onClick={() =>
-                                          setActivityToDelete(activity.id)
-                                        }
-                                      >
+                                      <Button className="border-2 border-red-500 bg-white cursor-pointer text-red-500 hover:bg-red-50 hover:text-red-700">
                                         <Delete />
                                         Delete Activity
                                       </Button>
@@ -799,7 +789,7 @@ export default function Updateleads(lead_id, onChange) {
                                       </DialogHeader>
                                       <DialogFooter>
                                         <Button
-                                          className="border-2 border-red-500 bg-white text-red-500 hover:bg-red-50 hover:text-red-700"
+                                          className="border-2 border-red-500 bg-white cursor-pointer text-red-500 hover:bg-red-50 hover:text-red-700"
                                           variant="outline"
                                           onClick={() => {
                                             handleRemoveActivity(activity.id);

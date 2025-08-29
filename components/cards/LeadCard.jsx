@@ -36,7 +36,13 @@ import {
 import { Textarea } from "../ui/textarea";
 import EmailTemplate from "../EmailTemplate";
 
-export default function LeadCard({ lead, setId, onChange }) {
+export default function LeadCard({
+  lead,
+  setId,
+  onChange,
+  fetchLeads,
+  fetchDeals,
+}) {
   const leadStatus = [
     "New",
     "In progress",
@@ -51,6 +57,7 @@ export default function LeadCard({ lead, setId, onChange }) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState(false);
   const [description, setDescription] = useState("");
+  const today = new Date();
 
   const handleStatusUpdate = async () => {
     const stage_history = lead.stage_history || [];
@@ -64,42 +71,52 @@ export default function LeadCard({ lead, setId, onChange }) {
       state_description: description,
     };
     stage_history.push(current_history);
-    const { error } = await supabase
+    const { data: LeadsData, error } = await supabase
       .from("Leads")
       .update({
         stage_history: stage_history,
         status: newState,
       })
-      .eq("id", lead.id);
-
-    if (lead.status === "Qualified") {
-      console.log("hello");
-      const { error } = await supabase.from("Deals").insert({
-        name: LeadsData.name,
-        phone: LeadsData.number,
-        email: LeadsData.email,
-        linkedIn: LeadsData.linkedIn,
-        location: LeadsData.location,
-        status: "New",
-        created_at: today.toISOString().split("T")[0],
-        closeDate: today.toISOString().split("T")[0],
-        user_email: LeadsData.userEmail,
-      });
-      if (error) {
-        console.error("Error moving lead to deal:", error);
-        toast.error("Error moving lead to deal");
-      } else {
-        toast.success("Lead moved to deal successfully");
-        onChange();
-      }
-    }
+      .select("*")
+      .eq("id", lead.id)
+      .single();
 
     if (error) {
       console.error("Error updating lead:", error);
       toast.error("Error updating lead");
     } else {
       toast.success("Lead updated successfully");
-      onChange();
+      if (newState === "Qualified") {
+        console.log("hello");
+        console.log(LeadsData);
+        const leadToDeal = {
+          name: LeadsData.name,
+          number: LeadsData.number,
+          email: LeadsData.email,
+          status: "New",
+          created_at: today.toISOString().split("T")[0],
+          closeDate: today.toISOString().split("T")[0],
+          user_email: LeadsData.user_email,
+        };
+        console.log(leadToDeal);
+        const { data: deal, error } = await supabase
+          .from("Deals")
+          .insert({
+            ...leadToDeal,
+          })
+          .select("*")
+          .single();
+      }
+
+      if (error) {
+        console.error("Error moving lead to deal:", error);
+        toast.error("Error moving lead to deal");
+      } else {
+        toast.success("Lead moved to deal successfully");
+
+        await fetchDeals();
+        await fetchLeads();
+      }
     }
   };
 
@@ -115,30 +132,9 @@ export default function LeadCard({ lead, setId, onChange }) {
     }
   };
 
-  const handleMoveToDeal = async (lead) => {
-    const { error } = await supabase.from("Deals").insert({
-      name: lead.name,
-      phone: lead.phone,
-      email: lead.email,
-      linkedIn: lead.linkedIn,
-      location: lead.location,
-      status: "New",
-      created_at: today.toISOString().split("T")[0],
-      closeDate: today.toISOString().split("T")[0],
-      user_email: lead.userEmail,
-    });
-    if (error) {
-      console.error("Error moving lead to deal:", error);
-      toast.error("Error moving lead to deal");
-    } else {
-      toast.success("Lead moved to deal successfully");
-      onChange();
-    }
-  };
-
   return (
     <>
-      <Card className="backdrop-blur-sm bg-white/70 h-auto w-full sm:max-w-md md:max-w-lg lg:max-w-sm z-0 hover:scale-103 hover:shadow-lg dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-1000 group mx-auto cursor-pointer">
+      <Card className="backdrop-blur-sm bg-white/70 h-auto w-full sm:max-w-md md:max-w-lg lg:max-w-sm z-0  hover:shadow-lg dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-1000 group mx-auto cursor-pointer">
         <CardContent className="p-3 pt-4">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex items-start space-x-0 flex-1 min-w-0">
@@ -307,9 +303,6 @@ export default function LeadCard({ lead, setId, onChange }) {
                             onClick={() => {
                               setNewState(statu);
                               setOpen(true);
-                              if (newState === "Qualified") {
-                                handleMoveToDeal(lead);
-                              }
                             }}
                           >
                             {statu}

@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/utils/supabase/client";
+import { round } from "lodash";
 
 export default function Home() {
   const [leads, setLeads] = useState([]);
@@ -45,12 +46,20 @@ export default function Home() {
   };
   const [customers, setCustomers] = useState([]);
   const [userEmail, setUserEmail] = useState("");
+  const [userName, setUserName] = useState("");
   const [session, setSession] = useState(null);
   useEffect(() => {
     const getSession = () => {
       const sessionJSON = JSON.parse(localStorage.getItem("session"));
       setSession(sessionJSON);
       setUserEmail(sessionJSON.user.email);
+      setUserName(
+        sessionJSON.user.name
+          .replace(/([A-Z])/g, " $1")
+          .split(" ")
+          .map((w) => w[0].toUpperCase() + w.slice(1))
+          .join(" ")
+      );
     };
 
     getSession();
@@ -114,7 +123,7 @@ export default function Home() {
   ).length;
 
   const onboardingData = {
-    rate: (QualifiedLeads / leads.length) * 100,
+    rate: round((QualifiedLeads / leads.length) * 100, 2),
     change: +12,
   };
 
@@ -132,42 +141,89 @@ export default function Home() {
     {
       name: "New",
       value: deals.filter((deal) => deal.status === "New").length,
+      rate: round(
+        (deals.filter((deal) => deal.status === "New").length / deals.length) *
+          100,
+        2
+      ),
       color: "bg-red-500",
     },
     {
       name: "Proposal Sent",
       value: deals.filter((deal) => deal.status === "Proposal Sent").length,
+      rate: round(
+        (deals.filter((deal) => deal.status === "Proposal Sent").length /
+          deals.length) *
+          100,
+        2
+      ),
       color: "bg-yellow-500",
     },
     {
       name: "Negotiation",
       value: deals.filter((deal) => deal.status === "Negotiation").length,
+      rate: round(
+        (deals.filter((deal) => deal.status === "Negotiation").length /
+          deals.length) *
+          100,
+        2
+      ),
       color: "bg-blue-500",
     },
     {
       name: "Closed Won",
       value: deals.filter((deal) => deal.status === "Closed-won").length,
+      rate: round(
+        (deals.filter((deal) => deal.status === "Closed-won").length /
+          deals.length) *
+          100,
+        2
+      ),
       color: "bg-green-500",
     },
     {
       name: "Closed Lost",
       value: deals.filter((deal) => deal.status === "Closed-lost").length,
+      rate: round(
+        (deals.filter((deal) => deal.status === "Closed-lost").length /
+          deals.length) *
+          100,
+        2
+      ),
       color: "bg-gray-500",
     },
     {
       name: "Meeting Booked",
       value: deals.filter((deal) => deal.status === "Meeting Booked").length,
+      rate: round(
+        (deals.filter((deal) => deal.status === "Meeting Booked").length /
+          deals.length) *
+          100,
+        2
+      ),
       color: "bg-purple-500",
     },
     {
       name: "On Hold",
       value: deals.filter((deal) => deal.status === "On-hold").length,
+      rate: round(
+        (deals.filter((deal) => deal.status === "On-hold").length /
+          deals.length) *
+          100,
+        2
+      ),
       color: "bg-pink-500",
     },
     {
       name: "Abandoned",
       value: deals.filter((deal) => deal.status === "Abandoned").length,
-      color: "bg-teal-500",
+      rate: round(
+        (deals.filter((deal) => deal.status === "Abandoned").length /
+          deals.length) *
+          100,
+        2
+      ),
+      color: "bg-orange-500",
     },
   ];
 
@@ -255,7 +311,7 @@ export default function Home() {
               {value}
               {title.includes("rate") ? "%" : ""}
             </p>
-            <p
+            {/* <p
               className={cn(
                 "text-sm flex items-center mt-1",
                 change > 0 ? "text-green-600" : "text-red-600"
@@ -264,7 +320,7 @@ export default function Home() {
               <TrendingUp className="w-4 h-4 mr-1" />
               {change > 0 ? "+" : ""}
               {change}% from last month
-            </p>
+            </p> */}
           </div>
           <Icon className="h-8 w-8 text-blue-500 group-hover:scale-110 transition-transform" />
         </div>
@@ -280,6 +336,11 @@ export default function Home() {
       "bg-red-500": "#ef4444",
       "bg-yellow-500": "#eab308",
       "bg-blue-500": "#3b82f6",
+      "bg-green-500": "#10b981",
+      "bg-orange-500": "#f97316",
+      "bg-purple-500": "#a855f7",
+      "bg-pink-500": "#ec4899",
+      "bg-gray-500": "#6b7280",
     };
 
     return (
@@ -359,8 +420,8 @@ export default function Home() {
         <svg width="100%" height="100%" viewBox="0 0 400 240">
           <defs>
             <linearGradient id="barGradient" x1="0%" y1="100%" x2="0%" y2="0%">
-              <stop offset="0%" stopColor="#3b82f6" />
-              <stop offset="100%" stopColor="#8b5cf6" />
+              <stop offset="0%" stopColor="#16699d" />
+              <stop offset="100%" stopColor="#57bba9" />
             </linearGradient>
           </defs>
 
@@ -527,7 +588,7 @@ export default function Home() {
             Dashboard
           </h1>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">
-            Welcome back! Here's your GTM overview.
+            Welcome back, {userName}! Here's your GTM overview.
           </p>
         </div>
         <Button

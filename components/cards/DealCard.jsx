@@ -176,7 +176,12 @@ export default function DealCard({
                 <SheetHeader>
                   <SheetTitle>Deal Data</SheetTitle>
                   <SheetDescription>
-                    <UpdateDeals deal_id={deal.id} onChange={onChange} />
+                    <UpdateDeals
+                      deal_id={deal.id}
+                      onChange={onChange}
+                      fetchCustomers={fetchCustomers}
+                      fetchDeals={fetchDeals}
+                    />
                   </SheetDescription>
                 </SheetHeader>
               </SheetContent>

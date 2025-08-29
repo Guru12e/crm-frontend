@@ -129,7 +129,7 @@ export default function Layout({ children }) {
                     className={cn(
                       "flex items-center cursor-pointer rounded-lg px-2 py-2 text-sm font-medium transition-all",
                       isActive
-                        ? "bg-gradient-to-r from-teal-500 to-sky-500 text-purple-600 dark:text-blue-400"
+                        ? "bg-gradient-to-r from-teal-500 to-sky-500 text-white "
                         : "text-slate-700 dark:text-slate-300 hover:bg-teal/50 dark:hover:bg-sky-800/50"
                     )}
                     onClick={() => handleItemClick(item)}
@@ -146,9 +146,7 @@ export default function Layout({ children }) {
                       <item.icon
                         className={cn(
                           "h-5 w-5 flex-shrink-0",
-                          isActive
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-slate-500"
+                          isActive ? "text-white " : "text-slate-500"
                         )}
                       />
                       {sidebarOpen && (
