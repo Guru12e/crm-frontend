@@ -156,6 +156,8 @@ export default function CampaignDetail({ params }) {
     } finally {
       setLoading(false);
     }
+    router.push("/campaigns");
+    sessionStorage.setItem("campaignsTab", "Sent");
   };
 
   if (!campaign) {
@@ -210,17 +212,6 @@ export default function CampaignDetail({ params }) {
             )}
           </div>
           <div className="flex justify-end gap-4 pt-6 border-t">
-            <button
-              onClick={handleSend}
-              disabled={loading}
-              className={`px-5 py-2 rounded-xl font-medium shadow transition ${
-                loading
-                  ? "bg-blue-400 text-white cursor-not-allowed"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
-              }`}
-            >
-              {loading ? "Sending..." : "Send"}
-            </button>
             <button
               onClick={() => router.push("/campaigns")}
               className="px-5 py-2 rounded-xl bg-gray-200 text-gray-800 font-medium shadow hover:bg-gray-300 transition"
