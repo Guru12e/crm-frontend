@@ -83,29 +83,29 @@ const LeadForm = ({ session, fetchLeads, fetchDeals, setLeadsData }) => {
     if (leadsFormData.status === "Qualified") {
       const leadToDeal = {
         name: leadsFormData.name,
-        phone: leadsFormData.phone,
+        number: leadsFormData.number,
         email: leadsFormData.email,
-        linkedIn: leadsFormData.linkedIn,
-        location: leadsFormData.location,
         status: "New",
         created_at: today.toISOString().split("T")[0],
         closeDate: today.toISOString().split("T")[0],
-        user_email: session.user.email,
+        user_email: leadsFormData.user_email,
       };
+      const { data: deal, error } = await supabase
+        .from("Deals")
+        .insert({
+          ...leadToDeal,
+        })
+        .select("*")
+        .single();
 
-      const { error } = await supabase.from("Deals").insert(leadToDeal);
-
-      if (!error) {
-        toast.success("Deal Added Since Lead is Qualified", {
-          autoClose: 3000,
-          position: "top-right",
-        });
-        await fetchDeals();
+      if (error) {
+        console.error("Error moving lead to deal:", error);
+        toast.error("Error moving lead to deal");
       } else {
-        toast.error("Error in Adding Deal", {
-          position: "top-right",
-          autoClose: 3000,
-        });
+        toast.success("Lead moved to deal successfully");
+
+        await fetchDeals();
+        await fetchLeads();
       }
     }
 

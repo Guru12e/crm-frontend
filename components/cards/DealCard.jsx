@@ -82,7 +82,6 @@ export default function DealCard({
       toast.error("Error updating deal");
     } else {
       if (newState == "Closed-won") {
-        console.log(deal);
         const customerData = {
           name: deal.name,
           phone: deal.number,

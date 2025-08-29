@@ -335,6 +335,45 @@ export default function Updateleads(lead_id, onChange) {
       LeadDetails.address === LeadsData.address &&
       LeadDetails.description === LeadsData.description &&
       LeadDetails.open_activities === openActivities;
+    if (LeadDetails.status != LeadsData.status) {
+      const current_history = {
+        old_status: LeadDetails.status,
+        new_status: LeadsData.status,
+        start_date: start_date.split("T")[0],
+        end_date: new Date().toISOString().split("T")[0],
+        state_description: "",
+      };
+      LeadsData.stage_history = [...stageHistory, current_history];
+
+      if (LeadsData.status === "Qualified") {
+        const leadToDeal = {
+          name: LeadsData.name,
+          number: LeadsData.number,
+          email: LeadsData.email,
+          status: "New",
+          created_at: today.toISOString().split("T")[0],
+          closeDate: today.toISOString().split("T")[0],
+          user_email: LeadsData.user_email,
+        };
+        const { data: deal, error } = await supabase
+          .from("Deals")
+          .insert({
+            ...leadToDeal,
+          })
+          .select("*")
+          .single();
+      }
+
+      if (error) {
+        console.error("Error moving lead to deal:", error);
+        toast.error("Error moving lead to deal");
+      } else {
+        toast.success("Lead moved to deal successfully");
+
+        await fetchDeals();
+        await fetchLeads();
+      }
+    }
 
     if (noChanges) {
       toast.info("No changes detected.");
@@ -353,26 +392,6 @@ export default function Updateleads(lead_id, onChange) {
           "Data updated permanently. All changes made are permanent.",
           { position: "top-right" }
         );
-        if (LeadsData.status === "Qualified") {
-          const { error } = await supabase.from("Deals").insert({
-            name: LeadsData.name,
-            phone: LeadsData.number,
-            email: LeadsData.email,
-            linkedIn: LeadsData.linkedIn,
-            location: LeadsData.location,
-            status: "New",
-            created_at: today,
-            closeDate: today,
-            user_email: LeadsData.userEmail,
-          });
-          if (error) {
-            console.error("Error moving lead to deal:", error);
-            toast.error("Error moving lead to deal");
-          } else {
-            toast.success("Lead moved to deal successfully");
-            onChange();
-          }
-        }
         localStorage.removeItem("companyDataCache");
         setLoading(false);
         fetchLeadData();

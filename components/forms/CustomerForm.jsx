@@ -79,7 +79,6 @@ const CustomerForm = ({ session, fetchCustomers, setCustomersData }) => {
     }
 
     if (!isValid) {
-      console.log(newErrors);
       setCustomerLoading(false);
       setErrors(newErrors);
       return;

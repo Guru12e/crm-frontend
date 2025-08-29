@@ -4,7 +4,6 @@ import { createClient } from "@/utils/supabase/server";
 export async function POST(request) {
   try {
     const formData = await request.json();
-    console.log(formData);
 
     if (
       !formData.name ||

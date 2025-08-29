@@ -192,7 +192,7 @@ export default function UpdateDeals(
       .eq("id", deal_id.deal_id);
     if (error) {
       console.error("Error updating activity:", error);
-      toast.error("Error updating activity!", { position: "top-right" });
+      toast.error("Error updating activity!");
     } else {
       await fetchDealData();
       setActivitiesFormData({ title: "", description: "", date: "" });
@@ -217,7 +217,7 @@ export default function UpdateDeals(
       .eq("id", deal_id.deal_id);
     if (error) {
       console.error("Error removing activity:", error);
-      toast.error("Error removing activity!", { position: "top-right" });
+      toast.error("Error removing activity!");
     } else {
       await fetchDealData();
       toast.success("Activity removed successfully!", {
@@ -285,7 +285,7 @@ export default function UpdateDeals(
       .eq("id", deal_id.deal_id);
     if (error) {
       console.error("Error closing activity:", error);
-      toast.error("Error closing activity!", { position: "top-right" });
+      toast.error("Error closing activity!");
     } else {
       await fetchDealData();
       toast.success("Activity closed successfully!", {
@@ -342,31 +342,30 @@ export default function UpdateDeals(
       };
       DealsData.stage_history = [...stageHistory, current_history];
 
-      if (DealsData.status === "Closed-won") {
-        console.log(deal);
+      if (DealsData.status == "Closed-won") {
         const customerData = {
-          name: deal.name,
-          phone: deal.number,
-          email: deal.email,
-          linkedIn: deal.linkedIn,
-          price: deal.value,
-          location: deal.location,
+          name: DealsData.name,
+          phone: DealsData.number,
+          email: DealsData.email,
+          linkedIn: DealsData.linkedIn,
+          price: DealsData.value,
+          location: DealsData.location,
           purchase_history: {
-            product: deal.product,
-            price: deal.value,
+            product: DealsData.product,
+            price: DealsData.value,
             purchase_date: today,
           },
-          industry: deal.industry,
+          industry: DealsData.industry,
           status: "Active",
           created_at: today,
-          user_email: deal.user_email,
+          user_email: DealsData.user_email,
         };
 
         const { data, error } = await supabase
           .from("Customers")
           .select("*")
-          .eq("email", deal.email)
-          .eq("user_email", deal.user_email)
+          .eq("email", DealsData.email)
+          .eq("user_email", DealsData.user_email)
           .maybeSingle();
         if (error) {
           console.error("Error checking existing customer:", error);
@@ -384,29 +383,28 @@ export default function UpdateDeals(
             .from("customers")
             .update({
               ...customerData,
-              price: data.price + deal.value,
+              price: data.price + DealsData.value,
               status: "Active",
               created_at: data.created_at,
               purchase_history: [
                 ...data.purchase_history,
                 {
-                  product: deal.product,
-                  price: deal.value,
+                  product: DealsData.product,
+                  price: DealsData.value,
                 },
               ],
             })
-            .eq("email", deal.email)
-            .eq("user_email", deal.user_email);
+            .eq("email", DealsData.email)
+            .eq("user_email", DealsData.user_email);
           if (error) {
             console.error("Error updating existing customer:", error);
           }
         }
-        await fetchCustomers();
-        await fetchDeals();
+        onChange();
       }
     }
     if (noChanges) {
-      toast.info("No changes detected.", { position: "top-right" });
+      toast.info("No changes detected.");
       return;
     } else {
       const { error } = await supabase
@@ -416,72 +414,12 @@ export default function UpdateDeals(
 
       if (error) {
         console.error("Error updating database:", error);
-        toast.error("Error updating database!", { position: "top-right" });
+        toast.error("Error updating database!");
       } else {
         toast.success(
           "Data updated permanently. All changes made are permanent.",
           { position: "top-right" }
         );
-        if (deal.status === "Closed-won") {
-          console.log("Adding to customers");
-          const customerData = {
-            name: deal.name,
-            phone: deal.phone,
-            email: deal.email,
-            linkedIn: deal.linkedIn,
-            price: deal.value,
-            location: deal.location,
-            purchase_history: {
-              product: deal.product,
-              price: deal.value,
-              purchase_date: today,
-            },
-            industry: deal.industry,
-            status: "Active",
-            created_at: today,
-            user_email: deal.user_email,
-          };
-          const { data, error } = await supabase
-            .from("Customers")
-            .select("*")
-            .eq("email", deal.email)
-            .eq("user_email", deal.user_email)
-            .maybeSingle();
-          if (error) {
-            console.error("Error checking existing customer:", error);
-          }
-          if (!data) {
-            await fetch("/api/addCustomer", {
-              method: "POST",
-              body: JSON.stringify({
-                ...customerData,
-                session: session,
-              }),
-            });
-          } else {
-            const { error } = await supabase
-              .from("Customers")
-              .update({
-                ...customerData,
-                price: data.price + deal.value,
-                status: "Active",
-                created_at: data.created_at,
-                purchase_history: [
-                  ...data.purchase_history,
-                  {
-                    product: deal.product,
-                    price: deal.value,
-                  },
-                ],
-              })
-              .eq("email", deal.email)
-              .eq("user_email", userEmail);
-            if (error) {
-              console.error("Error updating existing customer:", error);
-            }
-          }
-          onChange();
-        }
         localStorage.removeItem("companyDataCache");
         setLoading(false);
       }

@@ -87,8 +87,6 @@ export default function LeadCard({
     } else {
       toast.success("Lead updated successfully");
       if (newState === "Qualified") {
-        console.log("hello");
-        console.log(LeadsData);
         const leadToDeal = {
           name: LeadsData.name,
           number: LeadsData.number,
@@ -98,7 +96,6 @@ export default function LeadCard({
           closeDate: today.toISOString().split("T")[0],
           user_email: LeadsData.user_email,
         };
-        console.log(leadToDeal);
         const { data: deal, error } = await supabase
           .from("Deals")
           .insert({

@@ -99,7 +99,6 @@ const DealForm = ({ fetchDeals, session, products, setDealsData }) => {
       dealFormData.created_at = today;
     }
     if (!isValid) {
-      console.log(newErrors);
       setDealsLoading(false);
       setErrors(newErrors);
       return;
@@ -126,29 +125,28 @@ const DealForm = ({ fetchDeals, session, products, setDealsData }) => {
           autoClose: 3000,
           position: "top-right",
         });
-        if (dealFormData.status === "Closed-won") {
+        if (dealFormData.status == "Closed-won") {
           const customerData = {
             name: dealFormData.name,
             phone: dealFormData.phone,
             email: dealFormData.email,
-            linkedIn: dealFormData.linkedIn,
             price: dealFormData.value,
-            location: dealFormData.location,
             purchase_history: {
-              product: dealFormData.products,
+              product: dealFormData.product,
               price: dealFormData.value,
-              purchase_date: today.toISOString().split("T")[0],
+              purchase_date: today,
             },
             industry: dealFormData.industry,
             status: "Active",
-            created_at: today.toISOString().split("T")[0],
-            user_email: userEmail,
+            created_at: today,
+            user_email: dealFormData.user_email,
           };
+
           const { data, error } = await supabase
-            .from("customers")
+            .from("Customers")
             .select("*")
             .eq("email", dealFormData.email)
-            .eq("user_email", session.user.email)
+            .eq("user_email", dealFormData.user_email)
             .maybeSingle();
           if (error) {
             console.error("Error checking existing customer:", error);
@@ -166,25 +164,24 @@ const DealForm = ({ fetchDeals, session, products, setDealsData }) => {
               .from("customers")
               .update({
                 ...customerData,
-                price: data.price + dealFormData.value,
+                price: data.price + deal.value,
                 status: "Active",
                 created_at: data.created_at,
                 purchase_history: [
                   ...data.purchase_history,
                   {
-                    product: dealFormData.products,
+                    product: dealFormData.product,
                     price: dealFormData.value,
-                    purchase_date: today.toISOString().split("T")[0],
                   },
                 ],
               })
               .eq("email", dealFormData.email)
-              .eq("user_email", session.user.email);
+              .eq("user_email", dealFormData.user_email);
             if (error) {
               console.error("Error updating existing customer:", error);
             }
           }
-          await fetchCustomers();
+          onChange();
         }
         const updatedDeal = await req.json();
         setDealsData((prevDeals) => [...prevDeals, updatedDeal]);
