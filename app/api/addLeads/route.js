@@ -27,14 +27,15 @@ export async function POST(request) {
       })
       .select("*");
 
-    console.log(lead);
-
-    if (error) {
-      console.error(error);
-      return NextResponse.json("error", { status: 400 });
+    if (error.message.includes("duplicate key value")) {
+      return NextResponse.json("error", { status: 404 });
     }
 
-    return NextResponse.json(lead, { status: 200 });
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 401 });
+    }
+
+    return NextResponse.json(deal, { status: 200 });
   } catch (err) {
     console.error(err);
     return NextResponse.json("error", { status: 400 });

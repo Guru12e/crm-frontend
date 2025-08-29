@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/utils/supabase/client";
+import { round } from "lodash";
 
 export default function Home() {
   const [leads, setLeads] = useState([]);
@@ -117,7 +118,7 @@ export default function Home() {
   ).length;
 
   const onboardingData = {
-    rate: (QualifiedLeads / leads.length) * 100,
+    rate: round((QualifiedLeads / leads.length) * 100, 2),
     change: +12,
   };
 
@@ -135,42 +136,89 @@ export default function Home() {
     {
       name: "New",
       value: deals.filter((deal) => deal.status === "New").length,
+      rate: round(
+        (deals.filter((deal) => deal.status === "New").length / deals.length) *
+          100,
+        2
+      ),
       color: "bg-red-500",
     },
     {
       name: "Proposal Sent",
       value: deals.filter((deal) => deal.status === "Proposal Sent").length,
+      rate: round(
+        (deals.filter((deal) => deal.status === "Proposal Sent").length /
+          deals.length) *
+          100,
+        2
+      ),
       color: "bg-yellow-500",
     },
     {
       name: "Negotiation",
       value: deals.filter((deal) => deal.status === "Negotiation").length,
+      rate: round(
+        (deals.filter((deal) => deal.status === "Negotiation").length /
+          deals.length) *
+          100,
+        2
+      ),
       color: "bg-blue-500",
     },
     {
       name: "Closed Won",
       value: deals.filter((deal) => deal.status === "Closed-won").length,
+      rate: round(
+        (deals.filter((deal) => deal.status === "Closed-won").length /
+          deals.length) *
+          100,
+        2
+      ),
       color: "bg-green-500",
     },
     {
       name: "Closed Lost",
       value: deals.filter((deal) => deal.status === "Closed-lost").length,
+      rate: round(
+        (deals.filter((deal) => deal.status === "Closed-lost").length /
+          deals.length) *
+          100,
+        2
+      ),
       color: "bg-gray-500",
     },
     {
       name: "Meeting Booked",
       value: deals.filter((deal) => deal.status === "Meeting Booked").length,
+      rate: round(
+        (deals.filter((deal) => deal.status === "Meeting Booked").length /
+          deals.length) *
+          100,
+        2
+      ),
       color: "bg-purple-500",
     },
     {
       name: "On Hold",
       value: deals.filter((deal) => deal.status === "On-hold").length,
+      rate: round(
+        (deals.filter((deal) => deal.status === "On-hold").length /
+          deals.length) *
+          100,
+        2
+      ),
       color: "bg-pink-500",
     },
     {
       name: "Abandoned",
       value: deals.filter((deal) => deal.status === "Abandoned").length,
-      color: "bg-teal-500",
+      rate: round(
+        (deals.filter((deal) => deal.status === "Abandoned").length /
+          deals.length) *
+          100,
+        2
+      ),
+      color: "bg-orange-500",
     },
   ];
 
@@ -260,7 +308,7 @@ export default function Home() {
               {value}
               {title.includes("rate") ? "%" : ""}
             </p>
-            <p
+            {/* <p
               className={cn(
                 "text-sm flex items-center mt-1",
                 change > 0 ? "text-green-600" : "text-red-600"
@@ -269,7 +317,7 @@ export default function Home() {
               <TrendingUp className="w-4 h-4 mr-1" />
               {change > 0 ? "+" : ""}
               {change}% from last month
-            </p>
+            </p> */}
           </div>
           <Icon className="h-8 w-8 text-blue-500 group-hover:scale-110 transition-transform" />
         </div>
@@ -285,6 +333,11 @@ export default function Home() {
       "bg-red-500": "#ef4444",
       "bg-yellow-500": "#eab308",
       "bg-blue-500": "#3b82f6",
+      "bg-green-500": "#22c55e",
+      "bg-gray-500": "#6b7280",
+      "bg-purple-500": "#a855f7",
+      "bg-pink-500": "#ec4899",
+      "bg-orange-500": "#f97316",
     };
 
     return (
@@ -347,10 +400,11 @@ export default function Home() {
             <div key={index} className="flex items-center space-x-2">
               <div className={cn("w-3 h-3 rounded-full", item.color)}></div>
               <span className="text-xs font-medium whitespace-nowrap">
-                {item.name}: {item.value}%
+                {item.name}: {item.value} (<span>{item.rate}</span>%)
               </span>
             </div>
           ))}
+          <span>Total Deals: {deals.length}</span>
         </div>
       </div>
     );
@@ -596,7 +650,7 @@ export default function Home() {
                     className="flex justify-between items-center py-2 border-b border-slate-200 dark:border-slate-700 last:border-b-0"
                   >
                     <span className="font-medium">{item.name}</span>
-                    <span className="text-xl font-bold">{item.value}%</span>
+                    <span className="text-xl font-bold">{item.rate}%</span>
                   </div>
                 ))}
               </div>
@@ -631,7 +685,7 @@ export default function Home() {
         </Card>
       </div>
 
-      <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+      {/* <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
         <CardHeader>
           <CardTitle className="flex items-center">
             <DollarSign className="w-5 h-5 mr-2" />
@@ -662,9 +716,9 @@ export default function Home() {
             </div>
           )}
         </CardContent>
-      </Card>
+      </Card> */}
 
-      <div className="grid grid-cols-1 md:grid-cols-2  gap-4 sm:gap-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2  gap-4 sm:gap-6">
         <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -717,7 +771,7 @@ export default function Home() {
             ))}
           </CardContent>
         </Card>
-      </div>
+      </div> */}
     </div>
   );
 }

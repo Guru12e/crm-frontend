@@ -84,6 +84,7 @@ export default function CRM() {
   const [userEmail, setUserEmail] = useState(null);
   const [dealProducts, setDealProducts] = useState([]);
   const [otherValue, setOtherValue] = useState("");
+  const [open, setOpen] = useState(false);
 
   const [customerFormData, setCustomerFormData] = useState({
     name: "",
@@ -304,7 +305,7 @@ export default function CRM() {
           phone: "",
           email: "",
           linkedIn: "",
-          price: 0,
+          price: null,
           location: "",
           website: "",
           industry: "",
@@ -312,6 +313,7 @@ export default function CRM() {
           created_at: "",
         });
         await fetchCustomers();
+        setOpen(false);
       } else {
         toast.error("Error in Adding Customer", {
           position: "top-right",
@@ -367,23 +369,25 @@ export default function CRM() {
         user_email: userEmail,
       };
 
-      await fetch("/api/addDeals", {
+      const dealReq = await fetch("/api/addDeals", {
         method: "POST",
         body: JSON.stringify({ ...leadToDeal, session }),
       });
 
-      if (req.status === 200) {
+      if (dealReq.status === 200) {
         toast.success("Deal Added Since Lead is Qualified", {
           autoClose: 3000,
           position: "top-right",
         });
-        await fetchDeals();
       } else {
         toast.error("Error in Adding Deal", {
           position: "top-right",
           autoClose: 3000,
         });
       }
+      await fetchLeads();
+      await fetchDeals();
+      setOpen(false);
     }
 
     if (req.status === 200) {
@@ -541,7 +545,6 @@ export default function CRM() {
               console.error("Error updating existing customer:", error);
             }
           }
-          await fetchCustomers();
         }
         const updatedDeal = await req.json();
         setDealsData((prevDeals) => [...prevDeals, updatedDeal]);
@@ -566,8 +569,10 @@ export default function CRM() {
           autoClose: 3000,
         });
       }
-
       setDealsLoading(false);
+      await fetchCustomers();
+      await fetchDeals();
+      setOpen(false);
     }
   };
 
@@ -979,7 +984,7 @@ export default function CRM() {
           </Sheet>
         </div>
 
-        <Sheet>
+        <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger>
             <div className="bg-gradient-to-r px-3 py-2 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white w-full md:ml-5">
               Add New {activeTab}
