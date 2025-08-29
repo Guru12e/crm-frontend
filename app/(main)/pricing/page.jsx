@@ -93,8 +93,6 @@ export default function PricingPage() {
     fetchData();
   }, [userEmail]);
 
-  // ✅ Log whenever state changes (no stale logs!)
-
   const handleCompanyChange = (field, value) => {
     setCompanyData((prev) => ({ ...prev, [field]: value }));
   };
@@ -208,7 +206,7 @@ export default function PricingPage() {
                 Manage pricing and inventory
               </p>
             </div>
-            <SheetTrigger as Child>
+            <SheetTrigger asChild>
               <Button className="bg-gradient-to-r px-4 py-5 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white w-full ">
                 Add New Product
               </Button>

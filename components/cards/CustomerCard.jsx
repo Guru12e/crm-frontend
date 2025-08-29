@@ -1,8 +1,10 @@
-import { Avatar, AvatarFallback } from "./ui/avatar";
-import { Card, CardContent } from "./ui/card";
+"use client";
+
+import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Card, CardContent } from "../ui/card";
 import { MapPin, Building2, Eye, Mail, Phone, Trash2 } from "lucide-react";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
 import {
   Sheet,
   SheetTitle,
@@ -10,7 +12,7 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTrigger,
-} from "./ui/sheet";
+} from "../ui/sheet";
 import {
   Dialog,
   DialogTitle,
@@ -19,9 +21,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTrigger,
-} from "./ui/dialog";
-import EmailTemplate from "./EmailTemplate";
-import UpdateCustomer from "./UpdateCustomer";
+} from "../ui/dialog";
+import EmailTemplate from "../EmailTemplate";
+import UpdateCustomer from "../UpdateCustomer";
 import { useState } from "react";
 
 export default function CustomerCard({ customer, onChange }) {

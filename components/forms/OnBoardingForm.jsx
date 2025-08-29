@@ -25,8 +25,9 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import PhoneInput from "../PhoneInput";
 
-export default function OnBoardingFormComponent({ session }) {
+export default function OnBoardingForm({ session }) {
   const router = useRouter();
   const [currentSection, setCurrentSection] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -268,6 +269,7 @@ export default function OnBoardingFormComponent({ session }) {
           });
 
           if (response.status === 200) {
+            localStorage.setItem("user", JSON.stringify(formData));
             router.push("/home");
           } else {
             setLoading(false);
@@ -456,15 +458,17 @@ export default function OnBoardingFormComponent({ session }) {
                     >
                       Contact Number
                     </Label>
-                    <Input
-                      id="phone"
-                      type="tel"
+                    <PhoneInput
                       value={formData.phone}
-                      onChange={(e) => updateFormData("phone", e.target.value)}
+                      onChange={(value) => updateFormData("phone", value)}
                       className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
                         errors.phone ? "border-red-500" : ""
                       }`}
-                      placeholder="+1 (555) 123-4567"
+                      placeholder="Enter phone number"
+                      aria-invalid={!!errors.phone}
+                      aria-describedby={
+                        errors.phone ? "phone-error" : undefined
+                      }
                     />
                     <ErrorMessage error={errors.phone} />
                   </div>

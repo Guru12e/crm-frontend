@@ -128,3 +128,7 @@
 .animate-spin-reverse {
   animation: spin-reverse 1s linear infinite;
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

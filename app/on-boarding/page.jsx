@@ -1,10 +1,10 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import OnBoardingFormComponent from "@/components/OnBoardingFormComponent";
+import OnBoardingForm from "@/components/forms/OnBoardingForm";
 import { supabase } from "@/utils/supabase/client";
 
-export default async function OnBoardingForm() {
+export default async function OnBoardingPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -17,8 +17,9 @@ export default async function OnBoardingForm() {
     .select("*")
     .eq("email", userEmail)
     .single();
+
   if (!user) {
-    return <OnBoardingFormComponent session={session} />;
+    return <OnBoardingForm session={session} />;
   } else {
     return redirect(`/home`);
   }

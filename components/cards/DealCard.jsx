@@ -1,4 +1,6 @@
-import { Card, CardContent } from "./ui/card";
+"use client";
+
+import { Card, CardContent } from "../ui/card";
 import {
   Sheet,
   SheetTrigger,
@@ -6,19 +8,19 @@ import {
   SheetTitle,
   SheetHeader,
   SheetContent,
-} from "./ui/sheet";
-import { Mail, Phone, Eye, LucideUpload, Trash2 } from "lucide-react";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
+} from "../ui/sheet";
+import { Mail, Phone, LucideUpload, Trash2 } from "lucide-react";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
-import EmailTemplate from "./EmailTemplate";
+import EmailTemplate from "../EmailTemplate";
 import { useState } from "react";
-import UpdateDeals from "./UpdateDeals";
+import UpdateDeals from "../UpdateDeals";
 import {
   Dialog,
   DialogTitle,
@@ -27,10 +29,19 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTrigger,
-} from "./ui/dialog";
-import { Textarea } from "./ui/textarea";
+} from "../ui/dialog";
+import { Textarea } from "../ui/textarea";
+import { supabase } from "@/utils/supabase/client";
+import { toast } from "react-toastify";
 
-export default function DealCard({ deal, setId, onChange }) {
+export default function DealCard({
+  fetchDeals,
+  deal,
+  setId,
+  onChange,
+  session,
+  fetchCustomers,
+}) {
   const dealStatus = [
     "New",
     "Proposal Sent",
@@ -70,10 +81,11 @@ export default function DealCard({ deal, setId, onChange }) {
       console.error("Error updating deal:", error);
       toast.error("Error updating deal");
     } else {
-      if (deal.status === "Closed-won") {
+      if (newState == "Closed-won") {
+        console.log(deal);
         const customerData = {
           name: deal.name,
-          phone: deal.phone,
+          phone: deal.number,
           email: deal.email,
           linkedIn: deal.linkedIn,
           price: deal.value,
@@ -88,8 +100,9 @@ export default function DealCard({ deal, setId, onChange }) {
           created_at: today,
           user_email: deal.user_email,
         };
+
         const { data, error } = await supabase
-          .from("customers")
+          .from("Customers")
           .select("*")
           .eq("email", deal.email)
           .eq("user_email", deal.user_email)
@@ -122,13 +135,15 @@ export default function DealCard({ deal, setId, onChange }) {
               ],
             })
             .eq("email", deal.email)
-            .eq("user_email", userEmail);
+            .eq("user_email", deal.user_email);
           if (error) {
             console.error("Error updating existing customer:", error);
           }
         }
         onChange();
       }
+      await fetchDeals();
+      await fetchCustomers();
       toast.success("Deal updated successfully");
     }
   };
@@ -141,6 +156,7 @@ export default function DealCard({ deal, setId, onChange }) {
       toast.error("Error deleting deal");
     } else {
       toast.success("Deal deleted successfully");
+      await fetchDeals();
       onChange();
     }
   };

@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowUpLeft, ArrowUpRight, Eye } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function Campaigns() {
@@ -22,7 +21,6 @@ export default function Campaigns() {
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
     try {
@@ -170,7 +168,7 @@ export default function Campaigns() {
                 Manage your email campaigns effectively
               </p>
             </div>
-            <SheetTrigger as Child>
+            <SheetTrigger asChild>
               <Button className="bg-gradient-to-r px-3 py-2 rounded-xl from-teal-500 to-sky-500 hover:from-teal-600 hover:to-sky-600 text-white w-full ">
                 Create Campaign
               </Button>
@@ -362,22 +360,18 @@ export default function Campaigns() {
               <Card className="shadow-sm  rounded-2xl border hover:scale-105 hover:shadow-lg  bg-white/70 dark:bg-slate-800/50  border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 cursor-pointer h-full">
                 <CardContent className="p-5 flex flex-col h-full">
                   <div className="border border-teal-200 dark:border-sky-800 rounded-lg p-4 bg-sky-50/50 dark:bg-blue-900/20">
-                    {/* Title */}
                     <h3 className="font-semibold text-xl text-gray-900 mb-2">
                       {c.name}
                     </h3>
 
-                    {/* Subject */}
                     <p className="text-sm  text-slate-600 dark:text-slate-400 mb-3">
                       {c.subject}
                     </p>
 
-                    {/* Body */}
                     <p className="text-sm text-slate-900 dark:text-white line-clamp-3 flex-grow leading-relaxed">
                       {c.body}
                     </p>
 
-                    {/* Audience */}
                     <div className="mt-4 text-sm  text-slate-600 dark:text-slate-400">
                       {c.audience?.length > 0 ? (
                         <p>{c.audience.length} recipients</p>

@@ -16,9 +16,8 @@ import {
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { supabase } from "@/utils/supabase/client";
 import { Input } from "./ui/input";
-import { DialogClose, DialogTitle } from "./ui/dialog";
+import { DialogClose } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
-import { set, times } from "lodash";
 import { toast } from "react-toastify";
 
 // Toolbar button

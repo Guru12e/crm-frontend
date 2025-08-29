@@ -22,6 +22,7 @@ import {
   SquareCheckBig,
   SquareCheck,
   Edit,
+  Loader2,
 } from "lucide-react";
 import {
   Phone,
@@ -36,16 +37,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import {
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "./ui/sheet";
-import { set } from "lodash";
+import { toast } from "react-toastify";
 import {
   Select,
   SelectItem,
@@ -390,19 +382,6 @@ export default function Updateleads(lead_id, onChange) {
   const Activities = ["Meeting", "Email", "Call", "Product Demo", "Task"];
   return (
     <div className="flex flex-col">
-      <div>
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-        />
-      </div>
       <div className="py-4  md:py-6 w-full mx-auto space-y-6 bg-slate-50 dark:bg-slate-900 p-3 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <Label className={"mb-4 text-gray-600"} htmlFor="leadName">
@@ -965,9 +944,17 @@ export default function Updateleads(lead_id, onChange) {
         </div>
         <Button
           onClick={handleUpdateDB}
-          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+          className={`mt-4 bg-blue-600 hover:bg-blue-700 text-white ${
+            loading ? "cursor-not-allowed opacity-70" : ""
+          }`}
+          disabled={loading}
         >
-          <Plus className="w-4 h-4 mr-2" /> Update Lead Data
+          {loading ? (
+            <Loader2 className="w-4 h-4 mr-2" />
+          ) : (
+            <Plus className="w-4 h-4 mr-2" />
+          )}{" "}
+          Update Lead Data
         </Button>
       </div>
       <Card className="bg-transparent text-gray-600 border-0">

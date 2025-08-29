@@ -4,12 +4,9 @@ import { useEffect, useState } from "react";
 import {
   Home,
   Users,
-  MessageSquare,
   Database,
   Send,
   Megaphone,
-  Calendar,
-  BarChart3,
   ChevronDown,
   ChevronRight,
   Menu,
@@ -24,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import UserButton from "@/components/UserButton";
 import { Label } from "@/components/ui/label";
 
@@ -49,7 +46,7 @@ export default function Layout({ children }) {
   const [darkMode, setDarkMode] = useState(false);
   const [expandedItems, setExpandedItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const location = useSearchParams().get("pathname") || "/home";
+  const location = usePathname();
   const [alertMessage, setAlertMessage] = useState(false);
   const [user, setUser] = useState(null);
   const router = useRouter();
@@ -122,10 +119,7 @@ export default function Layout({ children }) {
 
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigation.map((item) => {
-              const isActive =
-                location.pathname === item.href ||
-                (item.subpages &&
-                  item.subpages.some((sub) => location.pathname === sub.href));
+              const isActive = item.href === location;
               const hasSubpages = item.subpages && item.subpages.length > 0;
               const isExpanded = expandedItems.includes(item.name);
 
@@ -222,10 +216,7 @@ export default function Layout({ children }) {
 
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigation.map((item) => {
-              const isActive =
-                location.pathname === item.href ||
-                (item.subpages &&
-                  item.subpages.some((sub) => location.pathname === sub.href));
+              const isActive = location === item.href;
               const hasSubpages = item.subpages && item.subpages.length > 0;
               const isExpanded = expandedItems.includes(item.name);
 

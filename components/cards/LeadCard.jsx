@@ -1,5 +1,7 @@
-import { Card, CardContent } from "./ui/card";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+"use client";
+
+import { Card, CardContent } from "../ui/card";
+import { Avatar, AvatarFallback } from "../ui/avatar";
 import {
   Sheet,
   SheetTrigger,
@@ -7,10 +9,10 @@ import {
   SheetTitle,
   SheetHeader,
   SheetContent,
-} from "./ui/sheet";
+} from "../ui/sheet";
 import { Mail, Phone, LucideUpload, Eye, Trash2 } from "lucide-react";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +20,7 @@ import {
   DropdownMenuTrigger,
   Label,
 } from "@radix-ui/react-dropdown-menu";
-import Updateleads from "./Updateleads";
+import Updateleads from "../Updateleads";
 import { supabase } from "@/utils/supabase/client";
 import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
@@ -30,9 +32,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTrigger,
-} from "./ui/dialog";
-import { Textarea } from "./ui/textarea";
-import EmailTemplate from "./EmailTemplate";
+} from "../ui/dialog";
+import { Textarea } from "../ui/textarea";
+import EmailTemplate from "../EmailTemplate";
 
 export default function LeadCard({ lead, setId, onChange }) {
   const leadStatus = [

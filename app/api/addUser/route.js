@@ -23,7 +23,7 @@ export async function POST(req) {
     if (error) {
       console.error(error);
     }
-    return new NextResponse("success", { status: 200 });
+    return new NextResponse(user, { status: 200 });
   } catch (err) {
     console.error(err);
     return new NextResponse("error", { status: 400 });

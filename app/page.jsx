@@ -21,9 +21,5 @@ export default function Home() {
     getUser();
   }, []);
 
-  return (
-    <div>
-      <OnBoarding />
-    </div>
-  );
+  return <OnBoarding />;
 }

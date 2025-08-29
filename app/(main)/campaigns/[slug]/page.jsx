@@ -3,13 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function CampaignDetail({ params }) {
   const { slug } = React.use(params);
   const [campaign, setCampaign] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [userEmail, setUserEmail] = useState(null);
   const [user, setUser] = useState(null);
   const router = useRouter();
 
@@ -51,7 +50,6 @@ export default function CampaignDetail({ params }) {
     if (!campaign) return;
 
     setLoading(true);
-    setMessage("");
 
     try {
       const res = await fetch("/api/sendMailCampaign", {
@@ -67,14 +65,22 @@ export default function CampaignDetail({ params }) {
       });
 
       if (res.ok) {
-        setMessage("✅ Campaign sent successfully!");
+        toast.success("Campaign sent successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+        });
       } else {
-        const err = await res.json();
-        setMessage(` Failed: ${err.error || "Unknown error"}`);
+        toast.error("Failed to send campaign.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
       }
     } catch (err) {
       console.error(err);
-      setMessage(" Error sending campaign.");
+      toast.error("Error sending campaign.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
     } finally {
       setLoading(false);
     }

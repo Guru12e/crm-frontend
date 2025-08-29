@@ -5,13 +5,8 @@ import { supabase } from "@/utils/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
-  Save,
-  Upload,
   Plus,
-  Trash2,
-  Package,
   AlertCircle,
-  Sheet,
   Calendar,
   Phone,
   Mail,
@@ -20,25 +15,11 @@ import {
   XCircle,
   ArrowRightLeft,
   UserPlus,
-  X,
-  ArrowRightToLine,
   BookmarkPlus,
-  Delete,
-  Edit,
-  SquareCheckBig,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import {
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "./ui/sheet";
+import { toast } from "react-toastify";
 import {
   Select,
   SelectItem,
@@ -46,29 +27,8 @@ import {
   SelectContent,
   SelectValue,
 } from "./ui/select";
-import {
-  Dialog,
-  DialogHeader,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "./ui/dialog";
-import { set } from "lodash";
-const ErrorMessage = ({ error }) => {
-  if (!error) return null;
-  return (
-    <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-      <AlertCircle className="w-4 h-4" />
-      {error}
-    </p>
-  );
-};
 
 export default function UpdateCustomer(customer_id, onChange) {
-  const today = new Date().toISOString().split("T")[0];
-  const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [CustomerData, setCustomerData] = useState({});
   const [messages, setMessages] = useState([]);
@@ -96,24 +56,6 @@ export default function UpdateCustomer(customer_id, onChange) {
   useEffect(() => {
     fetchCustomerData();
   }, [customer_id]);
-
-  const iconMap = {
-    meeting: Calendar,
-    call: Phone,
-    email: Mail,
-    demo: Presentation,
-    closed: CheckCircle2,
-    open: XCircle,
-    stage: ArrowRightLeft,
-    customer: UserPlus,
-  };
-
-  const colorMap = {
-    open: "text-blue-500",
-    closed: "text-green-500",
-    stage: "text-purple-500",
-    customer: "text-orange-500",
-  };
 
   const handleUpdateDB = async () => {
     setLoading(true);
@@ -177,19 +119,6 @@ export default function UpdateCustomer(customer_id, onChange) {
 
   return (
     <div className="flex flex-col">
-      <div>
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-        />
-      </div>
       <div className="py-4  md:py-6 w-full mx-auto space-y-6 bg-slate-50 dark:bg-slate-900 p-3 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <Label className={"mb-4 text-gray-600"} htmlFor="customerName">
