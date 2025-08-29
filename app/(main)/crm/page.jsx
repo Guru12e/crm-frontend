@@ -729,7 +729,7 @@ export default function CRM() {
                               window.open("/templates/customer_template.xlsx")
                             }
                           >
-                            Download Sample CSV
+                            Download Sample Excel
                           </Button>
                         </div>
 
@@ -828,10 +828,10 @@ export default function CRM() {
                           <Button
                             variant="outline"
                             onClick={() =>
-                              window.open("/templates/leads_template.csv")
+                              window.open("/templates/leads_template.xlsx")
                             }
                           >
-                            Download Sample CSV
+                            Download Sample Excel
                           </Button>
                         </div>
 
@@ -933,10 +933,10 @@ export default function CRM() {
                           <Button
                             variant="outline"
                             onClick={() =>
-                              window.open("/templates/deals_template.csv")
+                              window.open("/templates/deals_template.xlsx")
                             }
                           >
-                            Download Sample CSV
+                            Download Sample Excel
                           </Button>
                         </div>
 

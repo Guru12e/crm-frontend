@@ -194,7 +194,7 @@ export default function Campaigns() {
   if (loading) return <p className="p-6">Loading...</p>;
 
   return (
-    <div className="min-h-screen  p-8 rounded-lg">
+    <div className="min-h-screen rounded-lg">
       <div className="flex flex-col sm:flex-row sm:justify-left sm:items-center">
         <Sheet>
           <div className="flex justify-between items-center w-screen">

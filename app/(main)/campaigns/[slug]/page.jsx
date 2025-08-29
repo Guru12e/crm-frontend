@@ -42,12 +42,8 @@ export default function CampaignDetail({ params }) {
     );
   };
 
-  const handleRemoveNewAudience = (index) => {
-    setNewAudience((prev) => prev.filter((_, i) => i !== index));
-    handleChange(
-      `newAudience`,
-      newAudience.filter((_, i) => i !== index)
-    );
+  const handleRemoveNewAudience = (email) => {
+    setNewAudience((prev) => prev.filter((c) => c.email !== email.email));
   };
 
   const handleChange = (field, value) => {
@@ -75,10 +71,7 @@ export default function CampaignDetail({ params }) {
         .update({
           subject,
           body,
-          audience: audience
-            .split(",")
-            .map((email) => email.trim())
-            .filter((e) => e),
+          audience: audience,
         })
         .eq("id", campaign.id)
         .eq("user_email", userEmail);
