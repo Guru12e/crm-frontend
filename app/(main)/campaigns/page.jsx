@@ -301,7 +301,7 @@ export default function Campaigns() {
               </p>
             </div>
             <SheetTrigger asChild>
-              <Button className="bg-gradient-to-r px-3 py-2 rounded-xl from-teal-500 to-sky-500 hover:from-teal-600 hover:to-sky-600 text-white w-full ">
+              <Button className="bg-gradient-to-r px-3 py-2 rounded-xl from-teal-500 to-sky-500 hover:from-teal-600 hover:to-sky-600 text-white ">
                 Create Campaign
               </Button>
             </SheetTrigger>
