@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { supabase } from "@/utils/supabase/client";
 import { round } from "lodash";
+import { redirect } from "next/navigation";
 
 export default function Home() {
   const [leads, setLeads] = useState([]);
@@ -51,6 +52,9 @@ export default function Home() {
   useEffect(() => {
     const getSession = () => {
       const sessionJSON = JSON.parse(localStorage.getItem("session"));
+      if (sessionJSON == null) {
+        redirect("/");
+      }
       setSession(sessionJSON);
       setUserEmail(sessionJSON.user.email);
       setUserName(

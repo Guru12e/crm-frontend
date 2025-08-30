@@ -632,52 +632,52 @@ export default function CRM() {
         </TabsList>
 
         <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
-          <CardContent className="p-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              <div className="sm:col-span-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                  <Input
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50"
-                  />
-                </div>
+          <CardContent>
+            <div className="flex justify-between items-center h-auto">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+                <Input
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-[60vh] bg-white dark:bg-slate-800/50 border-black/20 dark:border-slate-700/50"
+                />
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All statuses">All statuses</SelectItem>
-                  {activeTab === "Customers" ? (
-                    <>
-                      {customerStatus.map((state, index) => (
-                        <SelectItem key={index} value={state}>
-                          {state}
-                        </SelectItem>
-                      ))}
-                    </>
-                  ) : activeTab === "Leads" ? (
-                    <>
-                      {leadStatus.map((state, index) => (
-                        <SelectItem key={index} value={state}>
-                          {state}
-                        </SelectItem>
-                      ))}
-                    </>
-                  ) : (
-                    <>
-                      {dealStatus.map((state, index) => (
-                        <SelectItem key={index} value={state}>
-                          {state}
-                        </SelectItem>
-                      ))}
-                    </>
-                  )}
-                </SelectContent>
-              </Select>
+              <div className="flex justify-end">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="bg-white dark:bg-slate-800/50 border-black/20 cursor-pointer dark:border-slate-700/50">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All statuses">All statuses</SelectItem>
+                    {activeTab === "Customers" ? (
+                      <>
+                        {customerStatus.map((state, index) => (
+                          <SelectItem key={index} value={state}>
+                            {state}
+                          </SelectItem>
+                        ))}
+                      </>
+                    ) : activeTab === "Leads" ? (
+                      <>
+                        {leadStatus.map((state, index) => (
+                          <SelectItem key={index} value={state}>
+                            {state}
+                          </SelectItem>
+                        ))}
+                      </>
+                    ) : (
+                      <>
+                        {dealStatus.map((state, index) => (
+                          <SelectItem key={index} value={state}>
+                            {state}
+                          </SelectItem>
+                        ))}
+                      </>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
               {/* <Select value={sourceFilter} onValueChange={setSourceFilter}>
                 <SelectTrigger className="bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50">
                   <SelectValue placeholder="Filter by source" />

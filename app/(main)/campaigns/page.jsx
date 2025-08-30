@@ -626,7 +626,7 @@ export default function Campaigns() {
                     key={c.id}
                     className="shadow-sm rounded-2xl border transition-all duration-200 hover:shadow-lg bg-white/70 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20 h-full"
                   >
-                    <CardContent className="p-5 flex flex-col h-full">
+                    <CardContent className="p flex flex-col h-full">
                       <div className="flex justify-between items-start mb-3">
                         <h3 className="font-semibold text-xl text-gray-900 dark:text-white">
                           {c.name}
