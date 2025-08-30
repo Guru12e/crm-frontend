@@ -194,8 +194,8 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="flex flex-col sm:flex-row sm:justify-left sm:items-center">
+    <div className="min-h-screen w-full">
+      <div className="flex flex-col w-full sm:flex-row sm:justify-left sm:items-center">
         <Sheet>
           <div className="flex justify-between items-center w-screen">
             <div>
@@ -207,7 +207,7 @@ export default function PricingPage() {
               </p>
             </div>
             <SheetTrigger asChild>
-              <Button className="bg-gradient-to-r px-4 py-5 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white w-full ">
+              <Button className="bg-gradient-to-r px-4 py-5 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white ">
                 Add New Product
               </Button>
             </SheetTrigger>
@@ -335,8 +335,8 @@ export default function PricingPage() {
         </Sheet>
       </div>
 
-      <div className="min-h-screen p-8">
-        <div className="shadow-lg rounded-2xl p-6 mb-8">
+      <div className="min-h-screen w-full">
+        <div className="my-8">
           <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">
             Available Products
           </h2>
@@ -354,7 +354,6 @@ export default function PricingPage() {
                 >
                   <CardContent className=" h-[40vh] flex flex-col gap-2 ">
                     <div className="flex flex-col gap-2">
-                      {/* Name */}
                       <div className="flex gap-4">
                         <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Name
@@ -371,11 +370,10 @@ export default function PricingPage() {
                         />
                       </div>
 
-                      {/* Stock */}
                       <div className="flex gap-4">
-                        <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
+                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Stock
-                        </label>
+                        </Label>
                         <Input
                           type="number"
                           value={product.stock}
@@ -388,11 +386,10 @@ export default function PricingPage() {
                         />
                       </div>
 
-                      {/* Price */}
                       <div className="flex gap-4">
-                        <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
+                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Price
-                        </label>
+                        </Label>
                         <Input
                           type="text"
                           value={
@@ -411,11 +408,10 @@ export default function PricingPage() {
                         />
                       </div>
 
-                      {/* Category */}
                       <div className="flex gap-4">
-                        <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
+                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Category
-                        </label>
+                        </Label>
                         <Input
                           type="text"
                           value={product.category}
@@ -428,11 +424,10 @@ export default function PricingPage() {
                         />
                       </div>
 
-                      {/* Description */}
                       <div className="flex gap-4">
-                        <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
+                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Description
-                        </label>
+                        </Label>
                         <Input
                           type="text"
                           value={product.description}
@@ -445,7 +440,6 @@ export default function PricingPage() {
                         />
                       </div>
 
-                      {/* Actions */}
                       <div className="flex justify-end mt-3 w-full">
                         <button
                           onClick={() => removeProduct(product.id)}
@@ -462,7 +456,6 @@ export default function PricingPage() {
           )}
         </div>
 
-        {/* Global Save Buttons */}
         <div className="flex gap-4">
           <Button onClick={handleSaveChanges} variant="secondary">
             <Save className="mr-2 w-4 h-4" /> Save Changes Locally

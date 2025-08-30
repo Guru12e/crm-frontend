@@ -309,7 +309,7 @@ export default function Campaigns() {
           <SheetContent side="right" className="min-w-[85vw] overflow-y-auto">
             <SheetHeader>
               <SheetTitle>Create Email Campaign</SheetTitle>
-              <SheetDescription>
+              <SheetDescription asChild>
                 <>
                   <div className="p-3 flex flex-col gap-4">
                     <div>
