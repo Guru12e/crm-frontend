@@ -7,16 +7,21 @@ import UpdateCompanyDetails from "@/components/UpdateCompanyDetails";
 export default function OurProspects() {
   const [result, setResult] = useState("");
   const [companyData_1, setCompanyData] = useState({});
-  const rawSession = localStorage.getItem("session");
-  const session = JSON.parse(rawSession);
-  const userEmail = session.user.email;
+
+  const [userEmail, setUserEmail] = useState("");
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const rawSession = localStorage.getItem("session");
+      const session = JSON.parse(rawSession);
+      setUserEmail(session.user.email);
+    };
+
+    fetchSession();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!rawSession) return;
-
-      if (!userEmail) return;
-
       const { data, error } = await supabase
         .from("Users")
         .select("*")
@@ -30,7 +35,7 @@ export default function OurProspects() {
     };
 
     fetchData();
-  }, []);
+  }, [userEmail]);
 
   const handleClick = async () => {
     if (!companyData_1) return;
