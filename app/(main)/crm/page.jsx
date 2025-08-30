@@ -34,7 +34,9 @@ import { supabase } from "@/utils/supabase/client";
 import {
   customerStatus,
   dealStatus,
+  leadSources,
   leadStatus,
+  monthFilters,
   summaryStats,
 } from "@/constants/constant";
 
@@ -42,8 +44,8 @@ export default function CRM() {
   const [activeTab, setActiveTab] = useState("Customers");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All statuses");
-  const [sourceFilter, setSourceFilter] = useState("");
-  const [monthFilter, setMonthFilter] = useState("");
+  const [sourceFilter, setSourceFilter] = useState("All sources");
+  const [monthFilter, setMonthFilter] = useState("All time");
   const [customersData, setCustomersData] = useState([]);
   const [products, setProducts] = useState([]);
   const [session, setSession] = useState(null);
@@ -682,10 +684,11 @@ export default function CRM() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All sources">All sources</SelectItem>
-                  <SelectItem value="Website">Website</SelectItem>
-                  <SelectItem value="Referral">Referral</SelectItem>
-                  <SelectItem value="Campaign">Campaign</SelectItem>
-                  <SelectItem value="LinkedIn">LinkedIn</SelectItem>
+                  {leadSources.map((source, index) => (
+                    <SelectItem key={index} value={source}>
+                      {source}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <Select value={monthFilter} onValueChange={setMonthFilter}>
@@ -693,10 +696,12 @@ export default function CRM() {
                   <SelectValue placeholder="Filter by month" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="All time">All time</SelectItem>
-                  <SelectItem value="2024-12">December 2024</SelectItem>
-                  <SelectItem value="2024-11">November 2024</SelectItem>
-                  <SelectItem value="2024-10">October 2024</SelectItem>
+                  <SelectItem value="All sources">All time</SelectItem>
+                  {monthFilters.map((month, index) => (
+                    <SelectItem key={index} value={month}>
+                      {month}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -708,8 +713,12 @@ export default function CRM() {
             {customersData
               .filter(
                 (customer) =>
-                  statusFilter === "All statuses" ||
-                  customer.status === statusFilter
+                  (statusFilter === "All statuses" ||
+                    customer.status === statusFilter) &&
+                  (sourceFilter === "All sources" ||
+                    customer.source === sourceFilter) &&
+                  (monthFilter === "All time" ||
+                    customer.created_at.getMonth() === monthFilter)
               )
               .map((customer) => (
                 <CustomerCard
@@ -726,7 +735,8 @@ export default function CRM() {
             {leadStatus
               .filter(
                 (leadState) =>
-                  statusFilter === "All statuses" || leadState === statusFilter
+                  statusFilter === "All statuses" ||
+                  leadState.status === statusFilter
               )
               .map((leadState) => (
                 <Card
@@ -746,7 +756,12 @@ export default function CRM() {
                       <Sheet>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-6 min-w-fit">
                           {leadsData
-                            .filter((lead) => lead.status === leadState)
+                            .filter(
+                              (lead) =>
+                                lead.status === leadState &&
+                                lead.source === sourceFilter &&
+                                lead.created_at.getMonth() === monthFilter
+                            )
                             .map((l) => (
                               <LeadCard
                                 fetchLeads={fetchLeads}
@@ -773,7 +788,8 @@ export default function CRM() {
             {dealStatus
               .filter(
                 (dealState) =>
-                  statusFilter === "All statuses" || dealState === statusFilter
+                  statusFilter === "All statuses" ||
+                  dealState.status === statusFilter
               )
               .map((dealState) => (
                 <Card
@@ -792,7 +808,12 @@ export default function CRM() {
                     >
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-6 min-w-fit">
                         {dealsData
-                          .filter((deal) => deal.status === dealState)
+                          .filter(
+                            (deal) =>
+                              deal.status === dealState &&
+                              deal.source === sourceFilter &&
+                              deal.created_at.getMonth() === monthFilter
+                          )
                           .map((deal) => (
                             <DealCard
                               fetchDeals={fetchDeals}

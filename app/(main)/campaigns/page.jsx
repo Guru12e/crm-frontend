@@ -12,11 +12,17 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowUpLeft, ArrowUpRight, Eye } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs } from "@radix-ui/react-tabs";
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { create, set } from "lodash";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function Campaigns() {
   const [campaigns, setCampaigns] = useState([]);
@@ -111,6 +117,41 @@ export default function Campaigns() {
     );
   };
 
+  const handleSend = async () => {
+    if (!campaign) return;
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const res = await fetch("/api/sendMailCampaign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: campaign.name,
+          subject: campaign.subject,
+          body: campaign.body,
+          recipients: campaign.audience,
+          user,
+        }),
+      });
+
+      if (res.ok) {
+        setMessage("✅ Campaign sent successfully!");
+      } else {
+        const err = await res.json();
+        setMessage(` Failed: ${err.error || "Unknown error"}`);
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage(" Error sending campaign.");
+    } finally {
+      setLoading(false);
+    }
+    router.push("/campaigns");
+    sessionStorage.setItem("campaignsTab", "Sent");
+  };
+
   const handleSaveCampaign = async () => {
     const allRecipients = [
       ...selectedContacts,
@@ -172,6 +213,23 @@ export default function Campaigns() {
       toast.error("An error occurred while saving the campaign.");
     }
     await fetchData();
+  };
+
+  const handleDeleteCampaign = async (id) => {
+    try {
+      const { error } = await supabase.from("Campaigns").delete().eq("id", id);
+
+      if (error) {
+        toast.error("Failed to delete campaign: " + error.message);
+        return;
+      }
+
+      toast.success("Campaign deleted successfully!");
+      await fetchData();
+    } catch (error) {
+      console.error("Error deleting campaign:", error);
+      toast.error("An error occurred while deleting the campaign.");
+    }
   };
 
   const handleDuplicateCampaign = async (campaign) => {
@@ -564,7 +622,7 @@ export default function Campaigns() {
                 {filteredSaved.map((c) => (
                   <Card
                     key={c.id}
-                    className="shadow-sm rounded-2xl border hover:scale-[1.01] transition-all duration-200 hover:shadow-lg bg-white/70 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20 cursor-pointer h-full"
+                    className="shadow-sm rounded-2xl border transition-all duration-200 hover:shadow-lg bg-white/70 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20 h-full"
                   >
                     <CardContent className="p-5 flex flex-col h-full">
                       <div className="flex justify-between items-start mb-3">
@@ -572,14 +630,49 @@ export default function Campaigns() {
                           {c.name}
                         </h3>
 
-                        <Link
-                          href={`/campaigns/${c.name}`}
-                          className="text-sm px-3 py-1 rounded-lg border border-slate-300 dark:border-slate-600 
-                       bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600
+                        <div className="flex gap-2">
+                          <Button
+                            href={`/campaigns/${c.name}`}
+                            className="text-sm px-3 py-1 rounded-lg border border-slate-300 dark:border-slate-600 
+                      bg-transparent hover:bg-slate-200 dark:hover:bg-slate-600 text-black dark:text-white
                        transition-colors"
-                        >
-                          Edit
-                        </Link>
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            onClick={() => handleSend}
+                            className="text-sm px-3 py-1 rounded-lg border border-green-300 dark:border-green-600 
+                      bg-transparent hover:bg-green-200 dark:hover:bg-green-600 text-green-600 dark:text-green-400
+                       transition-colors"
+                          >
+                            Send Campaign
+                          </Button>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                className="text-sm px-3 py-1 rounded-lg border border-red-300 dark:border-red-600 
+                      bg-transparent hover:bg-red-200 dark:hover:bg-red-600 text-red-600 dark:text-red-400
+                       transition-colors cursor-pointer"
+                              >
+                                Delete
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogTitle>Delete Campaign</DialogTitle>
+                              <DialogDescription>
+                                Are you sure you want to delete this campaign?
+                              </DialogDescription>
+                              <DialogFooter className="flex justify-end gap-2 mt-4">
+                                <Button
+                                  className="bg-transparent border border-red-300 dark:border-red-600 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-600"
+                                  onClick={() => handleDeleteCampaign(c.id)}
+                                >
+                                  Delete
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
                       </div>
 
                       <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">

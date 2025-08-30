@@ -194,3 +194,29 @@ export const dealStatus = [
   "On-hold",
   "Abandoned",
 ];
+
+export const leadSources = [
+  "Advertisement",
+  "Chat",
+  "Email",
+  "Employee referral",
+  "External referral",
+  "Cold call",
+  "Organic",
+];
+
+export const monthFilters = [
+  "All time",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
