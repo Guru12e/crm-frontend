@@ -56,6 +56,7 @@ export async function POST(req) {
       .from("Campaigns")
       .update({
         audience: results,
+        status: "Sent",
       })
       .eq("user_email", user.email)
       .eq("name", name);

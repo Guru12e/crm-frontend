@@ -3,20 +3,91 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
-import { decode } from "next-auth/jwt";
-import { Label } from "@radix-ui/react-dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@radix-ui/react-dropdown-menu";
 
 export default function CampaignDetail({ params }) {
   const { slug } = React.use(params);
   const name = decodeURIComponent(slug);
   const [campaign, setCampaign] = useState(null);
+  const [audience, setAudience] = useState([]);
+  const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [userEmail, setUserEmail] = useState(null);
   const [user, setUser] = useState(null);
-  const [audience, setAudience] = useState([]);
+  const [newAudience, setNewAudience] = useState([{ email: "" }]);
   const router = useRouter();
+
+  const handleUpdateAudience = () => {
+    setAudience((prev) => [
+      ...prev,
+      ...newAudience.map((c) => c.email).filter((e) => e),
+    ]);
+    setNewAudience([{ email: "" }]);
+    handleChange(
+      `audience`,
+      [...audience, ...newAudience.map((c) => c.email).filter((e) => e)].filter(
+        (e) => e
+      )
+    );
+  };
+
+  const handleRemoveAudience = (email) => {
+    setAudience((prev) => prev.filter((e) => e !== email));
+    handleChange(
+      `audience`,
+      audience.filter((e) => e !== email)
+    );
+  };
+
+  const handleRemoveNewAudience = (email) => {
+    setNewAudience((prev) => prev.filter((c) => c.email !== email.email));
+  };
+
+  const handleChange = (field, value) => {
+    setCampaign((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleAudienceChange = (index, value) => {
+    setAudience((prev) => {
+      const newAudience = [...prev];
+      newAudience[index] = value;
+      setAudience(newAudience);
+      handleChange(`audience`, newAudience);
+    });
+  };
+
+  const handleUpdate = async () => {
+    if (!campaign) return;
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const { error } = await supabase
+        .from("Campaigns")
+        .update({
+          subject,
+          body,
+          audience: audience,
+        })
+        .eq("id", campaign.id)
+        .eq("user_email", userEmail);
+
+      if (error) {
+        setMessage("❌ Update failed: " + error.message);
+      } else {
+        setMessage("✅ Campaign updated successfully!");
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage("❌ Error updating campaign.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     try {
@@ -39,7 +110,6 @@ export default function CampaignDetail({ params }) {
       let { data, error } = await supabase
         .from("Campaigns")
         .select("*")
-        .eq("user_email", userEmail)
         .eq("name", name)
         .single();
 
@@ -48,13 +118,12 @@ export default function CampaignDetail({ params }) {
       } else {
         setCampaign(data);
         setAudience(data.audience || []);
+        setStatus(data.status || null);
       }
     };
 
     fetchCampaign();
   }, [userEmail, name]);
-
-  console.log("Campaign data:", campaign);
 
   const handleSend = async () => {
     if (!campaign) return;
@@ -87,61 +156,8 @@ export default function CampaignDetail({ params }) {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleChange = (field, value) => {
-    setCampaign((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleAudience = (index, field, value) => {
-    setAudience((prev) => {
-      const newAudience = [...prev];
-      newAudience[index] = { ...newAudience[index], [field]: value };
-      setAudience(newAudience);
-      handleChange(`audience`, newAudience);
-    });
-  };
-
-  const handleAudienceChange = (index, value) => {
-    setAudience((prev) => {
-      const newAudience = [...prev];
-      newAudience[index] = value;
-      setAudience(newAudience);
-      handleChange(`audience`, newAudience);
-    });
-  };
-
-  const handleUpdate = async () => {
-    if (!campaign) return;
-
-    setLoading(true);
-    setMessage("");
-
-    try {
-      const { error } = await supabase
-        .from("Campaigns")
-        .update({
-          subject,
-          body,
-          audience: audience
-            .split(",")
-            .map((email) => email.trim())
-            .filter((e) => e),
-        })
-        .eq("id", campaign.id)
-        .eq("user_email", userEmail);
-
-      if (error) {
-        setMessage("❌ Update failed: " + error.message);
-      } else {
-        setMessage("✅ Campaign updated successfully!");
-      }
-    } catch (err) {
-      console.error(err);
-      setMessage("❌ Error updating campaign.");
-    } finally {
-      setLoading(false);
-    }
+    router.push("/campaigns");
+    sessionStorage.setItem("campaignsTab", "Sent");
   };
 
   if (!campaign) {
@@ -149,60 +165,109 @@ export default function CampaignDetail({ params }) {
   }
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 bg-white shadow rounded-2xl p-6">
-      <h1 className="text-2xl font-bold mb-4">{campaign.name}</h1>
+    <div className="min-h-screen">
+      {status === "Sent" && (
+        <div className="max-w-3xl mx-auto mt-10 bg-white/70 dark:bg-slate-800/50 shadow rounded-2xl p-6">
+          <h1 className="text-2xl font-bold mb-4">{campaign.name}</h1>
 
-      <div className="mb-4">
-        <Label className={"mb-4 text-gray-600"} htmlFor="subject">
-          Subject
-        </Label>
-        <Input
-          id="subject"
-          value={campaign.subject}
-          placeholder={campaign.subject}
-          onChange={(e) => handleChange("subject", e.target.value)}
-        />
-      </div>
+          <div className="mb-4">
+            <p className="text-gray-600">
+              <span className="font-semibold">Subject:</span> {campaign.subject}
+            </p>
+          </div>
 
-      <div className="mb-4">
-        <Label className={"mb-4 text-gray-600"} htmlFor="body">
-          Body
-        </Label>
-        <Input
-          id="body"
-          value={campaign.body}
-          placeholder={campaign.body}
-          onChange={(e) => handleChange("body", e.target.value)}
-        />
-      </div>
+          <div className="mb-4">
+            <p className="text-gray-700">
+              <span className="font-semibold">Body:</span>
+            </p>
+            <div className="mt-2 p-3 border rounded-lg bg-gray-50">
+              {campaign.body}
+            </div>
+          </div>
 
-      <div>
-        <h2 className="font-semibold mb-2">Audience</h2>
-        {campaign.audience?.length > 0 ? (
-          <ul className="list-disc list-inside">
-            {campaign.audience.map((email, idx) => {
-              if (email instanceof Object) {
-                return (
-                  <li
+          <div>
+            <h2 className="font-semibold mb-2">Audience</h2>
+            {campaign.audience?.length > 0 ? (
+              <ul className="list-disc list-inside">
+                {campaign.audience.map((email, idx) => {
+                  if (email instanceof Object) {
+                    return (
+                      <li
+                        key={idx}
+                        className={
+                          email.success ? "text-green-600" : "text-red-600"
+                        }
+                      >
+                        {email.email} -{" "}
+                        {email.success ? "Sent" : `Failed: ${email.error}`}
+                      </li>
+                    );
+                  } else {
+                    return <li key={idx}>{email}</li>;
+                  }
+                })}
+              </ul>
+            ) : (
+              <p className="text-gray-400">No recipients</p>
+            )}
+          </div>
+          <div className="flex justify-end gap-4 pt-6 border-t">
+            <button
+              onClick={() => router.push("/campaigns")}
+              className="px-5 py-2 rounded-xl bg-gray-200 text-gray-800 font-medium shadow hover:bg-gray-300 transition"
+            >
+              Exit
+            </button>
+          </div>
+        </div>
+      )}
+      {status === "Saved" && (
+        <div className="max-w-3xl mx-auto mt-10 bg-white/70 dark:bg-slate-800/50 shadow rounded-2xl p-6">
+          <div className="mb-4">
+            <Label className={"mb-4 text-gray-600"} htmlFor="name">
+              Campaign Name
+            </Label>
+            <Input
+              id="name"
+              value={campaign.name}
+              placeholder={campaign.name}
+              onChange={(e) => handleChange("name", e.target.value)}
+            />
+          </div>
+
+          <div className="mb-4">
+            <Label className={"mb-4 text-gray-600"} htmlFor="subject">
+              Subject
+            </Label>
+            <Input
+              id="subject"
+              value={campaign.subject}
+              placeholder={campaign.subject}
+              onChange={(e) => handleChange("subject", e.target.value)}
+            />
+          </div>
+
+          <div className="mb-4">
+            <Label className={"mb-4 text-gray-600"} htmlFor="body">
+              Body
+            </Label>
+            <Input
+              id="body"
+              value={campaign.body}
+              placeholder={campaign.body}
+              onChange={(e) => handleChange("body", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <h2 className="font-semibold mb-2">Audience</h2>
+            {campaign.audience?.length > 0 ? (
+              <div className="list-disc list-inside">
+                {campaign.audience.map((email, idx) => (
+                  <div
                     key={idx}
-                    className={
-                      email.success ? "text-green-600" : "text-red-600"
-                    }
+                    className="mb-2 flex justify-center items-center gap-2"
                   >
-                    <Input
-                      value={email.email}
-                      id={`email-${idx}`}
-                      placeholder={email.email}
-                      onChange={(e) =>
-                        handleAudience(idx, "email", e.target.value)
-                      }
-                    />
-                    - {email.success ? "Sent" : `Failed: ${email.error}`}
-                  </li>
-                );
-              } else {
-                return (
-                  <li key={idx}>
                     <Input
                       value={email}
                       id={`email-${idx}`}
@@ -210,35 +275,90 @@ export default function CampaignDetail({ params }) {
                       onChange={(e) =>
                         handleAudienceChange(idx, e.target.value)
                       }
+                      className="bg-gradient-to-r from-sky-700 to-teal-500 dark:from-sky-800 dark:to-teal-600 text-black dark:text-white"
                     />
-                  </li>
-                );
-              }
-            })}
-          </ul>
-        ) : (
-          <p className="text-gray-400">No recipients</p>
-        )}
-      </div>
-      <div className="flex justify-end gap-4 pt-6 border-t">
-        <button
-          onClick={handleSend}
-          disabled={loading}
-          className={`px-5 py-2 rounded-xl font-medium shadow transition ${
-            loading
-              ? "bg-blue-400 text-white cursor-not-allowed"
-              : "bg-blue-600 text-white hover:bg-blue-700"
-          }`}
-        >
-          {loading ? "Sending..." : "Send"}
-        </button>
-        <button
-          onClick={() => router.push("/campaigns")}
-          className="px-5 py-2 rounded-xl bg-gray-200 text-gray-800 font-medium shadow hover:bg-gray-300 transition"
-        >
-          Exit
-        </button>
-      </div>
+
+                    <Button
+                      type="button"
+                      onClick={() => handleRemoveAudience(email)}
+                      className="px-2 py-1 text-sm bg-transparent border border-red-600 text-red-600 hover:bg-red-100"
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div>
+                <p className="text-gray-400">No recipients</p>
+              </div>
+            )}
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Add New Contacts</h2>
+            {newAudience.map((c, i) => (
+              <div key={i} className="flex gap-2 mb-2">
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  value={c.email}
+                  onChange={(e) => {
+                    const updated = [...newAudience];
+                    updated[i] = { email: e.target.value };
+                    setNewAudience(updated);
+                  }}
+                  className="border rounded p-2 w-1/2"
+                />
+                <Button
+                  type="button"
+                  onClick={() => handleRemoveNewAudience(c)}
+                  className="px-2 py-1 text-sm bg-transparent border border-red-600 text-red-600 hover:bg-red-100"
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
+            <Button
+              onClick={() => setNewAudience([...newAudience, { email: "" }])}
+              className="mt-2 bg-transparent border border-sky-600 text-sky-600 hover:bg-sky-100"
+            >
+              + Add More
+            </Button>
+          </div>
+          <Button
+            onClick={handleUpdateAudience}
+            className="mt-2 bg-transparent border border-teal-600 text-teal-600 hover:bg-teal-100"
+          >
+            Update Audience
+          </Button>
+          <div className="flex justify-end gap-4 pt-2 border-t mt-2">
+            <Button
+              onClick={handleUpdate}
+              disabled={loading}
+              className="bg-transparent border border-green-600 text-green-600 hover:bg-green-100"
+            >
+              {loading ? "Updating..." : "Save"}
+            </Button>
+            <Button
+              onClick={handleSend}
+              disabled={loading}
+              className={`px-5 py-2 rounded-xl font-medium shadow transition ${
+                loading
+                  ? "bg-blue-400 text-white cursor-not-allowed"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+              }`}
+            >
+              {loading ? "Sending..." : "Send"}
+            </Button>
+            <Button
+              onClick={() => router.push("/campaigns")}
+              className="px-5 py-2 rounded-xl bg-purple-100 border border-purple-800 text-purple-800 font-medium shadow hover:bg-purple-300 transition"
+            >
+              Exit
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

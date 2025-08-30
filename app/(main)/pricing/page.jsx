@@ -204,7 +204,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen">
       <div className="flex flex-col sm:flex-row sm:justify-left sm:items-center">
         <Sheet>
           <div className="flex justify-between items-center w-screen">
