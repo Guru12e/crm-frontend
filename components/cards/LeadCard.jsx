@@ -133,7 +133,7 @@ export default function LeadCard({
     <>
       <Card className="backdrop-blur-sm bg-white/70 h-auto w-full sm:max-w-md md:max-w-lg lg:max-w-sm z-0  hover:shadow-lg dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-1000 group mx-auto cursor-pointer">
         <CardContent className="p-3 pt-4">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div className="flex sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex items-start space-x-0 flex-1 min-w-0">
               <div>
                 <ToastContainer

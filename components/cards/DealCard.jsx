@@ -163,7 +163,7 @@ export default function DealCard({
   return (
     <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 hover:scale-103 hover:shadow-lg cursor-pointer dark:hover:bg-slate-800/60 transition-all duration-300 group">
       <CardContent className="p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div className="flex sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1 min-w-0">
             <Sheet>
               <SheetTrigger asChild key={deal.id}>
@@ -188,7 +188,7 @@ export default function DealCard({
             <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 break-words">
               {deal.company}
             </p>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-2 text-sm text-slate-500 dark:text-slate-400 gap-1 sm:gap-0">
+            <div className="flex sm:flex-row sm:items-center sm:space-x-4 mt-2 text-sm text-slate-500 dark:text-slate-400 gap-1 sm:gap-0">
               <span className="break-words">Owner: {deal.owner}</span>
               <span className="break-words">Source: {deal.source}</span>
             </div>
@@ -205,7 +205,7 @@ export default function DealCard({
             </div>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-100  transition-opacity">
+        <div className="flex sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-100  transition-opacity">
           <div className="flex flex-wrap gap-2">
             <Dialog open={open} onOpenChange={setOpen}>
               <DropdownMenu className="relative">

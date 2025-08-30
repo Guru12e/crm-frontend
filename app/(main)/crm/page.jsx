@@ -678,7 +678,7 @@ export default function CRM() {
                   )}
                 </SelectContent>
               </Select>
-              <Select value={sourceFilter} onValueChange={setSourceFilter}>
+              {/* <Select value={sourceFilter} onValueChange={setSourceFilter}>
                 <SelectTrigger className="bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50">
                   <SelectValue placeholder="Filter by source" />
                 </SelectTrigger>
@@ -702,7 +702,7 @@ export default function CRM() {
                     </SelectItem>
                   ))}
                 </SelectContent>
-              </Select>
+              </Select> */}
             </div>
           </CardContent>
         </Card>
@@ -712,13 +712,8 @@ export default function CRM() {
             {customersData
               .filter(
                 (customer) =>
-                  (statusFilter === "All statuses" ||
-                    customer.status === statusFilter) &&
-                  (sourceFilter === "All sources" ||
-                    customer.source === sourceFilter) &&
-                  (monthFilter === "All time" ||
-                    monthFilter[new Date(customer.created_at).getMonth()] ===
-                      monthFilter)
+                  statusFilter === "All statuses" ||
+                  customer.status === statusFilter
               )
               .map((customer) => (
                 <CustomerCard
@@ -731,109 +726,41 @@ export default function CRM() {
         </TabsContent>
 
         <TabsContent value="Leads" className="space-y-6">
-          <div className="overflow-y-hidden">
-            {leadStatus
+          <div className="grid grid-cols-1  md:grid-cols-3 gap-6">
+            {leadsData
               .filter(
-                (leadState) =>
+                (lead) =>
                   statusFilter === "All statuses" ||
-                  leadState.status === statusFilter
+                  lead.status === statusFilter
               )
-              .map((leadState) => (
-                <Card
-                  key={leadState}
-                  className="mt-4 h-[35vh] relative overflow-hidden"
-                >
-                  <CardContent className="flex flex-col md:flex-row h-full p-0">
-                    <div className="w-full md:w-[15%] absolute md:left-0 top-0 md:bottom-0 bg-gray-300 dark:bg-slate-800 flex items-center text-center justify-center py-3 md:py-1 px-2 md:p-1 text-xl font-bold text-slate-800 dark:text-white z-10 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700">
-                      {leadState}
-                    </div>
-
-                    <div
-                      className="w-full md:ml-[15%] md:w-[85%] 
-                          h-[calc(35vh-40px)] md:h-full 
-                          overflow-y-auto p-2 md:p-4"
-                    >
-                      <Sheet>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-6 min-w-fit">
-                          {leadsData
-                            .filter(
-                              (lead) =>
-                                lead.status === leadState &&
-                                lead.source === sourceFilter &&
-                                monthFilter[
-                                  new Date(lead.created_at).getMonth()
-                                ] === monthFilter
-                            )
-                            .map((l) => (
-                              <LeadCard
-                                fetchLeads={fetchLeads}
-                                fetchDeals={fetchDeals}
-                                key={l.id}
-                                lead={l}
-                                setData={setLeadsData}
-                                onChange={() => {
-                                  fetchLeads();
-                                }}
-                              />
-                            ))}
-                        </div>
-                      </Sheet>
-                    </div>
-                  </CardContent>
-                </Card>
+              .map((lead) => (
+                <LeadCard
+                  key={lead.id}
+                  lead={lead}
+                  onChange={fetchLeads}
+                  fetchLeads={fetchLeads}
+                  fetchDeals={fetchDeals}
+                />
               ))}
           </div>
         </TabsContent>
 
         <TabsContent value="Deals" className="space-y-6">
-          <div className="overflow-y-hidden">
-            {dealStatus
+          <div className="grid grid-cols-1  md:grid-cols-3 gap-6">
+            {dealsData
               .filter(
-                (dealState) =>
+                (deal) =>
                   statusFilter === "All statuses" ||
-                  dealState.status === statusFilter
+                  deal.status === statusFilter
               )
-              .map((dealState) => (
-                <Card
-                  key={dealState}
-                  className="mt-4 h-[45vh] relative overflow-hidden"
-                >
-                  <CardContent className="flex flex-col md:flex-row h-full p-0">
-                    <div className="w-full md:w-[15%] absolute md:left-0 top-0 md:bottom-0 bg-gray-300 dark:bg-slate-800 flex items-center justify-center py-3 md:py-1 px-2 md:p-1 text-xl font-bold text-slate-800 dark:text-white z-10 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700">
-                      {dealState}
-                    </div>
-
-                    <div
-                      className="w-full md:ml-[15%] md:w-[85%] 
-                          h-[calc(35vh-40px)] md:h-full 
-                          overflow-y-auto p-2 md:p-4"
-                    >
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-6 min-w-fit">
-                        {dealsData
-                          .filter(
-                            (deal) =>
-                              deal.status === dealState &&
-                              deal.source === sourceFilter &&
-                              monthFilter[
-                                new Date(deal.created_at).getMonth()
-                              ] === monthFilter
-                          )
-                          .map((deal) => (
-                            <DealCard
-                              fetchDeals={fetchDeals}
-                              fetchCustomers={fetchCustomers}
-                              key={deal.id}
-                              deal={deal}
-                              onChange={() => {
-                                fetchDeals();
-                              }}
-                              session={session}
-                            />
-                          ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+              .map((deal) => (
+                <DealCard
+                  key={deal.id}
+                  deal={deal}
+                  onChange={fetchDeals}
+                  fetchDeals={fetchDeals}
+                  fetchCustomers={fetchCustomers}
+                />
               ))}
           </div>
         </TabsContent>
