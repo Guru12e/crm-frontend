@@ -18,6 +18,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Card, CardContent } from "@/components/ui/card";
+import { redirect } from "next/navigation";
 
 const ErrorMessage = ({ error }) => {
   if (!error) return null;
@@ -48,6 +49,8 @@ export default function PricingPage() {
       if (rawSession) {
         const session = JSON.parse(rawSession);
         setUserEmail(session?.user?.email || null);
+      } else {
+        redirect("/");
       }
     } catch (error) {
       console.error("Failed to parse session from localStorage:", error);

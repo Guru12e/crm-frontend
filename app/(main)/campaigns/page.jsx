@@ -23,7 +23,7 @@ import {
   DialogDescription,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 export default function Campaigns() {
   const [campaigns, setCampaigns] = useState([]);
@@ -52,6 +52,10 @@ export default function Campaigns() {
     try {
       const rawSession = localStorage.getItem("session");
       const user = localStorage.getItem("user");
+
+      if (!user) {
+        redirect("/");
+      }
       if (rawSession) {
         const session = JSON.parse(rawSession);
         setUserEmail(session?.user?.email || null);

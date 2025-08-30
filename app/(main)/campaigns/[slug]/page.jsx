@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase/client";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-dropdown-menu";
@@ -96,6 +96,8 @@ export default function CampaignDetail({ params }) {
       if (rawSession) {
         const session = JSON.parse(rawSession);
         setUserEmail(session?.user?.email || null);
+      } else {
+        redirect("/");
       }
       if (user) {
         setUser(JSON.parse(user));

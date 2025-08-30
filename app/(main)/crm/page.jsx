@@ -39,6 +39,7 @@ import {
   monthFilters,
   summaryStats,
 } from "@/constants/constant";
+import { redirect } from "next/navigation";
 
 export default function CRM() {
   const [activeTab, setActiveTab] = useState("Customers");
@@ -62,6 +63,10 @@ export default function CRM() {
       setActiveTab(sessionStorage.getItem("activeTab") || "Customers");
     };
     const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) {
+      redirect("/");
+    }
     setProducts(
       user?.products?.map((product) => ({
         value: product.name,
