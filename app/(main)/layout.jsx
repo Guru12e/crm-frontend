@@ -45,7 +45,6 @@ export default function Layout({ children }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [expandedItems, setExpandedItems] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
   const location = usePathname();
   const [alertMessage, setAlertMessage] = useState(false);
   const [user, setUser] = useState(null);
@@ -305,17 +304,7 @@ export default function Layout({ children }) {
               <Menu className="h-5 w-5" />
             </Button>
             <div className="flex-1">
-              <div className="max-w-md min-w-0 ml-2 sm:ml-0">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                  <Input
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-teal/50 dark:bg-sky-800/50 border-teal/30 dark:border-sky-700/50 text-sm w-full"
-                  />
-                </div>
-              </div>
+              <div className="max-w-md min-w-0 ml-2 sm:ml-0"></div>
             </div>
             {user &&
               (user.refresh_token == null || user.refresh_token == "") && (

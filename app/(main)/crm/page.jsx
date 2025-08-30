@@ -696,7 +696,6 @@ export default function CRM() {
                   <SelectValue placeholder="Filter by month" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="All sources">All time</SelectItem>
                   {monthFilters.map((month, index) => (
                     <SelectItem key={index} value={month}>
                       {month}
@@ -718,7 +717,8 @@ export default function CRM() {
                   (sourceFilter === "All sources" ||
                     customer.source === sourceFilter) &&
                   (monthFilter === "All time" ||
-                    customer.created_at.getMonth() === monthFilter)
+                    monthFilter[new Date(customer.created_at).getMonth()] ===
+                      monthFilter)
               )
               .map((customer) => (
                 <CustomerCard
@@ -760,7 +760,9 @@ export default function CRM() {
                               (lead) =>
                                 lead.status === leadState &&
                                 lead.source === sourceFilter &&
-                                lead.created_at.getMonth() === monthFilter
+                                monthFilter[
+                                  new Date(lead.created_at).getMonth()
+                                ] === monthFilter
                             )
                             .map((l) => (
                               <LeadCard
@@ -812,7 +814,9 @@ export default function CRM() {
                             (deal) =>
                               deal.status === dealState &&
                               deal.source === sourceFilter &&
-                              deal.created_at.getMonth() === monthFilter
+                              monthFilter[
+                                new Date(deal.created_at).getMonth()
+                              ] === monthFilter
                           )
                           .map((deal) => (
                             <DealCard

@@ -309,7 +309,7 @@ export default function Home() {
             </p>
             <p className="text-2xl font-bold text-slate-900 dark:text-white">
               {value}
-              {title.includes("rate") ? "%" : ""}
+              {title.includes("rate") || title.includes("Rate") ? "%" : ""}
             </p>
             {/* <p
               className={cn(
