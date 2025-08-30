@@ -275,7 +275,6 @@ export default function CampaignDetail({ params }) {
                       onChange={(e) =>
                         handleAudienceChange(idx, e.target.value)
                       }
-                      className="bg-gradient-to-r from-sky-700 to-teal-500 dark:from-sky-800 dark:to-teal-600 text-black dark:text-white"
                     />
 
                     <Button

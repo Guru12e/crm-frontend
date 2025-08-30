@@ -194,10 +194,10 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="min-h-screen w-full ">
       <div className="flex flex-col w-full sm:flex-row sm:justify-left sm:items-center">
         <Sheet>
-          <div className="flex justify-between items-center w-screen">
+          <div className="flex justify-between items-center max-w-screen md:w-screen">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
                 Pricing and Inventory
@@ -355,7 +355,7 @@ export default function PricingPage() {
                   <CardContent className=" h-[40vh] flex flex-col gap-2 ">
                     <div className="flex flex-col gap-2">
                       <div className="flex gap-4">
-                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
+                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh] md:w-[10vh]">
                           Name
                         </Label>
                         <Input
@@ -366,12 +366,12 @@ export default function PricingPage() {
                             updated[idx].name = e.target.value;
                             handleProductChange(updated);
                           }}
-                          className="mt-1 w-[110vh] border rounded-lg p-2  focus:ring-2 focus:ring-blue-400"
+                          className="mt-1 w-[90vh] md:w-[140vh] border rounded-lg p-2  focus:ring-2 focus:ring-blue-400"
                         />
                       </div>
 
                       <div className="flex gap-4">
-                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
+                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh] md:w-[10vh]">
                           Stock
                         </Label>
                         <Input
@@ -382,12 +382,12 @@ export default function PricingPage() {
                             updated[idx].stock = e.target.value;
                             handleProductChange(updated);
                           }}
-                          className="mt-1 w-[110vh] border rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
+                          className="mt-1 w-[90vh] md:w-[140vh] border rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
                         />
                       </div>
 
                       <div className="flex gap-4">
-                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
+                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh] md:w-[10vh]">
                           Price
                         </Label>
                         <Input
@@ -404,12 +404,12 @@ export default function PricingPage() {
                               : Number(e.target.value);
                             handleProductChange(updated);
                           }}
-                          className="mt-1 border rounded-lg p-2 w-[110vh] focus:ring-2 focus:ring-blue-400"
+                          className="mt-1 border rounded-lg p-2 w-[90vh] md:w-[140vh] focus:ring-2 focus:ring-blue-400"
                         />
                       </div>
 
                       <div className="flex gap-4">
-                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
+                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh] md:w-[10vh]">
                           Category
                         </Label>
                         <Input
@@ -420,12 +420,12 @@ export default function PricingPage() {
                             updated[idx].category = e.target.value;
                             handleProductChange(updated);
                           }}
-                          className="mt-1 border rounded-lg p-2 w-[110vh] focus:ring-2 focus:ring-blue-400"
+                          className="mt-1 border rounded-lg p-2 w-[90vh] md:w-[140vh] focus:ring-2 focus:ring-blue-400"
                         />
                       </div>
 
                       <div className="flex gap-4">
-                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
+                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh] md:w-[10vh]">
                           Description
                         </Label>
                         <Input
@@ -436,7 +436,7 @@ export default function PricingPage() {
                             updated[idx].description = e.target.value;
                             handleProductChange(updated);
                           }}
-                          className="mt-1 border rounded-lg p-2 w-[110vh] focus:ring-2 focus:ring-blue-400"
+                          className="mt-1 border rounded-lg p-2 w-[90vh] md:w-[140vh] focus:ring-2 focus:ring-blue-400"
                         />
                       </div>
 

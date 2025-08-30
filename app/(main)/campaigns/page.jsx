@@ -23,6 +23,7 @@ import {
   DialogDescription,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 export default function Campaigns() {
   const [campaigns, setCampaigns] = useState([]);
@@ -39,6 +40,7 @@ export default function Campaigns() {
   const [monthFilter, setMonthFilter] = useState("");
   const [dateFilter, setDateFilter] = useState(""); // "" = all
   const [audienceFilter, setAudienceFilter] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const storedTab = sessionStorage.getItem("campaignsTab");
@@ -632,10 +634,10 @@ export default function Campaigns() {
 
                         <div className="flex gap-2">
                           <Button
-                            href={`/campaigns/${c.name}`}
+                            onClick={() => router.push(`/campaigns/${c.name}`)}
                             className="text-sm px-3 py-1 rounded-lg border border-slate-300 dark:border-slate-600 
                       bg-transparent hover:bg-slate-200 dark:hover:bg-slate-600 text-black dark:text-white
-                       transition-colors"
+                       transition-colors cursor-pointer"
                           >
                             Edit
                           </Button>
