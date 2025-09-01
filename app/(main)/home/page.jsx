@@ -127,7 +127,7 @@ export default function Home() {
   ).length;
 
   const onboardingData = {
-    rate: round((QualifiedLeads / leads.length) * 100, 2),
+    rate: round((QualifiedLeads / leads.length) * 100, 2) || 0,
     change: +12,
   };
 
@@ -145,33 +145,37 @@ export default function Home() {
     {
       name: "New",
       value: deals.filter((deal) => deal.status === "New").length,
-      rate: round(
-        (deals.filter((deal) => deal.status === "New").length / deals.length) *
-          100,
-        2
-      ),
+      rate:
+        round(
+          (deals.filter((deal) => deal.status === "New").length /
+            deals.length) *
+            100,
+          2
+        ) || 0,
       color: "bg-red-500",
     },
     {
       name: "Proposal Sent",
       value: deals.filter((deal) => deal.status === "Proposal Sent").length,
-      rate: round(
-        (deals.filter((deal) => deal.status === "Proposal Sent").length /
-          deals.length) *
-          100,
-        2
-      ),
+      rate:
+        round(
+          (deals.filter((deal) => deal.status === "Proposal Sent").length /
+            deals.length) *
+            100,
+          2
+        ) || 0,
       color: "bg-yellow-500",
     },
     {
       name: "Negotiation",
       value: deals.filter((deal) => deal.status === "Negotiation").length,
-      rate: round(
-        (deals.filter((deal) => deal.status === "Negotiation").length /
-          deals.length) *
-          100,
-        2
-      ),
+      rate:
+        round(
+          (deals.filter((deal) => deal.status === "Negotiation").length /
+            deals.length) *
+            100,
+          2
+        ) || 0,
       color: "bg-blue-500",
     },
     {
@@ -188,45 +192,49 @@ export default function Home() {
     {
       name: "Closed Lost",
       value: deals.filter((deal) => deal.status === "Closed-lost").length,
-      rate: round(
-        (deals.filter((deal) => deal.status === "Closed-lost").length /
-          deals.length) *
-          100,
-        2
-      ),
+      rate:
+        round(
+          (deals.filter((deal) => deal.status === "Closed-lost").length /
+            deals.length) *
+            100,
+          2
+        ) || 0,
       color: "bg-gray-500",
     },
     {
       name: "Meeting Booked",
       value: deals.filter((deal) => deal.status === "Meeting Booked").length,
-      rate: round(
-        (deals.filter((deal) => deal.status === "Meeting Booked").length /
-          deals.length) *
-          100,
-        2
-      ),
+      rate:
+        round(
+          (deals.filter((deal) => deal.status === "Meeting Booked").length /
+            deals.length) *
+            100,
+          2
+        ) || 0,
       color: "bg-purple-500",
     },
     {
       name: "On Hold",
       value: deals.filter((deal) => deal.status === "On-hold").length,
-      rate: round(
-        (deals.filter((deal) => deal.status === "On-hold").length /
-          deals.length) *
-          100,
-        2
-      ),
+      rate:
+        round(
+          (deals.filter((deal) => deal.status === "On-hold").length /
+            deals.length) *
+            100,
+          2
+        ) || 0,
       color: "bg-pink-500",
     },
     {
       name: "Abandoned",
       value: deals.filter((deal) => deal.status === "Abandoned").length,
-      rate: round(
-        (deals.filter((deal) => deal.status === "Abandoned").length /
-          deals.length) *
-          100,
-        2
-      ),
+      rate:
+        round(
+          (deals.filter((deal) => deal.status === "Abandoned").length /
+            deals.length) *
+            100,
+          2
+        ) || 0,
       color: "bg-orange-500",
     },
   ];
@@ -246,7 +254,7 @@ export default function Home() {
     // },
     {
       name: "External referral",
-      value: leads.filter((c) => c.source === "External referral").length,
+      value: leads.filter((c) => c.source === "External referral").length || 0,
     },
     // {
     //   name: "Sales email alias",
@@ -254,11 +262,11 @@ export default function Home() {
     // },
     {
       name: "Chat",
-      value: leads.filter((c) => c.source === "Chat").length,
+      value: leads.filter((c) => c.source === "Chat").length || 0,
     },
     {
       name: "Facebook",
-      value: leads.filter((c) => c.source === "Facebook").length,
+      value: leads.filter((c) => c.source === "Facebook").length || 0,
     },
     // {
     //   name: "Web Research",
@@ -266,11 +274,11 @@ export default function Home() {
     // },
     {
       name: "X(Twitter)",
-      value: leads.filter((c) => c.source === "X(Twitter)").length,
+      value: leads.filter((c) => c.source === "X(Twitter)").length || 0,
     },
     {
       name: "Public relations",
-      value: leads.filter((c) => c.source === "Public relations").length,
+      value: leads.filter((c) => c.source === "Public relations").length || 0,
     },
   ];
 
