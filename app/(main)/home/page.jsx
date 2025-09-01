@@ -1,9 +1,8 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   TrendingUp,
   Users,
@@ -11,8 +10,6 @@ import {
   Calendar,
   Phone,
   DollarSign,
-  BarChart3,
-  PieChart,
   ToggleLeft,
   ToggleRight,
 } from "lucide-react";
@@ -48,20 +45,20 @@ export default function Home() {
   const [customers, setCustomers] = useState([]);
   const [userEmail, setUserEmail] = useState("");
   const [userName, setUserName] = useState("");
-  const [session, setSession] = useState(null);
+
   useEffect(() => {
     const getSession = () => {
       const sessionJSON = JSON.parse(localStorage.getItem("session"));
       if (sessionJSON == null) {
         redirect("/");
       }
-      setSession(sessionJSON);
       setUserEmail(sessionJSON.user.email);
       setUserName(JSON.parse(localStorage.getItem("user")).name);
     };
 
     getSession();
-  }, [session]);
+  }, []);
+
   const fetchCustomers = async () => {
     const { data: customersData } = await supabase
       .from("Customers")
@@ -113,6 +110,7 @@ export default function Home() {
       fetchLeads();
       fetchDeals();
     }, 60000);
+
     return () => clearInterval(intervalId);
   }, [userEmail]);
 
@@ -121,9 +119,10 @@ export default function Home() {
   ).length;
 
   const onboardingData = {
-    rate: leads?.length
-      ? round(((QualifiedLeads || 0) / leads.length) * 100, 2)
-      : 0,
+    rate:
+      leads?.length != 0
+        ? round(((QualifiedLeads || 0) / leads.length) * 100, 2)
+        : 0,
     change: 12,
   };
 

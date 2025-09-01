@@ -532,10 +532,10 @@ export default function CRM() {
         </div>
 
         <Sheet>
-          <SheetTrigger>
-            <div className="bg-gradient-to-r px-3 py-2 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white w-full md:ml-5">
+          <SheetTrigger asChild>
+            <Button className="bg-gradient-to-r px-3 py-2 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white md:ml-5">
               Add New {activeTab}
-            </div>
+            </Button>
           </SheetTrigger>
           <SheetContent>
             <SheetHeader>

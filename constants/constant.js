@@ -1,3 +1,5 @@
+import { Database, Home, Megaphone, Send, Users } from "lucide-react";
+
 export const analyticsData = {
   overview: {
     totalRevenue: 2340000,
@@ -219,4 +221,20 @@ export const monthFilters = [
   "October",
   "November",
   "December",
+];
+
+export const navigation = [
+  { name: "Home", href: "/home", icon: <Home /> },
+  {
+    name: "Prospects",
+    href: "/prospects",
+    icon: <Users />,
+    // subpages: [{ name: "Our Prospects", href: "/prospects/our-prospects" }],
+  },
+  // { name: "Engagement", href: "/engagement", icon: MessageSquare },
+  { name: "CRM", href: "/crm", icon: <Database /> },
+  { name: "Pricing", href: "/pricing", icon: <Send /> },
+  { name: "Campaigns", href: "/campaigns", icon: <Megaphone /> },
+  // { name: "Calendar", href: "/calendar", icon: Calendar },
+  // { name: "Analytics", href: "/analytics", icon: BarChart3 },
 ];

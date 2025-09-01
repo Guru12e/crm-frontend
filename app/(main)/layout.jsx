@@ -2,44 +2,23 @@
 
 import { useEffect, useState } from "react";
 import {
-  Home,
-  Users,
-  Database,
-  Send,
-  Megaphone,
   ChevronDown,
   ChevronRight,
   Menu,
   Sun,
   Moon,
-  Search,
   HelpCircle,
   Bot,
   AlertTriangleIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import UserButton from "@/components/UserButton";
 import { Label } from "@/components/ui/label";
+import { navigation } from "@/constants/constant";
 
-const navigation = [
-  { name: "Home", href: "/home", icon: Home },
-  {
-    name: "Prospects",
-    href: "/prospects",
-    icon: Users,
-    // subpages: [{ name: "Our Prospects", href: "/prospects/our-prospects" }],
-  },
-  // { name: "Engagement", href: "/engagement", icon: MessageSquare },
-  { name: "CRM", href: "/crm", icon: Database },
-  { name: "Pricing", href: "/pricing", icon: Send },
-  { name: "Campaigns", href: "/campaigns", icon: Megaphone },
-  // { name: "Calendar", href: "/calendar", icon: Calendar },
-  // { name: "Analytics", href: "/analytics", icon: BarChart3 },
-];
 export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -71,6 +50,7 @@ export default function Layout({ children }) {
     if (item.subpages && item.subpages.length > 0) {
       toggleExpanded(item.name);
     }
+    setMobileSidebarOpen(false);
   };
 
   const toggleTheme = () => {
@@ -119,8 +99,6 @@ export default function Layout({ children }) {
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigation.map((item) => {
               const isActive = item.href === location;
-              const hasSubpages = item.subpages && item.subpages.length > 0;
-              const isExpanded = expandedItems.includes(item.name);
 
               return (
                 <div key={item.name}>
@@ -136,25 +114,24 @@ export default function Layout({ children }) {
                     <Link
                       href={item.href}
                       className="group flex flex-1 items-center"
-                      onClick={(e) => {
-                        if (hasSubpages) {
-                          e.preventDefault();
-                        }
-                      }}
                     >
-                      <item.icon
+                      <div
                         className={cn(
                           "h-5 w-5 flex-shrink-0",
-                          isActive ? "text-white " : "text-slate-500"
+                          isActive
+                            ? "text-blue-600 dark:text-blue-400"
+                            : "text-slate-500"
                         )}
-                      />
+                      >
+                        {item.icon}
+                      </div>
                       {sidebarOpen && (
                         <span className="ml-3 truncate max-sm:hidden">
                           {item.name}
                         </span>
                       )}
                     </Link>
-                    {hasSubpages && sidebarOpen && (
+                    {/* {hasSubpages && sidebarOpen && (
                       <div className="p-1 max-sm:hidden">
                         {isExpanded ? (
                           <ChevronDown className="h-4 w-4" />
@@ -162,10 +139,10 @@ export default function Layout({ children }) {
                           <ChevronRight className="h-4 w-4" />
                         )}
                       </div>
-                    )}
+                    )} */}
                   </div>
 
-                  {hasSubpages && isExpanded && sidebarOpen && (
+                  {/* {hasSubpages && isExpanded && sidebarOpen && (
                     <div className="ml-8 mt-1 space-y-1 max-sm:hidden">
                       {item.subpages.map((subpage) => (
                         <Link
@@ -182,7 +159,7 @@ export default function Layout({ children }) {
                         </Link>
                       ))}
                     </div>
-                  )}
+                  )} */}
                 </div>
               );
             })}
@@ -196,7 +173,7 @@ export default function Layout({ children }) {
           mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex h-full flex-col backdrop-blur-xl bg-white/40 dark:bg-sky-900/90 border-r border-white/30 dark:border-slate-700/50">
+        <div className="flex h-full flex-col backdrop-blur-xl bg-white dark:bg-sky-900/90 border-r border-white/30 dark:border-slate-700/50">
           <div className="flex h-16 items-center justify-between px-4">
             <span className="text-xl font-bold bg-gradient-to-r from-sky-700 to-teal-500 dark:from-teal-200 dark:to-sky-300 bg-clip-text text-transparent">
               GTM Engine
@@ -214,8 +191,8 @@ export default function Layout({ children }) {
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigation.map((item) => {
               const isActive = location === item.href;
-              const hasSubpages = item.subpages && item.subpages.length > 0;
-              const isExpanded = expandedItems.includes(item.name);
+              // const hasSubpages = item.subpages && item.subpages.length > 0;
+              // const isExpanded = expandedItems.includes(item.name);
 
               return (
                 <div key={item.name}>
@@ -231,25 +208,20 @@ export default function Layout({ children }) {
                     <Link
                       href={item.href}
                       className="group flex flex-1 items-center"
-                      onClick={(e) => {
-                        if (hasSubpages) {
-                          e.preventDefault();
-                        } else {
-                          setMobileSidebarOpen(false);
-                        }
-                      }}
                     >
-                      <item.icon
+                      <div
                         className={cn(
                           "h-5 w-5 flex-shrink-0",
                           isActive
                             ? "text-blue-600 dark:text-blue-400"
                             : "text-slate-500"
                         )}
-                      />
+                      >
+                        {item.icon}
+                      </div>
                       <span className="ml-3 truncate">{item.name}</span>
                     </Link>
-                    {hasSubpages && (
+                    {/* {hasSubpages && (
                       <div className="p-1">
                         {isExpanded ? (
                           <ChevronDown className="h-4 w-4" />
@@ -257,10 +229,10 @@ export default function Layout({ children }) {
                           <ChevronRight className="h-4 w-4" />
                         )}
                       </div>
-                    )}
+                    )} */}
                   </div>
 
-                  {hasSubpages && isExpanded && (
+                  {/* {hasSubpages && isExpanded && (
                     <div className="ml-8 mt-1 space-y-1">
                       {item.subpages.map((subpage) => (
                         <Link
@@ -278,7 +250,7 @@ export default function Layout({ children }) {
                         </Link>
                       ))}
                     </div>
-                  )}
+                  )} */}
                 </div>
               );
             })}
