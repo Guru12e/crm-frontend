@@ -57,17 +57,11 @@ export default function Home() {
       }
       setSession(sessionJSON);
       setUserEmail(sessionJSON.user.email);
-      setUserName(
-        sessionJSON.user.name
-          .replace(/([A-Z])/g, " $1")
-          .split(" ")
-          .map((w) => w[0].toUpperCase() + w.slice(1))
-          .join(" ")
-      );
+      setUserName(JSON.parse(localStorage.getItem("user")).name);
     };
 
     getSession();
-  }, []);
+  }, [session]);
   const fetchCustomers = async () => {
     const { data: customersData } = await supabase
       .from("Customers")
