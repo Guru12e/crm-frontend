@@ -80,131 +80,131 @@ export default function OnBoardingForm({ session }) {
     let isValid = true;
     const newErrors = { ...errors };
 
-    if (sectionId === 1) {
-      if (!formData.name.trim()) {
-        newErrors.name = "Name is required";
-        isValid = false;
-      } else {
-        newErrors.name = "";
-      }
+    // if (sectionId === 1) {
+    //   if (!formData.name.trim()) {
+    //     newErrors.name = "Name is required";
+    //     isValid = false;
+    //   } else {
+    //     newErrors.name = "";
+    //   }
 
-      if (!formData.email.trim()) {
-        newErrors.email = "Email is required";
-        isValid = false;
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-        newErrors.email = "Invalid email format";
-        isValid = false;
-      } else {
-        newErrors.email = "";
-      }
+    //   if (!formData.email.trim()) {
+    //     newErrors.email = "Email is required";
+    //     isValid = false;
+    //   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    //     newErrors.email = "Invalid email format";
+    //     isValid = false;
+    //   } else {
+    //     newErrors.email = "";
+    //   }
 
-      if (!formData.role) {
-        newErrors.role = "Role is required";
-        isValid = false;
-      } else {
-        newErrors.role = "";
-      }
+    //   if (!formData.role) {
+    //     newErrors.role = "Role is required";
+    //     isValid = false;
+    //   } else {
+    //     newErrors.role = "";
+    //   }
 
-      if (!formData.phone.trim()) {
-        newErrors.phone = "Phone number is required";
-        isValid = false;
-      } else if (!/^\+?[\d\s-]{10,}$/.test(formData.phone)) {
-        newErrors.phone = "Invalid phone number format";
-        isValid = false;
-      } else {
-        newErrors.phone = "";
-      }
+    //   if (!formData.phone.trim()) {
+    //     newErrors.phone = "Phone number is required";
+    //     isValid = false;
+    //   } else if (!/^\+?[\d\s-]{10,}$/.test(formData.phone)) {
+    //     newErrors.phone = "Invalid phone number format";
+    //     isValid = false;
+    //   } else {
+    //     newErrors.phone = "";
+    //   }
 
-      if (!formData.companyName.trim()) {
-        newErrors.companyName = "Company name is required";
-        isValid = false;
-      } else {
-        newErrors.companyName = "";
-      }
+    //   if (!formData.companyName.trim()) {
+    //     newErrors.companyName = "Company name is required";
+    //     isValid = false;
+    //   } else {
+    //     newErrors.companyName = "";
+    //   }
 
-      if (!formData.companyWebsite.trim()) {
-        newErrors.companyWebsite = "Website is required";
-        isValid = false;
-      } else if (
-        !/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(formData.companyWebsite)
-      ) {
-        newErrors.companyWebsite = "Invalid URL format";
-        isValid = false;
-      } else {
-        newErrors.companyWebsite = "";
-      }
-    }
+    //   if (!formData.companyWebsite.trim()) {
+    //     newErrors.companyWebsite = "Website is required";
+    //     isValid = false;
+    //   } else if (
+    //     !/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(formData.companyWebsite)
+    //   ) {
+    //     newErrors.companyWebsite = "Invalid URL format";
+    //     isValid = false;
+    //   } else {
+    //     newErrors.companyWebsite = "";
+    //   }
+    // }
 
-    if (sectionId === 2) {
-      if (!formData.companyDescription.trim()) {
-        newErrors.companyDescription = "Company description is required";
-        isValid = false;
-      } else {
-        newErrors.companyDescription = "";
-      }
+    // if (sectionId === 2) {
+    //   if (!formData.companyDescription.trim()) {
+    //     newErrors.companyDescription = "Company description is required";
+    //     isValid = false;
+    //   } else {
+    //     newErrors.companyDescription = "";
+    //   }
 
-      if (!formData.industry) {
-        newErrors.industry = "Industry is required";
-        isValid = false;
-      } else {
-        newErrors.industry = "";
-      }
+    //   if (!formData.industry) {
+    //     newErrors.industry = "Industry is required";
+    //     isValid = false;
+    //   } else {
+    //     newErrors.industry = "";
+    //   }
 
-      if (!formData.companySize) {
-        newErrors.companySize = "Company size is required";
-        isValid = false;
-      } else {
-        newErrors.companySize = "";
-      }
-    }
+    //   if (!formData.companySize) {
+    //     newErrors.companySize = "Company size is required";
+    //     isValid = false;
+    //   } else {
+    //     newErrors.companySize = "";
+    //   }
+    // }
 
-    if (sectionId === 3) {
-      if (formData.products.length === 0) {
-        newErrors.newProduct.name = "At least one product is required";
-        isValid = false;
-      } else {
-        newErrors.newProduct.name = "";
-      }
+    // if (sectionId === 3) {
+    //   if (formData.products.length === 0) {
+    //     newErrors.newProduct.name = "At least one product is required";
+    //     isValid = false;
+    //   } else {
+    //     newErrors.newProduct.name = "";
+    //   }
 
-      if (
-        newProduct.name ||
-        newProduct.description ||
-        newProduct.category ||
-        newProduct.price
-      ) {
-        if (!newProduct.name.trim()) {
-          newErrors.newProduct.name = "Product name is required";
-          isValid = false;
-        } else {
-          newErrors.newProduct.name = "";
-        }
+    //   if (
+    //     newProduct.name ||
+    //     newProduct.description ||
+    //     newProduct.category ||
+    //     newProduct.price
+    //   ) {
+    //     if (!newProduct.name.trim()) {
+    //       newErrors.newProduct.name = "Product name is required";
+    //       isValid = false;
+    //     } else {
+    //       newErrors.newProduct.name = "";
+    //     }
 
-        if (!newProduct.description.trim()) {
-          newErrors.newProduct.description = "Description is required";
-          isValid = false;
-        } else {
-          newErrors.newProduct.description = "";
-        }
+    //     if (!newProduct.description.trim()) {
+    //       newErrors.newProduct.description = "Description is required";
+    //       isValid = false;
+    //     } else {
+    //       newErrors.newProduct.description = "";
+    //     }
 
-        if (!newProduct.category.trim()) {
-          newErrors.newProduct.category = "Category is required";
-          isValid = false;
-        } else {
-          newErrors.newProduct.category = "";
-        }
+    //     if (!newProduct.category.trim()) {
+    //       newErrors.newProduct.category = "Category is required";
+    //       isValid = false;
+    //     } else {
+    //       newErrors.newProduct.category = "";
+    //     }
 
-        if (
-          newProduct.price &&
-          !/^\$?\d+(\.\d{2})?(\/month)?$/.test(newProduct.price)
-        ) {
-          newErrors.newProduct.price =
-            "Invalid price format (e.g., $99, $99.00, or $99/month)";
-          isValid = false;
-        } else {
-          newErrors.newProduct.price = "";
-        }
-      }
-    }
+    //     if (
+    //       newProduct.price &&
+    //       !/^\$?\d+(\.\d{2})?(\/month)?$/.test(newProduct.price)
+    //     ) {
+    //       newErrors.newProduct.price =
+    //         "Invalid price format (e.g., $99, $99.00, or $99/month)";
+    //       isValid = false;
+    //     } else {
+    //       newErrors.newProduct.price = "";
+    //     }
+    //   }
+    // }
 
     setErrors(newErrors);
     return isValid;
