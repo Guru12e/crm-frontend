@@ -127,8 +127,10 @@ export default function Home() {
   ).length;
 
   const onboardingData = {
-    rate: round((QualifiedLeads / leads.length) * 100, 2) || 0,
-    change: +12,
+    rate: leads?.length
+      ? round(((QualifiedLeads || 0) / leads.length) * 100, 2)
+      : 0,
+    change: 12,
   };
 
   const customerEmails = new Set(customers.map((c) => c.email));
@@ -141,146 +143,45 @@ export default function Home() {
   const dealsWon = deals.filter((deal) => deal.status === "Closed-won").length;
   const dealsData = { won: dealsWon, change: +15 };
 
-  const dealClassification = [
-    {
-      name: "New",
-      value: deals.filter((deal) => deal.status === "New").length,
-      rate:
-        round(
-          (deals.filter((deal) => deal.status === "New").length /
-            deals.length) *
-            100,
-          2
-        ) || 0,
-      color: "bg-red-500",
-    },
-    {
-      name: "Proposal Sent",
-      value: deals.filter((deal) => deal.status === "Proposal Sent").length,
-      rate:
-        round(
-          (deals.filter((deal) => deal.status === "Proposal Sent").length /
-            deals.length) *
-            100,
-          2
-        ) || 0,
-      color: "bg-yellow-500",
-    },
-    {
-      name: "Negotiation",
-      value: deals.filter((deal) => deal.status === "Negotiation").length,
-      rate:
-        round(
-          (deals.filter((deal) => deal.status === "Negotiation").length /
-            deals.length) *
-            100,
-          2
-        ) || 0,
-      color: "bg-blue-500",
-    },
-    {
-      name: "Closed Won",
-      value: deals.filter((deal) => deal.status === "Closed-won").length,
-      rate: round(
-        (deals.filter((deal) => deal.status === "Closed-won").length /
-          deals.length) *
-          100,
-        2
-      ),
-      color: "bg-green-500",
-    },
-    {
-      name: "Closed Lost",
-      value: deals.filter((deal) => deal.status === "Closed-lost").length,
-      rate:
-        round(
-          (deals.filter((deal) => deal.status === "Closed-lost").length /
-            deals.length) *
-            100,
-          2
-        ) || 0,
-      color: "bg-gray-500",
-    },
+  const totalDeals = deals?.length || 0;
+
+  const dealStatuses = [
+    { name: "New", status: "New", color: "bg-red-500" },
+    { name: "Proposal Sent", status: "Proposal Sent", color: "bg-yellow-500" },
+    { name: "Negotiation", status: "Negotiation", color: "bg-blue-500" },
+    { name: "Closed Won", status: "Closed-won", color: "bg-green-500" },
+    { name: "Closed Lost", status: "Closed-lost", color: "bg-gray-500" },
     {
       name: "Meeting Booked",
-      value: deals.filter((deal) => deal.status === "Meeting Booked").length,
-      rate:
-        round(
-          (deals.filter((deal) => deal.status === "Meeting Booked").length /
-            deals.length) *
-            100,
-          2
-        ) || 0,
+      status: "Meeting Booked",
       color: "bg-purple-500",
     },
-    {
-      name: "On Hold",
-      value: deals.filter((deal) => deal.status === "On-hold").length,
-      rate:
-        round(
-          (deals.filter((deal) => deal.status === "On-hold").length /
-            deals.length) *
-            100,
-          2
-        ) || 0,
-      color: "bg-pink-500",
-    },
-    {
-      name: "Abandoned",
-      value: deals.filter((deal) => deal.status === "Abandoned").length,
-      rate:
-        round(
-          (deals.filter((deal) => deal.status === "Abandoned").length /
-            deals.length) *
-            100,
-          2
-        ) || 0,
-      color: "bg-orange-500",
-    },
+    { name: "On Hold", status: "On-hold", color: "bg-pink-500" },
+    { name: "Abandoned", status: "Abandoned", color: "bg-orange-500" },
   ];
 
+  const dealClassification = dealStatuses.map(({ name, status, color }) => {
+    const value = deals.filter((deal) => deal.status === status).length;
+    const rate = totalDeals > 0 ? round((value / totalDeals) * 100, 2) : 0;
+
+    return { name, value, rate, color };
+  });
+
+  const sourceCount = leads?.reduce((acc, { source }) => {
+    acc[source] = (acc[source] || 0) + 1;
+    return acc;
+  }, {});
+
   const leadSources = [
-    // {
-    //   name: "Advertisement",
-    //   value: leads.filter((c) => c.source === "Advertisement").length,
-    // },
-    // {
-    //   name: "Cold call",
-    //   value: leads.filter((c) => c.source === "Cold call").length,
-    // },
-    // {
-    //   name: "Employee referral",
-    //   value: leads.filter((c) => c.source === "Employee referral").length,
-    // },
-    {
-      name: "External referral",
-      value: leads.filter((c) => c.source === "External referral").length || 0,
-    },
-    // {
-    //   name: "Sales email alias",
-    //   value: leads.filter((c) => c.source === "Sales email alias").length,
-    // },
-    {
-      name: "Chat",
-      value: leads.filter((c) => c.source === "Chat").length || 0,
-    },
-    {
-      name: "Facebook",
-      value: leads.filter((c) => c.source === "Facebook").length || 0,
-    },
-    // {
-    //   name: "Web Research",
-    //   value: leads.filter((c) => c.source === "Web Research").length,
-    // },
-    {
-      name: "X(Twitter)",
-      value: leads.filter((c) => c.source === "X(Twitter)").length || 0,
-    },
-    {
-      name: "Public relations",
-      value: leads.filter((c) => c.source === "Public relations").length || 0,
-    },
-  ];
+    "External referral",
+    "Chat",
+    "Facebook",
+    "X(Twitter)",
+    "Public relations",
+  ].map((name) => ({
+    name,
+    value: sourceCount?.[name] || 0,
+  }));
 
   const revenueData = [
     { month: "Jan", revenue: 45000, deals: 12 },
