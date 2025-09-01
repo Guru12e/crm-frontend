@@ -293,10 +293,10 @@ export default function Campaigns() {
     }
   };
   const filterByMonth = (campaign) => {
-    if (!monthFilter) return true; // no filter applied
+    if (!monthFilter) return true;
 
-    const campaignMonth = new Date(campaign.created_at).getMonth() + 1; // 1-12
-    const filterMonth = parseInt(monthFilter, 10); // ensure numeric
+    const campaignMonth = new Date(campaign.created_at).getMonth() + 1;
+    const filterMonth = parseInt(monthFilter, 10);
 
     return campaignMonth === filterMonth;
   };
@@ -352,11 +352,11 @@ export default function Campaigns() {
   if (loading) return <p className="p-6">Loading...</p>;
 
   return (
-    <div className="min-h-screen rounded-lg">
-      <div className="flex flex-col sm:flex-row sm:justify-left sm:items-center">
+    <div className="min-h-screen w-full rounded-lg">
+      <div className="flex flex-row justify-left items-center">
         <Sheet>
-          <div className="flex justify-between items-center w-screen">
-            <div>
+          <div className="flex w-full flex-col items-stretch md:flex-row gap-4 justify-between md:items-center relative">
+            <div className="flex-1 w-full">
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
                 Campaigns
               </h1>
@@ -365,7 +365,7 @@ export default function Campaigns() {
               </p>
             </div>
             <SheetTrigger asChild>
-              <Button className="bg-gradient-to-r px-3 py-2 rounded-xl from-teal-500 to-sky-500 hover:from-teal-600 hover:to-sky-600 text-white ">
+              <Button className="bg-gradient-to-r max-sm:w-full px-3 py-2 rounded-xl from-teal-500 to-sky-500 hover:from-teal-600 hover:to-sky-600 text-white ">
                 Create Campaign
               </Button>
             </SheetTrigger>
@@ -543,7 +543,6 @@ export default function Campaigns() {
       <div className="mt-10">
         <Card className="mb-6 shadow-sm rounded-2xl bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 p-5">
           <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-            {/* Search Input */}
             <input
               type="text"
               placeholder="Search campaigns..."
@@ -551,7 +550,6 @@ export default function Campaigns() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="border rounded-lg px-3 py-2 w-full sm:w-1/2 focus:ring-2 focus:ring-sky-500 dark:bg-slate-900 dark:text-white"
             />
-            {/* Month Filter */}
             <select
               value={monthFilter}
               onChange={(e) => setMonthFilter(e.target.value)}
@@ -582,7 +580,6 @@ export default function Campaigns() {
               <option value="lastMonth">Last 1 month</option>
               <option value="lastYear">Last 1 year</option>
             </select>
-            {/* Audience Filter */}
             <select
               value={audienceFilter}
               onChange={(e) => setAudienceFilter(e.target.value)}
@@ -616,13 +613,11 @@ export default function Campaigns() {
             }}
             className="w-full"
           >
-            {/* Tab Header */}
             <TabsList className="mb-1 w-full">
               <TabsTrigger value="Saved">Saved Campaigns</TabsTrigger>
               <TabsTrigger value="Sent">Sent Campaigns</TabsTrigger>
             </TabsList>
 
-            {/* Saved Campaigns */}
             <TabsContent value="Saved">
               <div className="grid grid-cols-1 gap-6 p-6">
                 {filteredSaved.map((c) => (
@@ -631,7 +626,7 @@ export default function Campaigns() {
                     className="shadow-sm rounded-2xl border transition-all duration-200 hover:shadow-lg bg-white/70 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20 h-full"
                   >
                     <CardContent className="p flex flex-col h-full">
-                      <div className="flex justify-between items-start mb-3">
+                      <div className="flex flex-col md:flex-row gap-3 justify-between items-start mb-3">
                         <h3 className="font-semibold text-xl text-gray-900 dark:text-white">
                           {c.name}
                         </h3>
@@ -709,8 +704,6 @@ export default function Campaigns() {
                 ))}
               </div>
             </TabsContent>
-
-            {/* Sent Campaigns */}
             <TabsContent value="Sent">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredSent.map((c) => (

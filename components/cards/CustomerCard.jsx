@@ -43,13 +43,15 @@ export default function CustomerCard({ customer, onChange }) {
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 w-full">
-                <SheetTrigger as Child>
-                  <h3 className="text-base sm:text-lg cursor-pointer text-start font-semibold text-slate-900 dark:text-white break-words">
-                    {customer.name}
-                  </h3>
-                  <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 break-words">
-                    {customer.email}
-                  </p>
+                <SheetTrigger asChild>
+                  <div>
+                    <h3 className="text-base sm:text-lg cursor-pointer text-start font-semibold text-slate-900 dark:text-white break-words">
+                      {customer.name}
+                    </h3>
+                    <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 break-words">
+                      {customer.email}
+                    </p>
+                  </div>
                 </SheetTrigger>
                 <div className="flex flex-row sm:items-center sm:space-x-4 mt-2 text-sm text-slate-500 dark:text-slate-400 gap-1 sm:gap-0">
                   <div className="flex items-center">
@@ -85,7 +87,7 @@ export default function CustomerCard({ customer, onChange }) {
               </div>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+          <div className="flex flex-col items-start mt-4 gap-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
             <div className="gap-6 flex justify-between">
               <div>
                 <Dialog>
@@ -97,7 +99,7 @@ export default function CustomerCard({ customer, onChange }) {
                       onClick={() => setEmail(true)}
                     >
                       <Mail className="h-4 w-4 mr-1" />
-                      Email
+                      <span className="hidden md:block">Email</span>
                     </Button>
                   </DialogTrigger>
 
@@ -117,7 +119,7 @@ export default function CustomerCard({ customer, onChange }) {
                   className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
                 >
                   <Phone className="h-4 w-4 mr-1" />
-                  Call
+                  <span className="hidden md:block">Call</span>
                 </Button>
               </div>
               <div>
@@ -128,7 +130,7 @@ export default function CustomerCard({ customer, onChange }) {
                     className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
                   >
                     <Eye className="h-4 w-4" />
-                    View Details
+                    <span className="hidden md:block">View </span>Details
                   </Button>
                 </SheetTrigger>
               </div>
@@ -141,7 +143,7 @@ export default function CustomerCard({ customer, onChange }) {
                       className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
                     >
                       <Trash2 className="h-4 w-4" />
-                      Delete
+                      <span className="hidden md:block">Delete</span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent>

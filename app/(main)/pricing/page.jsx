@@ -197,10 +197,10 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen w-full ">
+    <div className="min-h-screen w-full">
       <div className="flex flex-col w-full sm:flex-row sm:justify-left sm:items-center">
         <Sheet>
-          <div className="flex justify-between items-center max-w-screen md:w-screen">
+          <div className="flex flex-col md:flex-row gap-3 items-stretch justify-between md:items-center max-w-screen md:w-screen">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
                 Pricing and Inventory

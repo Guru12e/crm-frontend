@@ -636,19 +636,19 @@ export default function CRM() {
           </TabsTrigger>
         </TabsList>
 
-        <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+        <Card className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
           <CardContent>
-            <div className="flex justify-between items-center h-auto">
-              <div className="relative">
+            <div className="flex w-full gap-5 flex-col md:flex-row justify-between items-center h-auto">
+              <div className="relative w-full">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
                 <Input
                   placeholder="Search..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-[60vh] bg-white dark:bg-slate-800/50 border-black/20 dark:border-slate-700/50"
+                  className="pl-10 max-w-[60vh] bg-white dark:bg-slate-800/50 border-black/20 dark:border-slate-700/50"
                 />
               </div>
-              <div className="flex justify-end">
+              <div className="flex w-full justify-end">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className="bg-white dark:bg-slate-800/50 border-black/20 cursor-pointer dark:border-slate-700/50">
                     <SelectValue placeholder="Filter by status" />
