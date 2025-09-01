@@ -573,7 +573,7 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+        {/* <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center">
               <BarChart3 className="w-5 h-5 mr-2" />
@@ -597,7 +597,7 @@ export default function Home() {
               </div>
             )}
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
