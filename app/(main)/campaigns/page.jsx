@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Tabs } from "@radix-ui/react-tabs";
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -38,7 +38,8 @@ export default function Campaigns() {
   const [campaignsTab, setCampaignsTab] = useState("Saved");
   const [searchTerm, setSearchTerm] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
-  const [dateFilter, setDateFilter] = useState(""); // "" = all
+  const [dateFilter, setDateFilter] = useState("");
+  const [show, setShow] = useState(-1);
   const [audienceFilter, setAudienceFilter] = useState("");
   const router = useRouter();
 
@@ -624,14 +625,48 @@ export default function Campaigns() {
                   <Card
                     key={c.id}
                     className="shadow-sm rounded-2xl border transition-all duration-200 hover:shadow-lg bg-white/70 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20 h-full"
+                    onMouseEnter={() => {
+                      setShow(c.id);
+                    }}
+                    onMouseLeave={() => {
+                      setShow(-1);
+                    }}
                   >
                     <CardContent className="p flex flex-col h-full">
-                      <div className="flex flex-col md:flex-row gap-3 justify-between items-start mb-3">
-                        <h3 className="font-semibold text-xl text-gray-900 dark:text-white">
-                          {c.name}
-                        </h3>
+                      <h3 className="font-semibold text-xl text-gray-900 dark:text-white">
+                        {c.name}
+                      </h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+                        {c.subject}
+                      </p>
 
-                        <div className="flex gap-2">
+                      <p className="text-sm text-slate-900 dark:text-white line-clamp-3 flex-grow leading-relaxed mb-3">
+                        {c.body.length > 50
+                          ? `${c.body.slice(0, 50)}...`
+                          : c.body}
+                      </p>
+
+                      <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 mt-auto pt-3 border-t border-slate-200 dark:border-slate-700">
+                        <span>
+                          {c.audience?.length > 0
+                            ? `${c.audience.length} recipients`
+                            : "No recipients"}
+                        </span>
+                        <span>
+                          Last edited:{" "}
+                          {new Date(
+                            c.updated_at || c.created_at
+                          ).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex gap-2">
+                      <div
+                        className={`flex flex-col w-full md:flex-row gap-3 justify-end items-end ${
+                          show === c.id ? "block" : "hidden"
+                        }`}
+                      >
+                        <div className="flex flex-col w-full md:flex-row gap-2">
                           <Button
                             onClick={() => router.push(`/campaigns/${c.name}`)}
                             className="text-sm px-3 py-1 rounded-lg border border-slate-300 dark:border-slate-600 
@@ -675,31 +710,7 @@ export default function Campaigns() {
                           </Dialog>
                         </div>
                       </div>
-
-                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
-                        {c.subject}
-                      </p>
-
-                      <p className="text-sm text-slate-900 dark:text-white line-clamp-3 flex-grow leading-relaxed mb-3">
-                        {c.body.length > 50
-                          ? `${c.body.slice(0, 50)}...`
-                          : c.body}
-                      </p>
-
-                      <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 mt-auto pt-3 border-t border-slate-200 dark:border-slate-700">
-                        <span>
-                          {c.audience?.length > 0
-                            ? `${c.audience.length} recipients`
-                            : "No recipients"}
-                        </span>
-                        <span>
-                          Last edited:{" "}
-                          {new Date(
-                            c.updated_at || c.created_at
-                          ).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </CardContent>
+                    </CardFooter>
                   </Card>
                 ))}
               </div>
