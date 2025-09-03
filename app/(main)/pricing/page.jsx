@@ -18,7 +18,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Card, CardContent } from "@/components/ui/card";
-import { redirect } from "next/navigation";
 
 const ErrorMessage = ({ error }) => {
   if (!error) return null;
@@ -40,6 +39,12 @@ export default function PricingPage() {
     price: "",
     stock: "",
     description: "",
+    features: [
+      {
+        name: "",
+        configurations: [""],
+      },
+    ],
   });
   const [errors, setErrors] = useState({ newProduct: {} });
   const [userEmail, setUserEmail] = useState(null);
@@ -49,8 +54,6 @@ export default function PricingPage() {
       if (rawSession) {
         const session = JSON.parse(rawSession);
         setUserEmail(session?.user?.email || null);
-      } else {
-        redirect("/");
       }
     } catch (error) {
       console.error("Failed to parse session from localStorage:", error);
@@ -72,6 +75,8 @@ export default function PricingPage() {
           ? JSON.parse(data.products || "[]")
           : data.products || []
       );
+
+      console.log("Fetched company data:", data);
     } catch (err) {
       console.error("Error fetching data from Supabase:", err);
     }
@@ -86,6 +91,7 @@ export default function PricingPage() {
         const parsed = JSON.parse(cachedData);
         setCompanyData(parsed);
         setProducts(Array.isArray(parsed.products) ? parsed.products : []);
+        console.log("Loaded from cache:", parsed);
       } catch (error) {
         console.error("Failed to parse cached data:", error);
         localStorage.removeItem("companyDataCache");
@@ -95,6 +101,13 @@ export default function PricingPage() {
 
     fetchData();
   }, [userEmail]);
+
+  // ✅ Log whenever state changes (no stale logs!)
+  useEffect(() => {
+    if (companyData && Object.keys(companyData).length > 0) {
+      console.log("Company data updated:", companyData);
+    }
+  }, [companyData]);
 
   const handleCompanyChange = (field, value) => {
     setCompanyData((prev) => ({ ...prev, [field]: value }));
@@ -129,6 +142,12 @@ export default function PricingPage() {
       price: "",
       description: "",
       stock: "",
+      features: [
+        {
+          name: "",
+          configurations: [""],
+        },
+      ],
     });
     setErrors({ newProduct: {} });
     const { error } = await supabase
@@ -197,10 +216,10 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen w-full">
-      <div className="flex flex-col w-full sm:flex-row sm:justify-left sm:items-center">
+    <div className="min-h-screen">
+      <div className="flex flex-col sm:flex-row sm:justify-left sm:items-center">
         <Sheet>
-          <div className="flex flex-col md:flex-row gap-3 items-stretch justify-between md:items-center max-w-screen md:w-screen">
+          <div className="flex justify-between items-center w-screen">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
                 Pricing and Inventory
@@ -209,13 +228,13 @@ export default function PricingPage() {
                 Manage pricing and inventory
               </p>
             </div>
-            <SheetTrigger asChild>
-              <Button className="bg-gradient-to-r px-4 py-5 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white ">
+            <SheetTrigger as Child>
+              <Button className="bg-gradient-to-r px-4 py-5 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white w-full ">
                 Add New Product
               </Button>
             </SheetTrigger>
           </div>
-          <SheetContent>
+          <SheetContent className="overflow-y-scroll">
             <SheetHeader>
               <SheetTitle>Add New Product</SheetTitle>
               <SheetDescription>
@@ -316,6 +335,133 @@ export default function PricingPage() {
                       />
                       <ErrorMessage error={errors.newProduct.description} />
                     </div>
+                    <div>
+                      <Label className="mb-2 text-slate-700 dark:text-slate-300">
+                        Configurable Features
+                      </Label>
+
+                      <div className="flex flex-col gap-4">
+                        {newProduct.features.map((feature, fIndex) => (
+                          <div
+                            key={fIndex}
+                            className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white/70 dark:bg-slate-800/50 shadow-sm"
+                          >
+                            {/* Feature Header (Name + Delete) */}
+                            <div className="flex items-center justify-between mb-3">
+                              <Input
+                                value={feature.name}
+                                onChange={(e) => {
+                                  const updated = [...newProduct.features];
+                                  updated[fIndex].name = e.target.value;
+                                  setNewProduct((prev) => ({
+                                    ...prev,
+                                    features: updated,
+                                  }));
+                                }}
+                                className="bg-white/70 dark:bg-slate-800/50 w-[40vh] border-slate-300 dark:border-slate-600"
+                                placeholder="Feature name (e.g., SLA, Integration, Region)"
+                              />
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30"
+                                onClick={() => {
+                                  const updated = newProduct.features.filter(
+                                    (_, idx) => idx !== fIndex
+                                  );
+                                  setNewProduct((prev) => ({
+                                    ...prev,
+                                    features: updated,
+                                  }));
+                                }}
+                              >
+                                ✕
+                              </Button>
+                            </div>
+
+                            {/* Configurations for Feature */}
+                            <div className="flex flex-col gap-2 ml-2">
+                              {feature.configurations.map((config, cIndex) => (
+                                <div
+                                  key={cIndex}
+                                  className="flex items-center gap-2"
+                                >
+                                  <Input
+                                    value={config}
+                                    onChange={(e) => {
+                                      const updated = [...newProduct.features];
+                                      updated[fIndex].configurations[cIndex] =
+                                        e.target.value;
+                                      setNewProduct((prev) => ({
+                                        ...prev,
+                                        features: updated,
+                                      }));
+                                    }}
+                                    className="bg-white/70 dark:bg-slate-800/50 w-[35vh] border-slate-300 dark:border-slate-600"
+                                    placeholder="Configuration (e.g., 99.9% SLA, Basic, Pro)"
+                                  />
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30"
+                                    onClick={() => {
+                                      const updated = [...newProduct.features];
+                                      updated[fIndex].configurations = updated[
+                                        fIndex
+                                      ].configurations.filter(
+                                        (_, idx) => idx !== cIndex
+                                      );
+                                      setNewProduct((prev) => ({
+                                        ...prev,
+                                        features: updated,
+                                      }));
+                                    }}
+                                  >
+                                    ✕
+                                  </Button>
+                                </div>
+                              ))}
+
+                              {/* ➕ Add Configuration */}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="mt-2 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                onClick={() => {
+                                  const updated = [...newProduct.features];
+                                  updated[fIndex].configurations.push("");
+                                  setNewProduct((prev) => ({
+                                    ...prev,
+                                    features: updated,
+                                  }));
+                                }}
+                              >
+                                + Add Configuration
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+
+                        {/* ➕ Add Feature */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="mt-2 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
+                          onClick={() =>
+                            setNewProduct((prev) => ({
+                              ...prev,
+                              features: [
+                                ...prev.features,
+                                { name: "", configurations: [""] },
+                              ],
+                            }))
+                          }
+                        >
+                          + Add Feature
+                        </Button>
+                      </div>
+                    </div>
+
                     <Button
                       disabled={loading}
                       onClick={addProduct}
@@ -338,8 +484,8 @@ export default function PricingPage() {
         </Sheet>
       </div>
 
-      <div className="min-h-screen w-full">
-        <div className="my-8">
+      <div className="min-h-screen p-8">
+        <div className="shadow-lg rounded-2xl p-6 mb-8">
           <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">
             Available Products
           </h2>
@@ -353,12 +499,13 @@ export default function PricingPage() {
               {products.map((product, idx) => (
                 <Card
                   key={product.id}
-                  className="flex flex-col sm:flex-row sm:items-center border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800/30"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800/30"
                 >
-                  <CardContent className=" h-[40vh] w-full flex flex-col gap-2 ">
-                    <div className="flex flex-col  gap-2">
-                      <div className="flex items-center justify-center gap-4">
-                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[10%]">
+                  <CardContent className=" h-[75vh] flex flex-col gap-2">
+                    <div className="flex flex-col gap-2">
+                      {/* Name */}
+                      <div className="flex gap-4">
+                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Name
                         </Label>
                         <Input
@@ -369,14 +516,15 @@ export default function PricingPage() {
                             updated[idx].name = e.target.value;
                             handleProductChange(updated);
                           }}
-                          className="mt-1 w-[90%] border rounded-lg p-2  focus:ring-2 focus:ring-blue-400"
+                          className="mt-1 w-[110vh] border rounded-lg p-2  focus:ring-2 focus:ring-blue-400"
                         />
                       </div>
 
+                      {/* Stock */}
                       <div className="flex gap-4">
-                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh] md:w-[10vh]">
+                        <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Stock
-                        </Label>
+                        </label>
                         <Input
                           type="number"
                           value={product.stock}
@@ -385,14 +533,15 @@ export default function PricingPage() {
                             updated[idx].stock = e.target.value;
                             handleProductChange(updated);
                           }}
-                          className="mt-1 w-[90vh] md:w-[140vh] border rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
+                          className="mt-1 w-[110vh] border rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
                         />
                       </div>
 
+                      {/* Price */}
                       <div className="flex gap-4">
-                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh] md:w-[10vh]">
+                        <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Price
-                        </Label>
+                        </label>
                         <Input
                           type="text"
                           value={
@@ -407,14 +556,15 @@ export default function PricingPage() {
                               : Number(e.target.value);
                             handleProductChange(updated);
                           }}
-                          className="mt-1 border rounded-lg p-2 w-[90vh] md:w-[140vh] focus:ring-2 focus:ring-blue-400"
+                          className="mt-1 border rounded-lg p-2 w-[110vh] focus:ring-2 focus:ring-blue-400"
                         />
                       </div>
 
+                      {/* Category */}
                       <div className="flex gap-4">
-                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh] md:w-[10vh]">
+                        <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Category
-                        </Label>
+                        </label>
                         <Input
                           type="text"
                           value={product.category}
@@ -423,14 +573,15 @@ export default function PricingPage() {
                             updated[idx].category = e.target.value;
                             handleProductChange(updated);
                           }}
-                          className="mt-1 border rounded-lg p-2 w-[90vh] md:w-[140vh] focus:ring-2 focus:ring-blue-400"
+                          className="mt-1 border rounded-lg p-2 w-[110vh] focus:ring-2 focus:ring-blue-400"
                         />
                       </div>
 
+                      {/* Description */}
                       <div className="flex gap-4">
-                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh] md:w-[10vh]">
+                        <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Description
-                        </Label>
+                        </label>
                         <Input
                           type="text"
                           value={product.description}
@@ -439,10 +590,145 @@ export default function PricingPage() {
                             updated[idx].description = e.target.value;
                             handleProductChange(updated);
                           }}
-                          className="mt-1 border rounded-lg p-2 w-[90vh] md:w-[140vh] focus:ring-2 focus:ring-blue-400"
+                          className="mt-1 border rounded-lg p-2 w-[110vh] focus:ring-2 focus:ring-blue-400"
                         />
                       </div>
+                      <div>
+                        <Label className="mb-2 text-slate-700 dark:text-slate-300">
+                          Configurable Features
+                        </Label>
 
+                        <div className="flex flex-col gap-4">
+                          {newProduct.features.map((feature, fIndex) => (
+                            <div
+                              key={fIndex}
+                              className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white/70 dark:bg-slate-800/50 shadow-sm"
+                            >
+                              {/* Feature Header (Name + Delete) */}
+                              <div className="flex items-center justify-between mb-3">
+                                <Input
+                                  value={feature.name}
+                                  onChange={(e) => {
+                                    const updated = [...newProduct.features];
+                                    updated[fIndex].name = e.target.value;
+                                    setNewProduct((prev) => ({
+                                      ...prev,
+                                      features: updated,
+                                    }));
+                                  }}
+                                  className="bg-white/70 dark:bg-slate-800/50 w-[40vh] border-slate-300 dark:border-slate-600"
+                                  placeholder="Feature name (e.g., SLA, Integration, Region)"
+                                />
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30"
+                                  onClick={() => {
+                                    const updated = newProduct.features.filter(
+                                      (_, idx) => idx !== fIndex
+                                    );
+                                    setNewProduct((prev) => ({
+                                      ...prev,
+                                      features: updated,
+                                    }));
+                                  }}
+                                >
+                                  ✕
+                                </Button>
+                              </div>
+
+                              {/* Configurations for Feature */}
+                              <div className="flex flex-col gap-2 ml-2">
+                                {feature.configurations.map(
+                                  (config, cIndex) => (
+                                    <div
+                                      key={cIndex}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Input
+                                        value={config}
+                                        onChange={(e) => {
+                                          const updated = [
+                                            ...newProduct.features,
+                                          ];
+                                          updated[fIndex].configurations[
+                                            cIndex
+                                          ] = e.target.value;
+                                          setNewProduct((prev) => ({
+                                            ...prev,
+                                            features: updated,
+                                          }));
+                                        }}
+                                        className="bg-white/70 dark:bg-slate-800/50 w-[35vh] border-slate-300 dark:border-slate-600"
+                                        placeholder="Configuration (e.g., 99.9% SLA, Basic, Pro)"
+                                      />
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30"
+                                        onClick={() => {
+                                          const updated = [
+                                            ...newProduct.features,
+                                          ];
+                                          updated[fIndex].configurations =
+                                            updated[
+                                              fIndex
+                                            ].configurations.filter(
+                                              (_, idx) => idx !== cIndex
+                                            );
+                                          setNewProduct((prev) => ({
+                                            ...prev,
+                                            features: updated,
+                                          }));
+                                        }}
+                                      >
+                                        ✕
+                                      </Button>
+                                    </div>
+                                  )
+                                )}
+
+                                {/* ➕ Add Configuration */}
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="mt-2 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                  onClick={() => {
+                                    const updated = [...newProduct.features];
+                                    updated[fIndex].configurations.push("");
+                                    setNewProduct((prev) => ({
+                                      ...prev,
+                                      features: updated,
+                                    }));
+                                  }}
+                                >
+                                  + Add Configuration
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+
+                          {/* ➕ Add Feature */}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="mt-2 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
+                            onClick={() =>
+                              setNewProduct((prev) => ({
+                                ...prev,
+                                features: [
+                                  ...prev.features,
+                                  { name: "", configurations: [""] },
+                                ],
+                              }))
+                            }
+                          >
+                            + Add Feature
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
                       <div className="flex justify-end mt-3 w-full">
                         <button
                           onClick={() => removeProduct(product.id)}
@@ -459,6 +745,7 @@ export default function PricingPage() {
           )}
         </div>
 
+        {/* Global Save Buttons */}
         <div className="flex gap-4">
           <Button onClick={handleSaveChanges} variant="secondary">
             <Save className="mr-2 w-4 h-4" /> Save Changes Locally
