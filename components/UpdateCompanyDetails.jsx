@@ -4,15 +4,21 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Save, Upload, Plus, Trash2, Package, AlertCircle } from "lucide-react";
+import {
+  Save,
+  Upload,
+  Plus,
+  Trash2,
+  Package,
+  AlertCircle,
+  Loader2,
+} from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ToastContainer, toast } from "react-toastify";
 import isEqual from "lodash/isEqual";
 import "react-toastify/dist/ReactToastify.css";
-import { fetchData } from "next-auth/client/_utils";
-import { set } from "lodash";
 const ErrorMessage = ({ error }) => {
   if (!error) return null;
   return (
@@ -482,6 +488,7 @@ export default function CompanyProfile() {
           <Save className="mr-2 w-4 h-4" /> Save Changes Locally
         </Button>
         <Button onClick={handleUpdateDB} className={"cursor-pointer"}>
+          {loading && <Loader2 className="mr-2 w-4 h-4 animate-spin" />}
           <Upload className="mr-2 w-4 h-4" /> Update Database
         </Button>
       </div>

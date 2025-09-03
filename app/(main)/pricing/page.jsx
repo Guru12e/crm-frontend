@@ -353,12 +353,12 @@ export default function PricingPage() {
               {products.map((product, idx) => (
                 <Card
                   key={product.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800/30"
+                  className="flex flex-col sm:flex-row sm:items-center border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800/30"
                 >
-                  <CardContent className=" h-[40vh] flex flex-col gap-2 ">
-                    <div className="flex flex-col gap-2">
-                      <div className="flex gap-4">
-                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh] md:w-[10vh]">
+                  <CardContent className=" h-[40vh] w-full flex flex-col gap-2 ">
+                    <div className="flex flex-col  gap-2">
+                      <div className="flex items-center justify-center gap-4">
+                        <Label className="text-sm font-medium text-gray-600 dark:text-white w-[10%]">
                           Name
                         </Label>
                         <Input
@@ -369,7 +369,7 @@ export default function PricingPage() {
                             updated[idx].name = e.target.value;
                             handleProductChange(updated);
                           }}
-                          className="mt-1 w-[90vh] md:w-[140vh] border rounded-lg p-2  focus:ring-2 focus:ring-blue-400"
+                          className="mt-1 w-[90%] border rounded-lg p-2  focus:ring-2 focus:ring-blue-400"
                         />
                       </div>
 

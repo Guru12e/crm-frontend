@@ -13,13 +13,17 @@ export async function POST(request) {
 
   if (!user_1) {
     try {
-      const response = await fetch("http://127.0.0.1:5000/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData.description),
-      });
+      const response = await fetch(
+        "https://genuine-spontaneity-production-e18a.up.railway.app/chat",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData.description),
+        }
+      );
+
       if (response.status === 200) {
         const responseData = await response.json();
         const high = responseData.response.high_prospect_group;
