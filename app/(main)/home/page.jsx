@@ -12,6 +12,8 @@ import {
   DollarSign,
   ToggleLeft,
   ToggleRight,
+  PieChart,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/utils/supabase/client";
@@ -274,22 +276,38 @@ export default function Home() {
               const y1 = 100 + 80 * Math.sin(startAngleRad);
               const x2 = 100 + 80 * Math.cos(endAngleRad);
               const y2 = 100 + 80 * Math.sin(endAngleRad);
+              const x3 = 100 + 50 * Math.cos(endAngleRad);
+              const y3 = 100 + 50 * Math.sin(endAngleRad);
+              const x4 = 100 + 50 * Math.cos(startAngleRad);
+              const y4 = 100 + 50 * Math.sin(startAngleRad);
 
+              const outerR = 80;
+              const innerR = 50;
+
+              // Outer arc start/end (same as before)
               const pathData = [
                 "M",
-                100,
-                100,
-                "L",
                 x1,
-                y1,
+                y1, // start outer arc
                 "A",
-                80,
-                80,
+                outerR,
+                outerR,
                 0,
                 largeArcFlag,
                 1,
                 x2,
-                y2,
+                y2, // outer arc
+                "L",
+                x3,
+                y3, // line to inner arc start
+                "A",
+                innerR,
+                innerR,
+                0,
+                largeArcFlag,
+                0,
+                x4,
+                y4, // inner arc (reverse direction)
                 "Z",
               ].join(" ");
 
@@ -309,7 +327,7 @@ export default function Home() {
             <div key={index} className="flex items-center space-x-2">
               <div className={cn("w-3 h-3 rounded-full", item.color)}></div>
               <span className="text-xs font-medium whitespace-nowrap">
-                {item.name}: {item.value}%
+                {item.name}: {item.rate}%
               </span>
             </div>
           ))}
@@ -332,7 +350,10 @@ export default function Home() {
           </defs>
 
           {leadSources.map((source, index) => {
-            const barHeight = (source.value / maxValue) * 160;
+            // prevent division by zero
+            const barHeight =
+              maxValue > 0 ? (source.value / maxValue) * 160 : 0;
+
             const barWidth = 50;
             const x = index * 75 + 25;
             const y = 180 - barHeight;
@@ -540,7 +561,7 @@ export default function Home() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        {/* <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+        <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center">
               <PieChart className="w-5 h-5 mr-2" />
@@ -558,15 +579,15 @@ export default function Home() {
                     className="flex justify-between items-center py-2 border-b border-slate-200 dark:border-slate-700 last:border-b-0"
                   >
                     <span className="font-medium">{item.name}</span>
-                    <span className="text-xl font-bold">{item.value}%</span>
+                    <span className="text-xl font-bold">{item.rate}%</span>
                   </div>
                 ))}
               </div>
             )}
           </CardContent>
-        </Card> */}
+        </Card>
 
-        {/* <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+        <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center">
               <BarChart3 className="w-5 h-5 mr-2" />
@@ -590,7 +611,7 @@ export default function Home() {
               </div>
             )}
           </CardContent>
-        </Card> */}
+        </Card>
       </div>
 
       <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
