@@ -20,84 +20,15 @@ import {
   Users,
   DollarSign,
   Calendar,
-  MessageSquare,
   Target,
   Filter,
   Download,
   RefreshCw,
   Eye,
-  MousePointer,
   CheckCircle,
   AlertTriangle,
 } from "lucide-react";
-
-const analyticsData = {
-  overview: {
-    totalRevenue: 2340000,
-    revenueGrowth: 23.5,
-    totalLeads: 4567,
-    leadsGrowth: 18.2,
-    conversionRate: 12.4,
-    conversionGrowth: 5.8,
-    customerAcquisition: 189,
-    acquisitionGrowth: 31.2,
-  },
-  traffic: {
-    totalVisitors: 45670,
-    pageViews: 123450,
-    bounceRate: 34.2,
-    avgSessionDuration: "3:42",
-    topPages: [
-      { page: "/pricing", views: 12340, conversion: 8.7 },
-      { page: "/features", views: 9876, conversion: 4.2 },
-      { page: "/demo", views: 8765, conversion: 15.3 },
-      { page: "/contact", views: 6543, conversion: 22.1 },
-    ],
-  },
-  sales: {
-    totalDeals: 234,
-    wonDeals: 89,
-    lostDeals: 23,
-    avgDealSize: 25600,
-    salesCycle: 32,
-    pipeline: [
-      { stage: "Prospecting", count: 67, value: 1670000 },
-      { stage: "Qualification", count: 45, value: 1125000 },
-      { stage: "Proposal", count: 23, value: 575000 },
-      { stage: "Negotiation", count: 12, value: 300000 },
-      { stage: "Closed Won", count: 89, value: 2278400 },
-    ],
-  },
-  marketing: {
-    campaignPerformance: [
-      { channel: "Google Ads", spend: 12500, leads: 234, cost: 53.4, roi: 340 },
-      { channel: "LinkedIn", spend: 8900, leads: 189, cost: 47.1, roi: 280 },
-      { channel: "Email", spend: 2300, leads: 456, cost: 5.0, roi: 890 },
-      { channel: "Content", spend: 5600, leads: 123, cost: 45.5, roi: 210 },
-    ],
-    leadSources: [
-      { source: "Organic", count: 1234, percentage: 27.0 },
-      { source: "Paid Search", count: 1098, percentage: 24.0 },
-      { source: "Social Media", count: 892, percentage: 19.5 },
-      { source: "Referrals", count: 645, percentage: 14.1 },
-      { source: "Direct", count: 698, percentage: 15.4 },
-    ],
-  },
-  customer: {
-    satisfaction: 4.7,
-    nps: 67,
-    churnRate: 3.2,
-    ltv: 89600,
-    supportTickets: 234,
-    resolutionTime: "4.2 hours",
-    segmentation: [
-      { segment: "Enterprise", count: 45, revenue: 1870000 },
-      { segment: "Mid-Market", count: 123, revenue: 892000 },
-      { segment: "SMB", count: 456, revenue: 345000 },
-      { segment: "Startup", count: 234, revenue: 123000 },
-    ],
-  },
-};
+import { analyticsData } from "@/constants/constant";
 
 export default function Analytics() {
   const [activeTab, setActiveTab] = useState("overview");

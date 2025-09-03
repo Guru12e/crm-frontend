@@ -12,11 +12,18 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowUpLeft, ArrowUpRight, Eye } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs } from "@radix-ui/react-tabs";
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { create, set } from "lodash";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { redirect, useRouter } from "next/navigation";
 
 export default function Campaigns() {
   const [campaigns, setCampaigns] = useState([]);
@@ -33,6 +40,7 @@ export default function Campaigns() {
   const [monthFilter, setMonthFilter] = useState("");
   const [dateFilter, setDateFilter] = useState(""); // "" = all
   const [audienceFilter, setAudienceFilter] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const storedTab = sessionStorage.getItem("campaignsTab");
@@ -44,6 +52,10 @@ export default function Campaigns() {
     try {
       const rawSession = localStorage.getItem("session");
       const user = localStorage.getItem("user");
+
+      if (!user) {
+        redirect("/");
+      }
       if (rawSession) {
         const session = JSON.parse(rawSession);
         setUserEmail(session?.user?.email || null);
@@ -111,6 +123,41 @@ export default function Campaigns() {
     );
   };
 
+  const handleSend = async () => {
+    if (!campaign) return;
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const res = await fetch("/api/sendMailCampaign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: campaign.name,
+          subject: campaign.subject,
+          body: campaign.body,
+          recipients: campaign.audience,
+          user,
+        }),
+      });
+
+      if (res.ok) {
+        setMessage("✅ Campaign sent successfully!");
+      } else {
+        const err = await res.json();
+        setMessage(` Failed: ${err.error || "Unknown error"}`);
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage(" Error sending campaign.");
+    } finally {
+      setLoading(false);
+    }
+    router.push("/campaigns");
+    sessionStorage.setItem("campaignsTab", "Sent");
+  };
+
   const handleSaveCampaign = async () => {
     const allRecipients = [
       ...selectedContacts,
@@ -174,6 +221,23 @@ export default function Campaigns() {
     await fetchData();
   };
 
+  const handleDeleteCampaign = async (id) => {
+    try {
+      const { error } = await supabase.from("Campaigns").delete().eq("id", id);
+
+      if (error) {
+        toast.error("Failed to delete campaign: " + error.message);
+        return;
+      }
+
+      toast.success("Campaign deleted successfully!");
+      await fetchData();
+    } catch (error) {
+      console.error("Error deleting campaign:", error);
+      toast.error("An error occurred while deleting the campaign.");
+    }
+  };
+
   const handleDuplicateCampaign = async (campaign) => {
     const { error } = await supabase.from("Campaigns").insert({
       ...campaign,
@@ -229,10 +293,10 @@ export default function Campaigns() {
     }
   };
   const filterByMonth = (campaign) => {
-    if (!monthFilter) return true; // no filter applied
+    if (!monthFilter) return true;
 
-    const campaignMonth = new Date(campaign.created_at).getMonth() + 1; // 1-12
-    const filterMonth = parseInt(monthFilter, 10); // ensure numeric
+    const campaignMonth = new Date(campaign.created_at).getMonth() + 1;
+    const filterMonth = parseInt(monthFilter, 10);
 
     return campaignMonth === filterMonth;
   };
@@ -288,11 +352,11 @@ export default function Campaigns() {
   if (loading) return <p className="p-6">Loading...</p>;
 
   return (
-    <div className="min-h-screen rounded-lg">
-      <div className="flex flex-col sm:flex-row sm:justify-left sm:items-center">
+    <div className="min-h-screen w-full rounded-lg">
+      <div className="flex flex-row justify-left items-center">
         <Sheet>
-          <div className="flex justify-between items-center w-screen">
-            <div>
+          <div className="flex w-full flex-col items-stretch md:flex-row gap-4 justify-between md:items-center relative">
+            <div className="flex-1 w-full">
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
                 Campaigns
               </h1>
@@ -300,8 +364,8 @@ export default function Campaigns() {
                 Manage your email campaigns effectively
               </p>
             </div>
-            <SheetTrigger as Child>
-              <Button className="bg-gradient-to-r px-3 py-2 rounded-xl from-teal-500 to-sky-500 hover:from-teal-600 hover:to-sky-600 text-white w-full ">
+            <SheetTrigger asChild>
+              <Button className="bg-gradient-to-r max-sm:w-full px-3 py-2 rounded-xl from-teal-500 to-sky-500 hover:from-teal-600 hover:to-sky-600 text-white ">
                 Create Campaign
               </Button>
             </SheetTrigger>
@@ -309,7 +373,7 @@ export default function Campaigns() {
           <SheetContent side="right" className="min-w-[85vw] overflow-y-auto">
             <SheetHeader>
               <SheetTitle>Create Email Campaign</SheetTitle>
-              <SheetDescription>
+              <SheetDescription asChild>
                 <>
                   <div className="p-3 flex flex-col gap-4">
                     <div>
@@ -479,7 +543,6 @@ export default function Campaigns() {
       <div className="mt-10">
         <Card className="mb-6 shadow-sm rounded-2xl bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 p-5">
           <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-            {/* Search Input */}
             <input
               type="text"
               placeholder="Search campaigns..."
@@ -487,7 +550,6 @@ export default function Campaigns() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="border rounded-lg px-3 py-2 w-full sm:w-1/2 focus:ring-2 focus:ring-sky-500 dark:bg-slate-900 dark:text-white"
             />
-            {/* Month Filter */}
             <select
               value={monthFilter}
               onChange={(e) => setMonthFilter(e.target.value)}
@@ -518,7 +580,6 @@ export default function Campaigns() {
               <option value="lastMonth">Last 1 month</option>
               <option value="lastYear">Last 1 year</option>
             </select>
-            {/* Audience Filter */}
             <select
               value={audienceFilter}
               onChange={(e) => setAudienceFilter(e.target.value)}
@@ -552,34 +613,67 @@ export default function Campaigns() {
             }}
             className="w-full"
           >
-            {/* Tab Header */}
             <TabsList className="mb-1 w-full">
               <TabsTrigger value="Saved">Saved Campaigns</TabsTrigger>
               <TabsTrigger value="Sent">Sent Campaigns</TabsTrigger>
             </TabsList>
 
-            {/* Saved Campaigns */}
             <TabsContent value="Saved">
               <div className="grid grid-cols-1 gap-6 p-6">
                 {filteredSaved.map((c) => (
                   <Card
                     key={c.id}
-                    className="shadow-sm rounded-2xl border hover:scale-[1.01] transition-all duration-200 hover:shadow-lg bg-white/70 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20 cursor-pointer h-full"
+                    className="shadow-sm rounded-2xl border transition-all duration-200 hover:shadow-lg bg-white/70 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20 h-full"
                   >
-                    <CardContent className="p-5 flex flex-col h-full">
-                      <div className="flex justify-between items-start mb-3">
+                    <CardContent className="p flex flex-col h-full">
+                      <div className="flex flex-col md:flex-row gap-3 justify-between items-start mb-3">
                         <h3 className="font-semibold text-xl text-gray-900 dark:text-white">
                           {c.name}
                         </h3>
 
-                        <Link
-                          href={`/campaigns/${c.name}`}
-                          className="text-sm px-3 py-1 rounded-lg border border-slate-300 dark:border-slate-600 
-                       bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => router.push(`/campaigns/${c.name}`)}
+                            className="text-sm px-3 py-1 rounded-lg border border-slate-300 dark:border-slate-600 
+                      bg-transparent hover:bg-slate-200 dark:hover:bg-slate-600 text-black dark:text-white
+                       transition-colors cursor-pointer"
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            onClick={() => handleSend}
+                            className="text-sm px-3 py-1 rounded-lg border border-green-300 dark:border-green-600 
+                      bg-transparent hover:bg-green-200 dark:hover:bg-green-600 text-green-600 dark:text-green-400
                        transition-colors"
-                        >
-                          Edit
-                        </Link>
+                          >
+                            Send Campaign
+                          </Button>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                className="text-sm px-3 py-1 rounded-lg border border-red-300 dark:border-red-600 
+                      bg-transparent hover:bg-red-200 dark:hover:bg-red-600 text-red-600 dark:text-red-400
+                       transition-colors cursor-pointer"
+                              >
+                                Delete
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogTitle>Delete Campaign</DialogTitle>
+                              <DialogDescription>
+                                Are you sure you want to delete this campaign?
+                              </DialogDescription>
+                              <DialogFooter className="flex justify-end gap-2 mt-4">
+                                <Button
+                                  className="bg-transparent border border-red-300 dark:border-red-600 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-600"
+                                  onClick={() => handleDeleteCampaign(c.id)}
+                                >
+                                  Delete
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
                       </div>
 
                       <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
@@ -610,8 +704,6 @@ export default function Campaigns() {
                 ))}
               </div>
             </TabsContent>
-
-            {/* Sent Campaigns */}
             <TabsContent value="Sent">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredSent.map((c) => (

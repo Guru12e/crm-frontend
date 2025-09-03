@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Calendar as CalendarIcon,
   Clock,
@@ -24,113 +24,12 @@ import {
   MapPin,
   Users,
   Edit,
-  Trash,
   ExternalLink,
   CheckCircle,
   AlertCircle,
   XCircle,
 } from "lucide-react";
-
-const mockMeetings = [
-  {
-    id: 1,
-    title: "Product Demo - TechFlow Inc",
-    attendees: ["Sarah Johnson", "Michael Chen"],
-    type: "demo",
-    platform: "Zoom",
-    date: "2024-12-20",
-    time: "10:00 AM",
-    duration: "45 min",
-    status: "scheduled",
-    description: "Product demonstration for TechFlow Inc procurement team",
-    location: "Virtual",
-    priority: "high",
-  },
-  {
-    id: 2,
-    title: "Follow-up Call - DataDrive Solutions",
-    attendees: ["Emily Rodriguez"],
-    type: "call",
-    platform: "Phone",
-    date: "2024-12-20",
-    time: "2:30 PM",
-    duration: "30 min",
-    status: "scheduled",
-    description: "Discuss pricing and implementation timeline",
-    location: "Phone Call",
-    priority: "medium",
-  },
-  {
-    id: 3,
-    title: "Proposal Presentation - GrowthCorp",
-    attendees: ["David Kim", "Lisa Thompson", "James Wilson"],
-    type: "presentation",
-    platform: "Google Meet",
-    date: "2024-12-20",
-    time: "4:00 PM",
-    duration: "60 min",
-    status: "scheduled",
-    description: "Final proposal presentation to executive team",
-    location: "Virtual",
-    priority: "high",
-  },
-  {
-    id: 4,
-    title: "Discovery Call - InnovateLab",
-    attendees: ["Alex Morgan"],
-    type: "discovery",
-    platform: "Teams",
-    date: "2024-12-21",
-    time: "9:00 AM",
-    duration: "30 min",
-    status: "scheduled",
-    description: "Initial discovery call to understand requirements",
-    location: "Virtual",
-    priority: "medium",
-  },
-  {
-    id: 5,
-    title: "Contract Review - ScaleUp Ventures",
-    attendees: ["Rachel Green", "Tom Anderson"],
-    type: "review",
-    platform: "In-person",
-    date: "2024-12-21",
-    time: "11:00 AM",
-    duration: "90 min",
-    status: "confirmed",
-    description: "Final contract review and signing",
-    location: "ScaleUp Ventures Office, Chicago",
-    priority: "high",
-  },
-  {
-    id: 6,
-    title: "Customer Success Check-in - Enterprise Co",
-    attendees: ["Samantha Davis"],
-    type: "checkin",
-    platform: "Zoom",
-    date: "2024-12-22",
-    time: "3:00 PM",
-    duration: "30 min",
-    status: "scheduled",
-    description: "Quarterly business review and feature feedback",
-    location: "Virtual",
-    priority: "low",
-  },
-  {
-    id: 7,
-    title: "Sales Training Session",
-    attendees: ["Sales Team"],
-    type: "training",
-    platform: "Conference Room",
-    date: "2024-12-23",
-    time: "10:00 AM",
-    duration: "120 min",
-    status: "scheduled",
-    description: "Monthly sales training on new features and methodologies",
-    location: "Conference Room A",
-    priority: "medium",
-  },
-];
+import { mockMeetings } from "@/constants/constant";
 
 export default function Calendar() {
   const [searchTerm, setSearchTerm] = useState("");

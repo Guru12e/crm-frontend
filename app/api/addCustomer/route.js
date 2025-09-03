@@ -45,14 +45,13 @@ export async function POST(request) {
         })
         .select("*");
 
-      if (companyError.message.includes("duplicate key value")) {
-        return NextResponse.json(
-          { error: `Failed to insert company: ${companyError.message}` },
-          { status: 404 }
-        );
-      }
-
       if (companyError) {
+        if (companyError.message.includes("duplicate key value")) {
+          return NextResponse.json(
+            { error: `Failed to insert company: ${companyError.message}` },
+            { status: 404 }
+          );
+        }
         return NextResponse.json(
           { error: `Failed to insert company: ${companyError.message}` },
           { status: 500 }

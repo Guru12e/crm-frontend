@@ -5,10 +5,15 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
-  const { data } = await supabase
-    .from("Users")
-    .select("*")
-    .eq("email", session.user.email)
-    .single();
-  return NextResponse.json(data, { status: 200 });
+  if (session) {
+    const { data } = await supabase
+      .from("Users")
+      .select("*")
+      .eq("email", session.user.email)
+      .single();
+
+    return NextResponse.json(data, { status: 200 });
+  } else {
+    return NextResponse.json({ user: null }, { status: 400 });
+  }
 }

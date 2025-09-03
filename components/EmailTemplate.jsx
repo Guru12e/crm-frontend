@@ -16,9 +16,8 @@ import {
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { supabase } from "@/utils/supabase/client";
 import { Input } from "./ui/input";
-import { DialogClose, DialogTitle } from "./ui/dialog";
+import { DialogClose } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
-import { set, times } from "lodash";
 import { toast } from "react-toastify";
 
 // Toolbar button
@@ -73,8 +72,6 @@ export default function EmailTemplate({ id, type, email, onOpenChange }) {
   };
   const handleSendEmail = async () => {
     try {
-      console.log(type);
-      console.log(form);
       const res = await fetch("/api/gmail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -95,7 +92,6 @@ export default function EmailTemplate({ id, type, email, onOpenChange }) {
           .eq("id", id)
           .eq("user_email", userEmail)
           .maybeSingle();
-        console.log(data);
         const oldMessages = Array.isArray(data?.messages) ? data.messages : [];
         if (error_1) {
           console.error("Error fetching email:", error_1);
@@ -108,7 +104,10 @@ export default function EmailTemplate({ id, type, email, onOpenChange }) {
         if (error) {
           console.error("Error updating email:", error);
         } else {
-          console.log("Email updated successfully");
+          toast.success("Email updated successfully", {
+            position: "top-right",
+            autoClose: 3000,
+          });
         }
         onOpenChange();
         setForm({ from_email: "", to_email: "", subject: "", body: "" });
@@ -123,16 +122,49 @@ export default function EmailTemplate({ id, type, email, onOpenChange }) {
   // FIX: wrap selection with span to persist styles
   const applyStyle = useCallback((command, value = null) => {
     if (!form.body) return;
-    if (command === "fontSize") {
-      const sel = window.getSelection();
-      if (!sel.rangeCount) return;
-      const range = sel.getRangeAt(0);
-      const span = document.createElement("span");
-      span.style.fontSize = value;
-      range.surroundContents(span);
-    } else {
-      document.execCommand(command, false, value);
+
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+
+    // Create a span wrapper for styling commands
+    const span = document.createElement("span");
+
+    switch (command) {
+      case "bold":
+        span.style.fontWeight = "bold";
+        range.surroundContents(span);
+        break;
+
+      case "italic":
+        span.style.fontStyle = "italic";
+        range.surroundContents(span);
+        break;
+
+      case "underline":
+        span.style.textDecoration = "underline";
+        range.surroundContents(span);
+        break;
+
+      case "fontSize":
+        span.style.fontSize = value;
+        range.surroundContents(span);
+        break;
+
+      case "color":
+        span.style.color = value;
+        range.surroundContents(span);
+        break;
+
+      case "insertText": // replacing execCommand('insertText', false, value)
+        range.deleteContents();
+        range.insertNode(document.createTextNode(value));
+        break;
+
+      default:
+        console.warn(`Unsupported command: ${command}`);
     }
+
     form.body.current.focus();
   }, []);
 

@@ -22,6 +22,7 @@ import {
   SquareCheckBig,
   SquareCheck,
   Edit,
+  Loader2,
 } from "lucide-react";
 import {
   Phone,
@@ -36,16 +37,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import {
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "./ui/sheet";
-import { set } from "lodash";
+import { toast } from "react-toastify";
 import {
   Select,
   SelectItem,
@@ -123,8 +115,6 @@ export default function Updateleads(lead_id, onChange) {
   useEffect(() => {
     fetchLeadData();
   }, [lead_id]);
-
-  console.log("LeadsData:", LeadsData);
 
   const allEvents = [
     // open activities
@@ -213,7 +203,7 @@ export default function Updateleads(lead_id, onChange) {
       .eq("id", lead_id.lead_id);
     if (error) {
       console.error("Error updating activity:", error);
-      toast.error("Error updating activity!", { position: "top-right" });
+      toast.error("Error updating activity!");
     } else {
       await fetchLeadData();
       setActivitiesFormData({ title: "", description: "", date: "" });
@@ -235,7 +225,7 @@ export default function Updateleads(lead_id, onChange) {
       .eq("id", lead_id.lead_id);
     if (error) {
       console.error("Error removing activity:", error);
-      toast.error("Error removing activity!", { position: "top-right" });
+      toast.error("Error removing activity!");
     } else {
       await fetchLeadData();
       toast.success("Activity removed successfully!", {
@@ -298,7 +288,7 @@ export default function Updateleads(lead_id, onChange) {
       .eq("id", lead_id.lead_id);
     if (error) {
       console.error("Error closing activity:", error);
-      toast.error("Error closing activity!", { position: "top-right" });
+      toast.error("Error closing activity!");
     } else {
       await fetchLeadData();
       toast.success("Activity closed successfully!", {
@@ -330,8 +320,6 @@ export default function Updateleads(lead_id, onChange) {
       .select("*")
       .eq("id", lead_id.lead_id)
       .single();
-    console.log(LeadDetails);
-    console.log("Lead data:", LeadsData);
     const noChanges =
       LeadDetails.name === LeadsData.name &&
       LeadDetails.email === LeadsData.email &&
@@ -347,9 +335,48 @@ export default function Updateleads(lead_id, onChange) {
       LeadDetails.address === LeadsData.address &&
       LeadDetails.description === LeadsData.description &&
       LeadDetails.open_activities === openActivities;
+    if (LeadDetails.status != LeadsData.status) {
+      const current_history = {
+        old_status: LeadDetails.status,
+        new_status: LeadsData.status,
+        start_date: start_date.split("T")[0],
+        end_date: new Date().toISOString().split("T")[0],
+        state_description: "",
+      };
+      LeadsData.stage_history = [...stageHistory, current_history];
+
+      if (LeadsData.status === "Qualified") {
+        const leadToDeal = {
+          name: LeadsData.name,
+          number: LeadsData.number,
+          email: LeadsData.email,
+          status: "New",
+          created_at: today.toISOString().split("T")[0],
+          closeDate: today.toISOString().split("T")[0],
+          user_email: LeadsData.user_email,
+        };
+        const { data: deal, error } = await supabase
+          .from("Deals")
+          .insert({
+            ...leadToDeal,
+          })
+          .select("*")
+          .single();
+      }
+
+      if (error) {
+        console.error("Error moving lead to deal:", error);
+        toast.error("Error moving lead to deal");
+      } else {
+        toast.success("Lead moved to deal successfully");
+
+        await fetchDeals();
+        await fetchLeads();
+      }
+    }
 
     if (noChanges) {
-      toast.info("No changes detected.", { position: "top-right" });
+      toast.info("No changes detected.");
       return;
     } else {
       const { error } = await supabase
@@ -359,32 +386,12 @@ export default function Updateleads(lead_id, onChange) {
 
       if (error) {
         console.error("Error updating database:", error);
-        toast.error("Error updating database!", { position: "top-right" });
+        toast.error("Error updating database!");
       } else {
         toast.success(
           "Data updated permanently. All changes made are permanent.",
           { position: "top-right" }
         );
-        if (LeadsData.status === "Qualified") {
-          const { error } = await supabase.from("Deals").insert({
-            name: LeadsData.name,
-            phone: LeadsData.number,
-            email: LeadsData.email,
-            linkedIn: LeadsData.linkedIn,
-            location: LeadsData.location,
-            status: "New",
-            created_at: today,
-            closeDate: today,
-            user_email: LeadsData.userEmail,
-          });
-          if (error) {
-            console.error("Error moving lead to deal:", error);
-            toast.error("Error moving lead to deal");
-          } else {
-            toast.success("Lead moved to deal successfully");
-            onChange();
-          }
-        }
         localStorage.removeItem("companyDataCache");
         setLoading(false);
         fetchLeadData();
@@ -394,19 +401,6 @@ export default function Updateleads(lead_id, onChange) {
   const Activities = ["Meeting", "Email", "Call", "Product Demo", "Task"];
   return (
     <div className="flex flex-col">
-      <div>
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-        />
-      </div>
       <div className="py-4  md:py-6 w-full mx-auto space-y-6 bg-slate-50 dark:bg-slate-900 p-3 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <Label className={"mb-4 text-gray-600"} htmlFor="leadName">
@@ -718,7 +712,7 @@ export default function Updateleads(lead_id, onChange) {
                       className="mt-4 border-green-500 bg-white text-green-500 hover:bg-green-50 hover:text-green-700"
                     >
                       <ArrowRightToLine />
-                      Update Activity
+                      Add Activity
                     </Button>
                   </div>
                 </DialogContent>
@@ -795,19 +789,9 @@ export default function Updateleads(lead_id, onChange) {
                                   }
                                 />
                                 <div className="grid grid-cols-3 gap-4 mt-5">
-                                  <Dialog
-                                    open={activityToDelete === activity.id}
-                                    onOpenChange={() =>
-                                      setActivityToDelete(null)
-                                    }
-                                  >
+                                  <Dialog>
                                     <DialogTrigger asChild>
-                                      <Button
-                                        className="border-2 border-red-500 bg-white text-red-500 hover:bg-red-50 hover:text-red-700"
-                                        onClick={() =>
-                                          setActivityToDelete(activity.id)
-                                        }
-                                      >
+                                      <Button className="border-2 border-red-500 bg-white cursor-pointer text-red-500 hover:bg-red-50 hover:text-red-700">
                                         <Delete />
                                         Delete Activity
                                       </Button>
@@ -824,7 +808,7 @@ export default function Updateleads(lead_id, onChange) {
                                       </DialogHeader>
                                       <DialogFooter>
                                         <Button
-                                          className="border-2 border-red-500 bg-white text-red-500 hover:bg-red-50 hover:text-red-700"
+                                          className="border-2 border-red-500 bg-white cursor-pointer text-red-500 hover:bg-red-50 hover:text-red-700"
                                           variant="outline"
                                           onClick={() => {
                                             handleRemoveActivity(activity.id);
@@ -969,9 +953,17 @@ export default function Updateleads(lead_id, onChange) {
         </div>
         <Button
           onClick={handleUpdateDB}
-          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+          className={`mt-4 bg-blue-600 hover:bg-blue-700 text-white ${
+            loading ? "cursor-not-allowed opacity-70" : ""
+          }`}
+          disabled={loading}
         >
-          <Plus className="w-4 h-4 mr-2" /> Update Lead Data
+          {loading ? (
+            <Loader2 className="w-4 h-4 mr-2" />
+          ) : (
+            <Plus className="w-4 h-4 mr-2" />
+          )}{" "}
+          Update Lead Data
         </Button>
       </div>
       <Card className="bg-transparent text-gray-600 border-0">

@@ -20,12 +20,12 @@ import {
   Delete,
   Edit,
   SquareCheckBig,
+  Loader2,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import {
   Select,
   SelectItem,
@@ -43,7 +43,12 @@ import {
   DialogFooter,
 } from "./ui/dialog";
 
-export default function UpdateDeals(deal_id, onChange) {
+export default function UpdateDeals(
+  deal_id,
+  onChange,
+  fetchCustomers,
+  fetchDeals
+) {
   const today = new Date().toISOString().split("T")[0];
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -97,7 +102,6 @@ export default function UpdateDeals(deal_id, onChange) {
   }, [deal_id]);
 
   const allEvents = [
-    // open activities
     ...openActivities.map((a) => ({
       title: a.title,
       description: a.description,
@@ -106,16 +110,14 @@ export default function UpdateDeals(deal_id, onChange) {
       category: a.category,
     })),
 
-    // closed activities
     ...closedActivities.map((a) => ({
       title: a.title,
       description: a.description,
-      date: a.closed_at, // important: closed_at
+      date: a.closed_at,
       type: "closed",
       category: a.category,
     })),
 
-    // stage history
     ...stageHistory.map((s) => ({
       title: `${s.old_status} → ${s.new_status}`,
       description: s.state_description,
@@ -124,7 +126,6 @@ export default function UpdateDeals(deal_id, onChange) {
       category: "Stage",
     })),
 
-    // deal created event at the end
     {
       title: "Deal Created",
       description: "Deal was created in the system",
@@ -134,7 +135,6 @@ export default function UpdateDeals(deal_id, onChange) {
     },
   ];
 
-  // sort descending based on date
   allEvents.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   const iconMap = {
@@ -192,7 +192,7 @@ export default function UpdateDeals(deal_id, onChange) {
       .eq("id", deal_id.deal_id);
     if (error) {
       console.error("Error updating activity:", error);
-      toast.error("Error updating activity!", { position: "top-right" });
+      toast.error("Error updating activity!");
     } else {
       await fetchDealData();
       setActivitiesFormData({ title: "", description: "", date: "" });
@@ -202,6 +202,7 @@ export default function UpdateDeals(deal_id, onChange) {
       });
       await fetchDealData();
     }
+    setLoading(false);
   };
 
   const handleRemoveActivity = async (activityId) => {
@@ -216,7 +217,7 @@ export default function UpdateDeals(deal_id, onChange) {
       .eq("id", deal_id.deal_id);
     if (error) {
       console.error("Error removing activity:", error);
-      toast.error("Error removing activity!", { position: "top-right" });
+      toast.error("Error removing activity!");
     } else {
       await fetchDealData();
       toast.success("Activity removed successfully!", {
@@ -225,6 +226,7 @@ export default function UpdateDeals(deal_id, onChange) {
       });
       onChange();
     }
+    setLoading(false);
   };
   const handleEditActivity = (activityId, field, value) => {
     setOpenActivities((prev) =>
@@ -283,7 +285,7 @@ export default function UpdateDeals(deal_id, onChange) {
       .eq("id", deal_id.deal_id);
     if (error) {
       console.error("Error closing activity:", error);
-      toast.error("Error closing activity!", { position: "top-right" });
+      toast.error("Error closing activity!");
     } else {
       await fetchDealData();
       toast.success("Activity closed successfully!", {
@@ -292,6 +294,7 @@ export default function UpdateDeals(deal_id, onChange) {
       });
       onChange();
     }
+    setLoading(false);
   };
 
   const handleUpdateDB = async () => {
@@ -329,9 +332,79 @@ export default function UpdateDeals(deal_id, onChange) {
       dealDetails.source === DealsData.source &&
       dealDetails.description === DealsData.description &&
       dealDetails.open_activities === openActivities;
+    if (dealDetails.status != DealsData.status) {
+      const current_history = {
+        old_status: dealDetails.status,
+        new_status: DealsData.status,
+        start_date: start_date.split("T")[0],
+        end_date: new Date().toISOString().split("T")[0],
+        state_description: "",
+      };
+      DealsData.stage_history = [...stageHistory, current_history];
 
+      if (DealsData.status == "Closed-won") {
+        const customerData = {
+          name: DealsData.name,
+          phone: DealsData.number,
+          email: DealsData.email,
+          linkedIn: DealsData.linkedIn,
+          price: DealsData.value,
+          location: DealsData.location,
+          purchase_history: {
+            product: DealsData.product,
+            price: DealsData.value,
+            purchase_date: today,
+          },
+          industry: DealsData.industry,
+          status: "Active",
+          created_at: today,
+          user_email: DealsData.user_email,
+        };
+
+        const { data, error } = await supabase
+          .from("Customers")
+          .select("*")
+          .eq("email", DealsData.email)
+          .eq("user_email", DealsData.user_email)
+          .maybeSingle();
+        if (error) {
+          console.error("Error checking existing customer:", error);
+        }
+        if (!data) {
+          await fetch("/api/addCustomer", {
+            method: "POST",
+            body: JSON.stringify({
+              ...customerData,
+              session: session,
+            }),
+          });
+        } else {
+          const { error } = await supabase
+            .from("customers")
+            .update({
+              ...customerData,
+              price: data.price + DealsData.value,
+              status: "Active",
+              created_at: data.created_at,
+              purchase_history: [
+                ...data.purchase_history,
+                {
+                  product: DealsData.product,
+                  price: DealsData.value,
+                },
+              ],
+            })
+            .eq("email", DealsData.email)
+            .eq("user_email", DealsData.user_email);
+          if (error) {
+            console.error("Error updating existing customer:", error);
+          }
+        }
+        onChange();
+      }
+    }
     if (noChanges) {
-      toast.info("No changes detected.", { position: "top-right" });
+      toast.info("No changes detected.");
       return;
     } else {
       const { error } = await supabase
@@ -341,71 +414,12 @@ export default function UpdateDeals(deal_id, onChange) {
 
       if (error) {
         console.error("Error updating database:", error);
-        toast.error("Error updating database!", { position: "top-right" });
+        toast.error("Error updating database!");
       } else {
         toast.success(
           "Data updated permanently. All changes made are permanent.",
           { position: "top-right" }
         );
-        if (deal.status === "Closed-won") {
-          const customerData = {
-            name: deal.name,
-            phone: deal.phone,
-            email: deal.email,
-            linkedIn: deal.linkedIn,
-            price: deal.value,
-            location: deal.location,
-            purchase_history: {
-              product: deal.product,
-              price: deal.value,
-              purchase_date: today,
-            },
-            industry: deal.industry,
-            status: "Active",
-            created_at: today,
-            user_email: deal.user_email,
-          };
-          const { data, error } = await supabase
-            .from("customers")
-            .select("*")
-            .eq("email", deal.email)
-            .eq("user_email", deal.user_email)
-            .maybeSingle();
-          if (error) {
-            console.error("Error checking existing customer:", error);
-          }
-          if (!data) {
-            await fetch("/api/addCustomer", {
-              method: "POST",
-              body: JSON.stringify({
-                ...customerData,
-                session: session,
-              }),
-            });
-          } else {
-            const { error } = await supabase
-              .from("customers")
-              .update({
-                ...customerData,
-                price: data.price + deal.value,
-                status: "Active",
-                created_at: data.created_at,
-                purchase_history: [
-                  ...data.purchase_history,
-                  {
-                    product: deal.product,
-                    price: deal.value,
-                  },
-                ],
-              })
-              .eq("email", deal.email)
-              .eq("user_email", userEmail);
-            if (error) {
-              console.error("Error updating existing customer:", error);
-            }
-          }
-          onChange();
-        }
         localStorage.removeItem("companyDataCache");
         setLoading(false);
       }
@@ -416,19 +430,6 @@ export default function UpdateDeals(deal_id, onChange) {
 
   return (
     <div className="flex flex-col">
-      <div>
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-        />
-      </div>
       <div className="py-4  md:py-6 w-full mx-auto space-y-6 bg-slate-50 dark:bg-slate-900 p-3 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <Label className={"mb-4 text-gray-600"} htmlFor="dealName">
@@ -727,7 +728,7 @@ export default function UpdateDeals(deal_id, onChange) {
                       className="mt-4 border-green-500 bg-white text-green-500 hover:bg-green-50 hover:text-green-700"
                     >
                       <ArrowRightToLine />
-                      Update Activity
+                      Add Activity
                     </Button>
                   </div>
                 </DialogContent>
@@ -747,7 +748,6 @@ export default function UpdateDeals(deal_id, onChange) {
                             key={activity.id}
                             className="shadow-md rounded-2xl border border-purple-500 dark:border-slate-700 bg-white dark:bg-slate-800"
                           >
-                            {/* Header: Title + Category */}
                             <CardHeader className="pb-2">
                               <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100 break-words">
                                 <Input
@@ -804,19 +804,9 @@ export default function UpdateDeals(deal_id, onChange) {
                                   }
                                 />
                                 <div className="grid grid-cols-3 gap-4 mt-5">
-                                  <Dialog
-                                    open={activityToDelete === activity.id}
-                                    onOpenChange={() =>
-                                      setActivityToDelete(null)
-                                    }
-                                  >
+                                  <Dialog>
                                     <DialogTrigger asChild>
-                                      <Button
-                                        className="border-2 border-red-500 bg-white text-red-500 hover:bg-red-50 hover:text-red-700"
-                                        onClick={() =>
-                                          setActivityToDelete(activity.id)
-                                        }
-                                      >
+                                      <Button className="border-2 border-red-500 cursor-pointer bg-white text-red-500 hover:bg-red-50 hover:text-red-700">
                                         <Delete />
                                         Delete Activity
                                       </Button>
@@ -909,16 +899,13 @@ export default function UpdateDeals(deal_id, onChange) {
                             key={activity.id}
                             className="shadow-md rounded-2xl border border-purple-500 dark:border-slate-700 bg-white dark:bg-slate-800"
                           >
-                            {/* Header: Title + Category */}
                             <CardHeader className="pb-2">
                               <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100 break-words">
                                 <Label>{activity.title}</Label>
                               </CardTitle>
                             </CardHeader>
 
-                            {/* Content */}
                             <CardContent className="space-y-4">
-                              {/* Info Row: Date + Category (responsive) */}
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                   <Label className="text-slate-500 dark:text-slate-400 text-xs">
@@ -946,7 +933,6 @@ export default function UpdateDeals(deal_id, onChange) {
                                 </div>
                               </div>
 
-                              {/* Description */}
                               <div>
                                 <Label className="text-slate-500 dark:text-slate-400 text-xs">
                                   Description
@@ -978,9 +964,17 @@ export default function UpdateDeals(deal_id, onChange) {
         </div>
         <Button
           onClick={handleUpdateDB}
-          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+          disabled={loading}
+          className={`mt-4 bg-blue-600 hover:bg-blue-700 text-white ${
+            loading ? "cursor-not-allowed opacity-70" : ""
+          }`}
         >
-          <Plus className="w-4 h-4 mr-2" /> Update Deal Data
+          {loading ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Plus className="w-4 h-4 mr-2" />
+          )}{" "}
+          Update Deal Data
         </Button>
       </div>
       <Card className="bg-transparent text-gray-600 border-0">
@@ -1109,7 +1103,6 @@ export default function UpdateDeals(deal_id, onChange) {
                   }`}
                 >
                   <CardContent className="p-3">
-                    {/* Sender Type */}
                     <div className="flex items-center justify-between mb-2">
                       <span
                         className={`text-xs font-semibold px-2 py-1 rounded-full ${
@@ -1125,7 +1118,6 @@ export default function UpdateDeals(deal_id, onChange) {
                       </span>
                     </div>
 
-                    {/* Message Content */}
                     <p className="text-sm text-slate-800 dark:text-slate-100 whitespace-pre-wrap break-words">
                       {msg.message}
                     </p>
