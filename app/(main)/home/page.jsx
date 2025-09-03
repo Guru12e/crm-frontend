@@ -309,11 +309,10 @@ export default function Home() {
             <div key={index} className="flex items-center space-x-2">
               <div className={cn("w-3 h-3 rounded-full", item.color)}></div>
               <span className="text-xs font-medium whitespace-nowrap">
-                {item.name}: {item.value} (<span>{item.rate}</span>%)
+                {item.name}: {item.value}%
               </span>
             </div>
           ))}
-          <span>Total Deals: {deals.length}</span>
         </div>
       </div>
     );
@@ -559,7 +558,7 @@ export default function Home() {
                     className="flex justify-between items-center py-2 border-b border-slate-200 dark:border-slate-700 last:border-b-0"
                   >
                     <span className="font-medium">{item.name}</span>
-                    <span className="text-xl font-bold">{item.rate}%</span>
+                    <span className="text-xl font-bold">{item.value}%</span>
                   </div>
                 ))}
               </div>
@@ -594,7 +593,7 @@ export default function Home() {
         </Card> */}
       </div>
 
-      {/* <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+      <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
         <CardHeader>
           <CardTitle className="flex items-center">
             <DollarSign className="w-5 h-5 mr-2" />
@@ -625,9 +624,9 @@ export default function Home() {
             </div>
           )}
         </CardContent>
-      </Card> */}
+      </Card>
 
-      {/* <div className="grid grid-cols-1 md:grid-cols-2  gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2  gap-4 sm:gap-6">
         <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -680,7 +679,7 @@ export default function Home() {
             ))}
           </CardContent>
         </Card>
-      </div> */}
+      </div>
     </div>
   );
 }
