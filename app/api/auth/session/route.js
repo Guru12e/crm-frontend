@@ -4,5 +4,9 @@ import { authOptions } from "../[...nextauth]/route";
 
 export async function GET(req) {
   const session = await getServerSession(authOptions);
-  return NextResponse.json({ user: session.user }, { status: 200 });
+  if (session) {
+    return NextResponse.json({ user: session.user }, { status: 200 });
+  } else {
+    return NextResponse.json({ user: null }, { status: 400 });
+  }
 }

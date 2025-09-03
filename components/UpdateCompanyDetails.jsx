@@ -4,15 +4,21 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Save, Upload, Plus, Trash2, Package, AlertCircle } from "lucide-react";
+import {
+  Save,
+  Upload,
+  Plus,
+  Trash2,
+  Package,
+  AlertCircle,
+  Loader2,
+} from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ToastContainer, toast } from "react-toastify";
 import isEqual from "lodash/isEqual";
 import "react-toastify/dist/ReactToastify.css";
-import { fetchData } from "next-auth/client/_utils";
-import { set } from "lodash";
 const ErrorMessage = ({ error }) => {
   if (!error) return null;
   return (
@@ -58,7 +64,6 @@ export default function CompanyProfile() {
         const parsed = JSON.parse(cachedData);
         setCompanyData(parsed);
         setProducts(Array.isArray(parsed.products) ? parsed.products : []);
-        console.log("Loaded from cache:", parsed);
       } catch (error) {
         console.error("Failed to parse cached data:", error);
         localStorage.removeItem("companyDataCache");
@@ -92,8 +97,6 @@ export default function CompanyProfile() {
         );
         if (icpData) setIcpData(icpData);
 
-        console.log("Fetched company data:", data);
-        if (icpData) console.log("Fetched ICP data:", icpData);
         if (icpError) console.error("Error fetching ICP data:", icpError);
       } catch (err) {
         console.error("Error fetching data from Supabase:", err);
@@ -103,23 +106,8 @@ export default function CompanyProfile() {
     fetchData();
   }, [userEmail]);
 
-  // ✅ Log whenever state changes (no stale logs!)
-  useEffect(() => {
-    if (companyData && Object.keys(companyData).length > 0) {
-      console.log("Company data updated:", companyData);
-    }
-  }, [companyData]);
-
-  useEffect(() => {
-    if (icpData && Object.keys(icpData).length > 0) {
-      console.log("ICP data updated:", icpData);
-    }
-  }, [icpData]);
-
   useEffect(() => {
     const createICPEntry = async () => {
-      console.log("Creating ICP entry with:", { userEmail, companyData });
-
       const res = await fetch("/api/ICP", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -131,7 +119,6 @@ export default function CompanyProfile() {
 
       if (res.ok) {
         const data = await res.json();
-        console.log("ICP response:", data);
         setResult(data.output);
       } else {
         console.error("Error creating ICP entry:", res.statusText);
@@ -207,8 +194,6 @@ export default function CompanyProfile() {
       .select("*")
       .eq("email", userEmail)
       .single();
-    console.log(companyDetails);
-    console.log("Company data:", companyData);
     const noChanges =
       companyDetails.companyName === companyData.companyName &&
       companyDetails.companyDescription === companyData.companyDescription &&
@@ -241,7 +226,6 @@ export default function CompanyProfile() {
 
       if (res.ok) {
         const data = await res.json();
-        console.log(data);
         setResult(data.output);
       }
 
@@ -504,6 +488,7 @@ export default function CompanyProfile() {
           <Save className="mr-2 w-4 h-4" /> Save Changes Locally
         </Button>
         <Button onClick={handleUpdateDB} className={"cursor-pointer"}>
+          {loading && <Loader2 className="mr-2 w-4 h-4 animate-spin" />}
           <Upload className="mr-2 w-4 h-4" /> Update Database
         </Button>
       </div>

@@ -1,9 +1,8 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   TrendingUp,
   Users,
@@ -11,14 +10,13 @@ import {
   Calendar,
   Phone,
   DollarSign,
-  BarChart3,
-  PieChart,
   ToggleLeft,
   ToggleRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/utils/supabase/client";
 import { round } from "lodash";
+import { redirect } from "next/navigation";
 
 export default function Home() {
   const [leads, setLeads] = useState([]);
@@ -28,17 +26,14 @@ export default function Home() {
       .from("Leads")
       .select("*")
       .eq("user_email", userEmail);
-    console.log(leadsData);
     const { data: dealsData, error: dealsError } = await supabase
       .from("Deals")
       .select("*")
       .eq("user_email", userEmail);
-    console.log(dealsData);
     const { data: customersData, error: customersError } = await supabase
       .from("Customers")
       .select("*")
       .eq("user_email", userEmail);
-    console.log(customersData);
     if (leadsError) console.error("Error fetching leads:", leadsError);
     if (dealsError) console.error("Error fetching deals:", dealsError);
     if (customersError)
@@ -49,16 +44,21 @@ export default function Home() {
   };
   const [customers, setCustomers] = useState([]);
   const [userEmail, setUserEmail] = useState("");
-  const [session, setSession] = useState(null);
+  const [userName, setUserName] = useState("");
+
   useEffect(() => {
     const getSession = () => {
       const sessionJSON = JSON.parse(localStorage.getItem("session"));
-      setSession(sessionJSON);
+      if (sessionJSON == null) {
+        redirect("/");
+      }
       setUserEmail(sessionJSON.user.email);
+      setUserName(JSON.parse(localStorage.getItem("user")).name);
     };
 
     getSession();
   }, []);
+
   const fetchCustomers = async () => {
     const { data: customersData } = await supabase
       .from("Customers")
@@ -110,6 +110,7 @@ export default function Home() {
       fetchLeads();
       fetchDeals();
     }, 60000);
+
     return () => clearInterval(intervalId);
   }, [userEmail]);
 
@@ -118,8 +119,11 @@ export default function Home() {
   ).length;
 
   const onboardingData = {
-    rate: round((QualifiedLeads / leads.length) * 100, 2),
-    change: +12,
+    rate:
+      leads?.length != 0
+        ? round(((QualifiedLeads || 0) / leads.length) * 100, 2)
+        : 0,
+    change: 12,
   };
 
   const customerEmails = new Set(customers.map((c) => c.email));
@@ -132,140 +136,45 @@ export default function Home() {
   const dealsWon = deals.filter((deal) => deal.status === "Closed-won").length;
   const dealsData = { won: dealsWon, change: +15 };
 
-  const dealClassification = [
-    {
-      name: "New",
-      value: deals.filter((deal) => deal.status === "New").length,
-      rate: round(
-        (deals.filter((deal) => deal.status === "New").length / deals.length) *
-          100,
-        2
-      ),
-      color: "bg-red-500",
-    },
-    {
-      name: "Proposal Sent",
-      value: deals.filter((deal) => deal.status === "Proposal Sent").length,
-      rate: round(
-        (deals.filter((deal) => deal.status === "Proposal Sent").length /
-          deals.length) *
-          100,
-        2
-      ),
-      color: "bg-yellow-500",
-    },
-    {
-      name: "Negotiation",
-      value: deals.filter((deal) => deal.status === "Negotiation").length,
-      rate: round(
-        (deals.filter((deal) => deal.status === "Negotiation").length /
-          deals.length) *
-          100,
-        2
-      ),
-      color: "bg-blue-500",
-    },
-    {
-      name: "Closed Won",
-      value: deals.filter((deal) => deal.status === "Closed-won").length,
-      rate: round(
-        (deals.filter((deal) => deal.status === "Closed-won").length /
-          deals.length) *
-          100,
-        2
-      ),
-      color: "bg-green-500",
-    },
-    {
-      name: "Closed Lost",
-      value: deals.filter((deal) => deal.status === "Closed-lost").length,
-      rate: round(
-        (deals.filter((deal) => deal.status === "Closed-lost").length /
-          deals.length) *
-          100,
-        2
-      ),
-      color: "bg-gray-500",
-    },
+  const totalDeals = deals?.length || 0;
+
+  const dealStatuses = [
+    { name: "New", status: "New", color: "bg-red-500" },
+    { name: "Proposal Sent", status: "Proposal Sent", color: "bg-yellow-500" },
+    { name: "Negotiation", status: "Negotiation", color: "bg-blue-500" },
+    { name: "Closed Won", status: "Closed-won", color: "bg-green-500" },
+    { name: "Closed Lost", status: "Closed-lost", color: "bg-gray-500" },
     {
       name: "Meeting Booked",
-      value: deals.filter((deal) => deal.status === "Meeting Booked").length,
-      rate: round(
-        (deals.filter((deal) => deal.status === "Meeting Booked").length /
-          deals.length) *
-          100,
-        2
-      ),
+      status: "Meeting Booked",
       color: "bg-purple-500",
     },
-    {
-      name: "On Hold",
-      value: deals.filter((deal) => deal.status === "On-hold").length,
-      rate: round(
-        (deals.filter((deal) => deal.status === "On-hold").length /
-          deals.length) *
-          100,
-        2
-      ),
-      color: "bg-pink-500",
-    },
-    {
-      name: "Abandoned",
-      value: deals.filter((deal) => deal.status === "Abandoned").length,
-      rate: round(
-        (deals.filter((deal) => deal.status === "Abandoned").length /
-          deals.length) *
-          100,
-        2
-      ),
-      color: "bg-orange-500",
-    },
+    { name: "On Hold", status: "On-hold", color: "bg-pink-500" },
+    { name: "Abandoned", status: "Abandoned", color: "bg-orange-500" },
   ];
 
-  console.log(customers);
+  const dealClassification = dealStatuses.map(({ name, status, color }) => {
+    const value = deals.filter((deal) => deal.status === status).length;
+    const rate = totalDeals > 0 ? round((value / totalDeals) * 100, 2) : 0;
+
+    return { name, value, rate, color };
+  });
+
+  const sourceCount = leads?.reduce((acc, { source }) => {
+    acc[source] = (acc[source] || 0) + 1;
+    return acc;
+  }, {});
 
   const leadSources = [
-    // {
-    //   name: "Advertisement",
-    //   value: leads.filter((c) => c.source === "Advertisement").length,
-    // },
-    // {
-    //   name: "Cold call",
-    //   value: leads.filter((c) => c.source === "Cold call").length,
-    // },
-    // {
-    //   name: "Employee referral",
-    //   value: leads.filter((c) => c.source === "Employee referral").length,
-    // },
-    {
-      name: "External referral",
-      value: leads.filter((c) => c.source === "External referral").length,
-    },
-    // {
-    //   name: "Sales email alias",
-    //   value: leads.filter((c) => c.source === "Sales email alias").length,
-    // },
-    {
-      name: "Chat",
-      value: leads.filter((c) => c.source === "Chat").length,
-    },
-    {
-      name: "Facebook",
-      value: leads.filter((c) => c.source === "Facebook").length,
-    },
-    // {
-    //   name: "Web Research",
-    //   value: leads.filter((c) => c.source === "Web Research").length,
-    // },
-    {
-      name: "X(Twitter)",
-      value: leads.filter((c) => c.source === "X(Twitter)").length,
-    },
-    {
-      name: "Public relations",
-      value: leads.filter((c) => c.source === "Public relations").length,
-    },
-  ];
+    "External referral",
+    "Chat",
+    "Facebook",
+    "X(Twitter)",
+    "Public relations",
+  ].map((name) => ({
+    name,
+    value: sourceCount?.[name] || 0,
+  }));
 
   const revenueData = [
     { month: "Jan", revenue: 45000, deals: 12 },
@@ -306,7 +215,7 @@ export default function Home() {
             </p>
             <p className="text-2xl font-bold text-slate-900 dark:text-white">
               {value}
-              {title.includes("rate") ? "%" : ""}
+              {title.includes("rate") || title.includes("Rate") ? "%" : ""}
             </p>
             {/* <p
               className={cn(
@@ -333,11 +242,11 @@ export default function Home() {
       "bg-red-500": "#ef4444",
       "bg-yellow-500": "#eab308",
       "bg-blue-500": "#3b82f6",
-      "bg-green-500": "#22c55e",
-      "bg-gray-500": "#6b7280",
+      "bg-green-500": "#10b981",
+      "bg-orange-500": "#f97316",
       "bg-purple-500": "#a855f7",
       "bg-pink-500": "#ec4899",
-      "bg-orange-500": "#f97316",
+      "bg-gray-500": "#6b7280",
     };
 
     return (
@@ -418,8 +327,8 @@ export default function Home() {
         <svg width="100%" height="100%" viewBox="0 0 400 240">
           <defs>
             <linearGradient id="barGradient" x1="0%" y1="100%" x2="0%" y2="0%">
-              <stop offset="0%" stopColor="#3b82f6" />
-              <stop offset="100%" stopColor="#8b5cf6" />
+              <stop offset="0%" stopColor="#16699d" />
+              <stop offset="100%" stopColor="#57bba9" />
             </linearGradient>
           </defs>
 
@@ -586,7 +495,7 @@ export default function Home() {
             Dashboard
           </h1>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">
-            Welcome back! Here's your GTM overview.
+            Welcome back, {userName}! Here's your GTM overview.
           </p>
         </div>
         <Button
@@ -632,7 +541,7 @@ export default function Home() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+        {/* <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center">
               <PieChart className="w-5 h-5 mr-2" />
@@ -656,9 +565,9 @@ export default function Home() {
               </div>
             )}
           </CardContent>
-        </Card>
+        </Card> */}
 
-        <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+        {/* <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center">
               <BarChart3 className="w-5 h-5 mr-2" />
@@ -682,7 +591,7 @@ export default function Home() {
               </div>
             )}
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       {/* <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">

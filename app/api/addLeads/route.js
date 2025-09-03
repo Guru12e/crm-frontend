@@ -27,10 +27,6 @@ export async function POST(request) {
       })
       .select("*");
 
-    if (error.message.includes("duplicate key value")) {
-      return NextResponse.json("error", { status: 404 });
-    }
-
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 401 });
     }

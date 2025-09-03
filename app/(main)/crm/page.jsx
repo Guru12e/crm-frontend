@@ -7,9 +7,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import LeadCard from "@/components/LeadCard";
-import CustomerCard from "@/components/CustomerCard";
-import DealCard from "@/components/DealCard";
+import LeadCard from "@/components/cards/LeadCard";
+import LeadForm from "@/components/forms/LeadForm";
+import CustomerCard from "@/components/cards/CustomerCard";
+import CustomerForm from "@/components/forms/CustomerForm";
+import DealCard from "@/components/cards/DealCard";
+import DealForm from "@/components/forms/DealForm";
 import {
   Select,
   SelectContent,
@@ -25,115 +28,32 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  Users,
-  TrendingUp,
-  DollarSign,
-  Search,
-  Loader2,
-  AlertCircle,
-  ChevronsUpDown,
-  CheckIcon,
-  ChevronsUpDownIcon,
-} from "lucide-react";
-import { Label } from "@/components/ui/label";
+import { Users, TrendingUp, DollarSign, Search } from "lucide-react";
 import { toast } from "react-toastify";
-import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/utils/supabase/client";
-import MultipleSelector from "@/components/ui/multiselect";
-import { set } from "lodash";
-
-const summaryStats = {
-  customers: { total: 1247, new: 89, growth: 12 },
-  leads: { total: 2456, qualified: 567, growth: 18 },
-  deals: { total: 189, won: 67, growth: 15, value: 2340000 },
-};
-
-const customerStatus = ["Active", "Inactive", "At Risk"];
-const leadStatus = [
-  "New",
-  "In progress",
-  "Contact Attempted",
-  "Contacted",
-  "Meeting Booked",
-  "Qualified",
-  "Unqualified",
-];
-const dealStatus = [
-  "New",
-  "Proposal Sent",
-  "Negotiation",
-  "Closed-won",
-  "Closed-lost",
-  "On-hold",
-  "Abandoned",
-];
+import {
+  customerStatus,
+  dealStatus,
+  leadSources,
+  leadStatus,
+  monthFilters,
+  summaryStats,
+} from "@/constants/constant";
+import { redirect } from "next/navigation";
 
 export default function CRM() {
   const [activeTab, setActiveTab] = useState("Customers");
-  const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All statuses");
-  const [sourceFilter, setSourceFilter] = useState("");
-  const [monthFilter, setMonthFilter] = useState("");
+  const [sourceFilter, setSourceFilter] = useState("All sources");
+  const [monthFilter, setMonthFilter] = useState("All time");
   const [customersData, setCustomersData] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [session, setSession] = useState(null);
   const [leadsData, setLeadsData] = useState([]);
   const [dealsData, setDealsData] = useState([]);
   const today = new Date();
-  const [session, setSession] = useState("");
   const [userEmail, setUserEmail] = useState(null);
-  const [dealProducts, setDealProducts] = useState([]);
-  const [otherValue, setOtherValue] = useState("");
-  const [open, setOpen] = useState(false);
-
-  const [customerFormData, setCustomerFormData] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    linkedIn: "",
-    price: "",
-    location: "",
-    website: "",
-    industry: "",
-    status: "",
-    created_at: today,
-  });
-  const [leadsFormData, setLeadsFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    age: 18,
-    linkedIn: "",
-    industry: "",
-    company: "",
-    income: 0,
-    website: "",
-    status: "",
-    source: "",
-    address: "",
-    description: "",
-  });
-
-  const [dealFormData, setDealFormData] = useState({
-    name: "",
-    email: "",
-    title: "",
-    phone: "",
-    company: "",
-    value: 0,
-    status: "",
-    priority: "Low",
-    closeDate: today,
-    products: [],
-    owner: "",
-    source: "",
-    description: "",
-  });
-
-  const [errors, setErrors] = useState({});
-  const [customerLoading, setCustomerLoading] = useState(false);
-  const [leadsLoading, setLeadsLoading] = useState(false);
-  const [dealsLoading, setDealsLoading] = useState(false);
 
   useEffect(() => {
     const getSession = () => {
@@ -143,6 +63,10 @@ export default function CRM() {
       setActiveTab(sessionStorage.getItem("activeTab") || "Customers");
     };
     const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) {
+      redirect("/");
+    }
     setProducts(
       user?.products?.map((product) => ({
         value: product.name,
@@ -153,26 +77,6 @@ export default function CRM() {
     getSession();
   }, []);
 
-  const ErrorMessage = ({ error }) =>
-    error && (
-      <div className="flex items-center gap-1 text-red-500 text-sm mt-1">
-        <AlertCircle className="w-4 h-4" />
-        {error}
-      </div>
-    );
-
-  const updateCustomerFormData = (field, value) => {
-    setCustomerFormData((prev) => ({ ...prev, [field]: value }));
-    setErrors((prev) => ({ ...prev, [field]: "" }));
-  };
-  const updateLeadsFormData = (field, value) => {
-    setLeadsFormData((prev) => ({ ...prev, [field]: value }));
-    setErrors((prev) => ({ ...prev, [field]: "" }));
-  };
-  const updateDealFormData = (field, value) => {
-    setDealFormData((prev) => ({ ...prev, [field]: value }));
-    setErrors((prev) => ({ ...prev, [field]: "" }));
-  };
   const fetchCustomers = async () => {
     const { data: customersData } = await supabase
       .from("Customers")
@@ -228,354 +132,6 @@ export default function CRM() {
     return () => clearInterval(intervalId);
   }, [userEmail]);
 
-  const handleCustomerSubmit = async (e) => {
-    e.preventDefault();
-    setCustomerLoading(true);
-    let isValid = true;
-    if (!customerFormData.name) {
-      errors.name = "Name is required";
-      isValid = false;
-    } else {
-      errors.name = "";
-    }
-    if (!customerFormData.phone) {
-      errors.number = "Phone Number is Required";
-      isValid = false;
-    } else {
-      errors.number = "";
-    }
-
-    if (!customerFormData.status) {
-      errors.status = "Status is Required";
-      isValid = false;
-    } else {
-      errors.status = "";
-    }
-
-    if (!customerFormData.created_at) {
-      customerFormData.created_at = today;
-      errors.created_at = "";
-      isValid = true;
-    }
-
-    if (customerFormData.linkedIn) {
-      if (!customerFormData.linkedIn.includes("https://www.linkedin.com/")) {
-        errors.linkedIn = "LinkedIn Url Required";
-        toast.error("LinkedIn Url Required");
-        isValid = false;
-      } else {
-        errors.linkedIn = "";
-      }
-    }
-
-    if (!isValid) {
-      setCustomerLoading(false);
-      setErrors(errors);
-      return;
-    } else {
-      const req = await fetch("/api/addCustomer", {
-        method: "POST",
-        body: JSON.stringify({
-          ...customerFormData,
-          session: session,
-        }),
-      });
-
-      if (req.status == 404) {
-        toast.error("Email Already Exists", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-        return;
-      }
-
-      if (req.status == 200) {
-        toast.success("Customer Added", {
-          autoClose: 3000,
-          position: "top-right",
-        });
-
-        const updatedCustomer = await req.json();
-        setCustomersData((prevCustomers) => [
-          ...prevCustomers,
-          updatedCustomer,
-        ]);
-        setCustomerFormData({
-          name: "",
-          phone: "",
-          email: "",
-          linkedIn: "",
-          price: null,
-          location: "",
-          website: "",
-          industry: "",
-          status: "",
-          created_at: "",
-        });
-        await fetchCustomers();
-        setOpen(false);
-      } else {
-        toast.error("Error in Adding Customer", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-      }
-
-      setCustomerLoading(false);
-    }
-  };
-  const handleLeadsSubmit = async (e) => {
-    e.preventDefault();
-    setLeadsLoading(true);
-
-    let newErrors = {};
-    let isValid = true;
-
-    if (!leadsFormData.name) {
-      newErrors.leadName = "Name is required";
-      isValid = false;
-    }
-    if (!leadsFormData.phone) {
-      newErrors.leadPhone = "Phone is required";
-      isValid = false;
-    }
-    if (!leadsFormData.status) {
-      newErrors.leadStatus = "Status is required";
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-
-    if (!isValid) {
-      setLeadsLoading(false);
-      return;
-    }
-
-    const req = await fetch("/api/addLeads", {
-      method: "POST",
-      body: JSON.stringify({ ...leadsFormData, session }),
-    });
-
-    if (leadsFormData.status === "Qualified") {
-      const leadToDeal = {
-        name: leadsFormData.name,
-        phone: leadsFormData.phone,
-        email: leadsFormData.email,
-        linkedIn: leadsFormData.linkedIn,
-        location: leadsFormData.location,
-        status: "New",
-        created_at: today.toISOString().split("T")[0],
-        closeDate: today.toISOString().split("T")[0],
-        user_email: userEmail,
-      };
-
-      const dealReq = await fetch("/api/addDeals", {
-        method: "POST",
-        body: JSON.stringify({ ...leadToDeal, session }),
-      });
-
-      if (dealReq.status === 200) {
-        toast.success("Deal Added Since Lead is Qualified", {
-          autoClose: 3000,
-          position: "top-right",
-        });
-      } else {
-        toast.error("Error in Adding Deal", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-      }
-      await fetchLeads();
-      await fetchDeals();
-      setOpen(false);
-    }
-
-    if (req.status === 200) {
-      toast.success("Lead Added", { autoClose: 3000, position: "top-right" });
-      const updatedLead = await req.json();
-      setLeadsData((prevLeads) => [...prevLeads, updatedLead]);
-      setLeadsFormData({
-        name: "",
-        phone: "",
-        email: "",
-        linkedIn: "",
-        location: "",
-        website: "",
-        industry: "",
-        status: "",
-        created_at: "",
-        user_email: userEmail,
-      });
-      await fetchLeads();
-    } else {
-      toast.error("Error in Adding Leads", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-    }
-
-    setLeadsLoading(false);
-  };
-
-  const handleDealsSubmit = async (e) => {
-    e.preventDefault();
-    setDealsLoading(true);
-    dealFormData.products = dealProducts.map((prod) => prod.value);
-    console.log(dealFormData);
-    let isValid = true;
-    if (!dealFormData.name) {
-      errors.dealName = "Name is required";
-      isValid = false;
-    } else {
-      errors.dealName = "";
-    }
-    if (!dealFormData.phone) {
-      errors.dealPhone = "Phone is required";
-      isValid = false;
-    } else {
-      errors.dealPhone = "";
-    }
-    if (!dealFormData.title) {
-      errors.dealTitle = "Title is required";
-      isValid = false;
-    } else {
-      errors.dealTitle = "";
-    }
-    if (!dealFormData.value) {
-      errors.dealValue = "Value is required";
-      isValid = false;
-    } else {
-      errors.dealValue = "";
-    }
-    if (!dealFormData.status) {
-      errors.dealStatus = "Status is required";
-      isValid = false;
-    } else {
-      errors.dealStatus = "";
-    }
-    if (!dealFormData.closeDate) {
-      dealFormData.closeDate = today;
-      errors.closeDate = "";
-    }
-    if (!dealFormData.created_at) {
-      dealFormData.created_at = today;
-    }
-    if (!isValid) {
-      setDealsLoading(false);
-      setErrors(errors);
-      return;
-    } else {
-      const req = await fetch("/api/addDeals", {
-        method: "POST",
-        body: JSON.stringify({
-          ...dealFormData,
-          session: session,
-        }),
-      });
-
-      if (req.status == 404) {
-        toast.error("Email Already Found", {
-          autoClose: 3000,
-          position: "top-right",
-        });
-
-        return;
-      }
-
-      if (req.status == 200) {
-        toast.success("Deal Added", {
-          autoClose: 3000,
-          position: "top-right",
-        });
-        if (dealFormData.status === "Closed-won") {
-          const customerData = {
-            name: dealFormData.name,
-            phone: dealFormData.phone,
-            email: dealFormData.email,
-            linkedIn: dealFormData.linkedIn,
-            price: dealFormData.value,
-            location: dealFormData.location,
-            purchase_history: {
-              product: dealFormData.products,
-              price: dealFormData.value,
-              purchase_date: today.toISOString().split("T")[0],
-            },
-            industry: dealFormData.industry,
-            status: "Active",
-            created_at: today.toISOString().split("T")[0],
-            user_email: userEmail,
-          };
-          const { data, error } = await supabase
-            .from("customers")
-            .select("*")
-            .eq("email", dealFormData.email)
-            .eq("user_email", userEmail)
-            .maybeSingle();
-          if (error) {
-            console.error("Error checking existing customer:", error);
-          }
-          if (!data) {
-            await fetch("/api/addCustomer", {
-              method: "POST",
-              body: JSON.stringify({
-                ...customerData,
-                session: session,
-              }),
-            });
-          } else {
-            const { error } = await supabase
-              .from("customers")
-              .update({
-                ...customerData,
-                price: data.price + dealFormData.value,
-                status: "Active",
-                created_at: data.created_at,
-                purchase_history: [
-                  ...data.purchase_history,
-                  {
-                    product: dealFormData.products,
-                    price: dealFormData.value,
-                    purchase_date: today.toISOString().split("T")[0],
-                  },
-                ],
-              })
-              .eq("email", dealFormData.email)
-              .eq("user_email", userEmail);
-            if (error) {
-              console.error("Error updating existing customer:", error);
-            }
-          }
-        }
-        const updatedDeal = await req.json();
-        setDealsData((prevDeals) => [...prevDeals, updatedDeal]);
-
-        setDealFormData({
-          name: "",
-          phone: "",
-          email: "",
-          linkedIn: "",
-          location: "",
-          title: "",
-          value: "",
-          status: "",
-          created_at: "",
-          closeDate: "",
-          user_email: userEmail,
-        });
-        await fetchDeals();
-      } else {
-        toast.error("Error in Adding Deal", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-      }
-      setDealsLoading(false);
-      await fetchCustomers();
-      await fetchDeals();
-      setOpen(false);
-    }
-  };
-
   const fileInputRef = useRef();
 
   const handleFileUpload = (event) => {
@@ -597,7 +153,10 @@ export default function CRM() {
         if (error) {
           console.error("Error inserting data:", error);
         } else {
-          console.log("Data inserted successfully:");
+          toast.success("Data inserted successfully:", {
+            position: "top-right",
+            autoClose: 3000,
+          });
         }
       },
     });
@@ -709,7 +268,6 @@ export default function CRM() {
                           </li>
                         </ul>
 
-                        {/* Tip Box */}
                         <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mt-4 text-sm text-blue-700">
                           💡 <span className="font-semibold">Tip:</span>{" "}
                           Download our template to ensure your CSV is properly
@@ -717,7 +275,6 @@ export default function CRM() {
                         </div>
                       </div>
 
-                      {/* Download Template */}
                       <div className="gap-4 md:space-y-6">
                         <div>
                           <h3 className="font-semibold text-lg mb-2">
@@ -733,7 +290,6 @@ export default function CRM() {
                           </Button>
                         </div>
 
-                        {/* Select CSV File */}
                         <div>
                           <h3 className="font-semibold text-lg mb-2">
                             📂 Select CSV File
@@ -753,7 +309,6 @@ export default function CRM() {
                           />
                         </div>
 
-                        {/* Pro Tips */}
                         <div>
                           <h3 className="font-semibold text-lg mb-2">
                             💡 Pro Tips
@@ -811,7 +366,6 @@ export default function CRM() {
                           </li>
                         </ul>
 
-                        {/* Tip Box */}
                         <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mt-4 text-sm text-blue-700">
                           💡 <span className="font-semibold">Tip:</span>{" "}
                           Download our template to ensure your CSV is properly
@@ -819,7 +373,6 @@ export default function CRM() {
                         </div>
                       </div>
 
-                      {/* Download Template */}
                       <div className="gap-4 md:space-y-6">
                         <div>
                           <h3 className="font-semibold text-lg mb-2">
@@ -835,7 +388,6 @@ export default function CRM() {
                           </Button>
                         </div>
 
-                        {/* Select CSV File */}
                         <div>
                           <h3 className="font-semibold text-lg mb-2">
                             📂 Select CSV File
@@ -855,7 +407,6 @@ export default function CRM() {
                           />
                         </div>
 
-                        {/* Pro Tips */}
                         <div>
                           <h3 className="font-semibold text-lg mb-2">
                             💡 Pro Tips
@@ -916,7 +467,6 @@ export default function CRM() {
                           </li>
                         </ul>
 
-                        {/* Tip Box */}
                         <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mt-4 text-sm text-blue-700">
                           💡 <span className="font-semibold">Tip:</span>{" "}
                           Download our template to ensure your CSV is properly
@@ -924,7 +474,6 @@ export default function CRM() {
                         </div>
                       </div>
 
-                      {/* Download Template */}
                       <div className="gap-4 md:space-y-6">
                         <div>
                           <h3 className="font-semibold text-lg mb-2">
@@ -940,7 +489,6 @@ export default function CRM() {
                           </Button>
                         </div>
 
-                        {/* Select CSV File */}
                         <div>
                           <h3 className="font-semibold text-lg mb-2">
                             📂 Select CSV File
@@ -960,7 +508,6 @@ export default function CRM() {
                           />
                         </div>
 
-                        {/* Pro Tips */}
                         <div>
                           <h3 className="font-semibold text-lg mb-2">
                             💡 Pro Tips
@@ -984,1002 +531,40 @@ export default function CRM() {
           </Sheet>
         </div>
 
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger>
-            <div className="bg-gradient-to-r px-3 py-2 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white w-full md:ml-5">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button className="bg-gradient-to-r px-3 py-2 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white md:ml-5">
               Add New {activeTab}
-            </div>
+            </Button>
           </SheetTrigger>
           <SheetContent>
             <SheetHeader>
               <SheetTitle>Add New {activeTab}</SheetTitle>
               <SheetDescription>
                 <>
-                  <div
-                    className={`${
-                      activeTab == "Customers" ? "grid" : "hidden"
-                    } p-3 grid-cols-1 md:grid-cols-2 gap-4`}
-                  >
-                    <div>
-                      <Label
-                        htmlFor="name"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Name
-                      </Label>
-                      <Input
-                        id="name"
-                        value={customerFormData.name}
-                        onChange={(e) =>
-                          updateCustomerFormData("name", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.name ? "border-red-500" : ""
-                        }`}
-                        placeholder="Customer full name"
-                      />
-                      <ErrorMessage error={errors.name} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="email"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Email
-                      </Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={customerFormData.email}
-                        onChange={(e) =>
-                          updateCustomerFormData("email", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.email ? "border-red-500" : ""
-                        }`}
-                        placeholder="customer@email.com"
-                      />
-                      <ErrorMessage error={errors.email} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="number"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Number
-                      </Label>
-                      <Input
-                        id="number"
-                        type="text"
-                        value={customerFormData.phone}
-                        onChange={(e) =>
-                          updateCustomerFormData("phone", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.phone ? "border-red-500" : ""
-                        }`}
-                        placeholder="+91 12345 67890"
-                      />
-                      <ErrorMessage error={errors.phone} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="linkedIn"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        LinkedIn Profile
-                      </Label>
-                      <Input
-                        id="linkedIn"
-                        type="url"
-                        value={customerFormData.linkedIn}
-                        onChange={(e) =>
-                          updateCustomerFormData("linkedIn", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.linkedIn ? "border-red-500" : ""
-                        }`}
-                        placeholder="LinkedIn profile URL"
-                      />
-                      <ErrorMessage error={errors.linkedIn} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="industry"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Industry
-                      </Label>
-                      <Select
-                        value={customerFormData.industry}
-                        onValueChange={(value) =>
-                          updateCustomerFormData("industry", value)
-                        }
-                        className={errors.industry ? "border-red-500" : ""}
-                      >
-                        <SelectTrigger
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                            errors.industry ? "border-red-500" : ""
-                          }`}
-                        >
-                          <SelectValue placeholder="Select industry" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Technology">Technology</SelectItem>
-                          <SelectItem value="Healthcare">Healthcare</SelectItem>
-                          <SelectItem value="Finance">Finance</SelectItem>
-                          <SelectItem value="Retail">Retail</SelectItem>
-                          <SelectItem value="Manufacturing">
-                            Manufacturing
-                          </SelectItem>
-                          <SelectItem value="Education">Education</SelectItem>
-                          <SelectItem value="Other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <ErrorMessage error={errors.industry} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="website"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Company Website
-                      </Label>
-                      <Input
-                        id="companyWebsite"
-                        type="url"
-                        value={customerFormData.website}
-                        onChange={(e) =>
-                          updateCustomerFormData("website", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.website ? "border-red-500" : ""
-                        }`}
-                        placeholder="https://yourcompany.com"
-                      />
-                      <ErrorMessage error={errors.website} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="address"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Customer Address
-                      </Label>
-                      <Input
-                        id="address"
-                        type="text"
-                        value={customerFormData.location}
-                        onChange={(e) =>
-                          updateCustomerFormData("location", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.location ? "border-red-500" : ""
-                        }`}
-                        placeholder="Customer Address"
-                      />
-                      <ErrorMessage error={errors.location} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="status"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Customer Status
-                      </Label>
-                      <Select
-                        value={customerFormData.status}
-                        onValueChange={(value) =>
-                          updateCustomerFormData("status", value)
-                        }
-                        className={errors.status ? "border-red-500" : ""}
-                      >
-                        <SelectTrigger
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                            errors.status ? "border-red-500" : ""
-                          }`}
-                        >
-                          <SelectValue placeholder="Select Customer Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Active">Active</SelectItem>
-                          <SelectItem value="Inactive">Inactive</SelectItem>
-                          <SelectItem value="At Risk">At Risk</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <ErrorMessage error={errors.status} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="price"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Customer Price
-                      </Label>
-                      <Input
-                        id="price"
-                        type="number"
-                        value={customerFormData.price}
-                        onChange={(e) =>
-                          updateCustomerFormData("price", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.price ? "border-red-500" : ""
-                        }`}
-                        placeholder="Customer Price"
-                      />
-                      <ErrorMessage error={errors.price} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="issue"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Customer issue
-                      </Label>
-                      <Input
-                        id="price"
-                        type="text"
-                        value={customerFormData.issue}
-                        onChange={(e) =>
-                          updateCustomerFormData("issue", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.issue ? "border-red-500" : ""
-                        }`}
-                        placeholder="Customer issue"
-                      />
-                      <ErrorMessage error={errors.issue} />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="issue"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Customer On-boarded Date
-                      </Label>
-                      <Input
-                        id="onboarded-date"
-                        type="date"
-                        value={customerFormData.created_at}
-                        onChange={(e) =>
-                          updateCustomerFormData("created_at", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.created_at ? "border-red-500" : ""
-                        }`}
-                        placeholder="Customer On Boarded Date"
-                      />
-                      <ErrorMessage error={errors.created_at} />
-                    </div>
-                    <Button
-                      disabled={customerLoading}
-                      onClick={handleCustomerSubmit}
-                      className={`${
-                        customerLoading
-                          ? "bg-purple-400 hover:bg-purple-500"
-                          : "bg-gradient-to-r from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600"
-                      }  cursor-pointer text-white`}
-                    >
-                      {customerLoading && (
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      )}
-                      Add Customers
-                    </Button>
-                  </div>
-                  <div
-                    className={`${activeTab == "Leads" ? "block" : "hidden"}`}
-                  >
-                    <div
-                      className={`grid p-3 grid-cols-1 md:grid-cols-2 gap-4`}
-                    >
-                      <div>
-                        <Label
-                          htmlFor="name"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Name
-                        </Label>
-                        <Input
-                          id="name"
-                          value={leadsFormData.name}
-                          onChange={(e) =>
-                            updateLeadsFormData("name", e.target.value)
-                          }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.name ? "border-red-500" : ""
-                          }`}
-                          placeholder="Lead's full name"
-                        />
-                        <ErrorMessage error={errors.name} />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="email"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Email
-                        </Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={leadsFormData.email}
-                          onChange={(e) =>
-                            updateLeadsFormData("email", e.target.value)
-                          }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.email ? "border-red-500" : ""
-                          }`}
-                          placeholder="lead@email.com"
-                        />
-                        <ErrorMessage error={errors.email} />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="number"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Phone
-                        </Label>
-                        <Input
-                          id="phone"
-                          type="text"
-                          value={leadsFormData.phone}
-                          onChange={(e) =>
-                            updateLeadsFormData("phone", e.target.value)
-                          }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.phone ? "border-red-500" : ""
-                          }`}
-                          placeholder="+91 12345 67890"
-                        />
-                        <ErrorMessage error={errors.phone} />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="age"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Age
-                        </Label>
-                        <Input
-                          id="age"
-                          value={leadsFormData.age}
-                          onChange={(e) =>
-                            updateLeadsFormData("age", e.target.value)
-                          }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.age ? "border-red-500" : ""
-                          }`}
-                          placeholder="Lead's age"
-                        />
-                        <ErrorMessage error={errors.age} />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="linkedIn"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          LinkedIn Profile
-                        </Label>
-                        <Input
-                          id="linkedIn"
-                          type="url"
-                          value={leadsFormData.linkedIn}
-                          onChange={(e) =>
-                            updateLeadsFormData("linkedIn", e.target.value)
-                          }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.linkedIn ? "border-red-500" : ""
-                          }`}
-                          placeholder="LinkedIn profile URL"
-                        />
-                        <ErrorMessage error={errors.linkedIn} />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="industry"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Industry
-                        </Label>
-                        <Select
-                          value={leadsFormData.industry}
-                          onValueChange={(value) =>
-                            updateLeadsFormData("industry", value)
-                          }
-                          className={errors.industry ? "border-red-500" : ""}
-                        >
-                          <SelectTrigger
-                            className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                              errors.industry ? "border-red-500" : ""
-                            }`}
-                          >
-                            <SelectValue placeholder="Select industry" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Technology">
-                              Technology
-                            </SelectItem>
-                            <SelectItem value="Healthcare">
-                              Healthcare
-                            </SelectItem>
-                            <SelectItem value="Finance">Finance</SelectItem>
-                            <SelectItem value="Retail">Retail</SelectItem>
-                            <SelectItem value="Manufacturing">
-                              Manufacturing
-                            </SelectItem>
-                            <SelectItem value="Education">Education</SelectItem>
-                            <SelectItem value="Other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <ErrorMessage error={errors.industry} />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="company"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Company
-                        </Label>
-                        <Input
-                          id="company"
-                          value={leadsFormData.company}
-                          onChange={(e) =>
-                            updateLeadsFormData("company", e.target.value)
-                          }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.company ? "border-red-500" : ""
-                          }`}
-                          placeholder="Lead Company"
-                        />
-                        <ErrorMessage error={errors.company} />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="income"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Income
-                        </Label>
-                        <Input
-                          id="income"
-                          value={leadsFormData.income}
-                          onChange={(e) =>
-                            updateLeadsFormData("income", e.target.value)
-                          }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.income ? "border-red-500" : ""
-                          }`}
-                          placeholder="Lead's income"
-                        />
-                        <ErrorMessage error={errors.income} />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="website"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Company Website
-                        </Label>
-                        <Input
-                          id="companyWebsite"
-                          type="url"
-                          value={leadsFormData.website}
-                          onChange={(e) =>
-                            updateLeadsFormData("website", e.target.value)
-                          }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.website ? "border-red-500" : ""
-                          }`}
-                          placeholder="https://yourcompany.com"
-                        />
-                        <ErrorMessage error={errors.website} />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="status"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Lead Status
-                        </Label>
-                        <Select
-                          value={leadsFormData.status}
-                          onValueChange={(value) =>
-                            updateLeadsFormData("status", value)
-                          }
-                          className={errors.status ? "border-red-500" : ""}
-                        >
-                          <SelectTrigger
-                            className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                              errors.status ? "border-red-500" : ""
-                            }`}
-                          >
-                            <SelectValue placeholder="Select Lead Status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="New">New</SelectItem>
-                            <SelectItem value="In progress">
-                              In progress
-                            </SelectItem>
-                            <SelectItem value="Contact Attempted">
-                              Contact Attempted
-                            </SelectItem>
-                            <SelectItem value="Contacted">Contacted</SelectItem>
-                            <SelectItem value="Qualified">Qualified</SelectItem>
-                            <SelectItem value="Unqualified">
-                              Unqualified
-                            </SelectItem>
-                            <SelectItem value="Meeting Booked">
-                              Meeting Booked
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <ErrorMessage error={errors.status} />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="source"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Lead Source
-                        </Label>
-                        <Select
-                          value={leadsFormData.source}
-                          onValueChange={(value) =>
-                            updateLeadsFormData("source", value)
-                          }
-                          className={errors.source ? "border-red-500" : ""}
-                        >
-                          <SelectTrigger
-                            className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                              errors.source ? "border-red-500" : ""
-                            }`}
-                          >
-                            <SelectValue placeholder="Select Lead Source" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Advertisement">
-                              Advertisement
-                            </SelectItem>
-                            <SelectItem value="Cold call">Cold call</SelectItem>
-                            <SelectItem value="Employee referral">
-                              Employee referral
-                            </SelectItem>
-                            <SelectItem value="External referral">
-                              External referral
-                            </SelectItem>
-                            <SelectItem value="Sales email alias">
-                              Sales email alias
-                            </SelectItem>
-                            <SelectItem value="Chat">Chat</SelectItem>
-                            <SelectItem value="Facebook">Facebook</SelectItem>
-                            <SelectItem value="Web Research">
-                              Web Research
-                            </SelectItem>
-                            <SelectItem value="X(Twitter)">
-                              X(Twitter)
-                            </SelectItem>
-                            <SelectItem value="Public relations">
-                              Public relations
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <ErrorMessage error={errors.source} />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="address"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Address
-                        </Label>
-                        <Input
-                          id="address"
-                          type="url"
-                          value={leadsFormData.address}
-                          onChange={(e) =>
-                            updateLeadsFormData("address", e.target.value)
-                          }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.address ? "border-red-500" : ""
-                          }`}
-                          placeholder="Lead's Address"
-                        />
-                        <ErrorMessage error={errors.address} />
-                      </div>
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="description"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Description
-                      </Label>
-                      <Textarea
-                        id="description"
-                        value={leadsFormData.description}
-                        onChange={(e) =>
-                          updateLeadsFormData("description", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.income ? "border-red-500" : ""
-                        }`}
-                        placeholder="Lead description"
-                      />
-                      <ErrorMessage error={errors.description} />
-                      <Button
-                        disabled={leadsLoading}
-                        onClick={handleLeadsSubmit}
-                        className={`${
-                          leadsLoading
-                            ? "bg-purple-400 hover:bg-purple-500"
-                            : "bg-gradient-to-r from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600"
-                        }  cursor-pointer text-white`}
-                      >
-                        {leadsLoading && (
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        )}
-                        Add Leads
-                      </Button>
-                    </div>
-                  </div>
-                  <div
-                    className={`${activeTab == "Deals" ? "block" : "hidden"}`}
-                  >
-                    <div
-                      className={`grid p-3 grid-cols-1 md:grid-cols-2 gap-4`}
-                    >
-                      <div>
-                        <Label
-                          htmlFor="title"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Deal Title
-                        </Label>
-                        <Input
-                          id="title"
-                          type="text"
-                          value={dealFormData.title}
-                          onChange={(e) =>
-                            updateDealFormData("title", e.target.value)
-                          }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.title ? "border-red-500" : ""
-                          }`}
-                          placeholder="e.g., CRM Subscription - 1 Year"
-                        />
-                        <ErrorMessage error={errors.title} />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="name"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Deal Name / Company
-                        </Label>
-                        <Input
-                          id="name"
-                          value={dealFormData.name}
-                          onChange={(e) =>
-                            updateDealFormData("name", e.target.value)
-                          }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.name ? "border-red-500" : ""
-                          }`}
-                          placeholder="Full name of the deal"
-                        />
-                        <ErrorMessage error={errors.name} />
-                      </div>
-
-                      <div>
-                        <Label
-                          htmlFor="phone"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Phone Number
-                        </Label>
-                        <Input
-                          id="phone"
-                          type="text"
-                          value={dealFormData.phone}
-                          onChange={(e) =>
-                            updateDealFormData("phone", e.target.value)
-                          }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.phone ? "border-red-500" : ""
-                          }`}
-                          placeholder="+91 98765 43210"
-                        />
-                        <ErrorMessage error={errors.phone} />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="owner"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Deal Owner
-                        </Label>
-                        <Input
-                          id="owner"
-                          type="text"
-                          value={dealFormData.owner}
-                          onChange={(e) =>
-                            updateDealFormData("owner", e.target.value)
-                          }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.dealOwner ? "border-red-500" : ""
-                          }`}
-                          placeholder="e.g., John Doe"
-                        />
-                        <ErrorMessage error={errors.owner} />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="source"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Deal Source
-                        </Label>
-                        <Select
-                          value={dealFormData.source}
-                          onValueChange={(value) =>
-                            updateDealFormData("source", value)
-                          }
-                          className={errors.source ? "border-red-500" : ""}
-                        >
-                          <SelectTrigger
-                            className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                              errors.source ? "border-red-500" : ""
-                            }`}
-                          >
-                            <SelectValue placeholder="Select Deal Source" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Advertisement">
-                              Advertisement
-                            </SelectItem>
-                            <SelectItem value="Cold call">Cold call</SelectItem>
-                            <SelectItem value="Employee referral">
-                              Employee referral
-                            </SelectItem>
-                            <SelectItem value="External referral">
-                              External referral
-                            </SelectItem>
-                            <SelectItem value="Sales email alias">
-                              Sales email alias
-                            </SelectItem>
-                            <SelectItem value="Chat">Chat</SelectItem>
-                            <SelectItem value="Facebook">Facebook</SelectItem>
-                            <SelectItem value="Web Research">
-                              Web Research
-                            </SelectItem>
-                            <SelectItem value="X(Twitter)">
-                              X(Twitter)
-                            </SelectItem>
-                            <SelectItem value="Public relations">
-                              Public relations
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <ErrorMessage error={errors.source} />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="status"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Deal Status
-                        </Label>
-                        <Select
-                          value={dealFormData.status}
-                          onValueChange={(value) =>
-                            updateDealFormData("status", value)
-                          }
-                          className={errors.status ? "border-red-500" : ""}
-                        >
-                          <SelectTrigger
-                            className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                              errors.status ? "border-red-500" : ""
-                            }`}
-                          >
-                            <SelectValue placeholder="Select Deal Status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="New">New</SelectItem>
-                            <SelectItem value="Proposal Sent">
-                              Proposal Sent
-                            </SelectItem>
-                            <SelectItem value="Negotiation">
-                              Negotiation
-                            </SelectItem>
-                            <SelectItem value="Contract Sent">
-                              Contract Sent
-                            </SelectItem>
-                            <SelectItem value="Closed-won">
-                              Closed - Won
-                            </SelectItem>
-                            <SelectItem value="Closed-lost">
-                              Closed - Lost
-                            </SelectItem>
-                            <SelectItem value="On-hold">On Hold</SelectItem>
-                            <SelectItem value="Abandoned">Abandoned</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <ErrorMessage error={errors.dealStatus} />
-                      </div>
-
-                      <div>
-                        <Label
-                          htmlFor="email"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Email
-                        </Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={dealFormData.email}
-                          onChange={(e) =>
-                            updateDealFormData("email", e.target.value)
-                          }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.dealEmail ? "border-red-500" : ""
-                          }`}
-                          placeholder="Enter email"
-                        />
-                        <ErrorMessage error={errors.dealEmail} />
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="priority"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Deal Priority
-                        </Label>
-                        <Select
-                          value={dealFormData.priority}
-                          onValueChange={(value) =>
-                            updateDealFormData("priority", value)
-                          }
-                          className={errors.priority ? "border-red-500" : ""}
-                        >
-                          <SelectTrigger
-                            className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                              errors.priority ? "border-red-500" : ""
-                            }`}
-                          >
-                            <SelectValue placeholder="Select Deal Priority" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="High">High</SelectItem>
-                            <SelectItem value="Medium">Medium</SelectItem>
-                            <SelectItem value="Low">Low</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <ErrorMessage error={errors.priority} />
-                      </div>
-                      <div>
-                        <div className="mb-2">
-                          <Label
-                            htmlFor="product"
-                            className="mb-2 text-slate-700 dark:text-slate-300"
-                          >
-                            Select Products
-                          </Label>
-                        </div>
-
-                        <MultipleSelector
-                          commandProps={{
-                            label: "Select Products",
-                          }}
-                          value={dealProducts}
-                          onChange={setDealProducts}
-                          defaultOptions={products.concat({
-                            value: "Other",
-                            label: "Other",
-                          })}
-                          placeholder="Select Products"
-                          hideClearAllButton
-                          hidePlaceholderWhenSelected
-                          emptyIndicator={
-                            <p className="text-center text-sm">
-                              No results found
-                            </p>
-                          }
-                        />
-
-                        {dealProducts.find(
-                          (prod) => prod.value === "Other"
-                        ) && (
-                          <Input
-                            type="text"
-                            placeholder="Please specify the product"
-                            className="mt-2"
-                            value={otherValue}
-                            onChange={(e) => setOtherValue(e.target.value)}
-                          />
-                        )}
-                      </div>
-                      <div>
-                        <Label
-                          htmlFor="value"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Deal Amount / Value
-                        </Label>
-                        <Input
-                          id="value"
-                          type="number"
-                          value={dealFormData.value}
-                          onChange={(e) =>
-                            updateDealFormData("value", e.target.value)
-                          }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.value ? "border-red-500" : ""
-                          }`}
-                          placeholder="₹50000"
-                        />
-                        <ErrorMessage error={errors.value} />
-                      </div>
-
-                      <div>
-                        <Label
-                          htmlFor="closeDate"
-                          className="mb-2 text-slate-700 dark:text-slate-300"
-                        >
-                          Expected Close Date
-                        </Label>
-                        <Input
-                          id="closeDate"
-                          type="date"
-                          value={dealFormData.closeDate}
-                          onChange={(e) =>
-                            updateDealFormData("closeDate", e.target.value)
-                          }
-                          className={`bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                            errors.closeDate ? "border-red-500" : ""
-                          }`}
-                          placeholder="YYYY-MM-DD"
-                        />
-                        <ErrorMessage error={errors.closeDate} />
-                      </div>
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="description"
-                        className="mb-2 text-slate-700 dark:text-slate-300"
-                      >
-                        Status Description
-                      </Label>
-                      <textarea
-                        id="description"
-                        type="text"
-                        value={dealFormData.description}
-                        onChange={(e) =>
-                          updateDealFormData("description", e.target.value)
-                        }
-                        className={`bg-white/50 dark:bg-slate-800/50 w-full pl-1 border-white dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 ${
-                          errors.description ? "border-red-500" : ""
-                        }`}
-                        placeholder="Enter the insights gathered during this status"
-                      />
-                      <Button
-                        disabled={dealsLoading}
-                        onClick={handleDealsSubmit}
-                        className={`${
-                          dealsLoading
-                            ? "bg-purple-400 hover:bg-purple-500"
-                            : "bg-gradient-to-r from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600"
-                        }  cursor-pointer text-white`}
-                      >
-                        {dealsLoading && (
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        )}
-                        Add Deals
-                      </Button>
-                    </div>
-                  </div>
+                  {activeTab === "Customers" && (
+                    <CustomerForm
+                      session={session}
+                      fetchCustomers={fetchCustomers}
+                      setCustomersData={setCustomersData}
+                    />
+                  )}
+                  {activeTab === "Leads" && (
+                    <LeadForm
+                      session={session}
+                      fetchDeals={fetchDeals}
+                      fetchLeads={fetchLeads}
+                      setLeadsData={setLeadsData}
+                    />
+                  )}
+                  {activeTab === "Deals" && (
+                    <DealForm
+                      fetchDeals={fetchDeals}
+                      session={session}
+                      products={products}
+                      setDealsData={setDealsData}
+                    />
+                  )}
                 </>
               </SheetDescription>
             </SheetHeader>
@@ -2051,63 +636,64 @@ export default function CRM() {
           </TabsTrigger>
         </TabsList>
 
-        <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
-          <CardContent className="p-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              <div className="sm:col-span-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                  <Input
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50"
-                  />
-                </div>
+        <Card className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+          <CardContent>
+            <div className="flex w-full gap-5 flex-col md:flex-row justify-between items-center h-auto">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+                <Input
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 max-w-[60vh] bg-white dark:bg-slate-800/50 border-black/20 dark:border-slate-700/50"
+                />
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All statuses">All statuses</SelectItem>
-                  {activeTab === "Customers" ? (
-                    <>
-                      {customerStatus.map((state, index) => (
-                        <SelectItem key={index} value={state}>
-                          {state}
-                        </SelectItem>
-                      ))}
-                    </>
-                  ) : activeTab === "Leads" ? (
-                    <>
-                      {leadStatus.map((state, index) => (
-                        <SelectItem key={index} value={state}>
-                          {state}
-                        </SelectItem>
-                      ))}
-                    </>
-                  ) : (
-                    <>
-                      {dealStatus.map((state, index) => (
-                        <SelectItem key={index} value={state}>
-                          {state}
-                        </SelectItem>
-                      ))}
-                    </>
-                  )}
-                </SelectContent>
-              </Select>
-              <Select value={sourceFilter} onValueChange={setSourceFilter}>
+              <div className="flex w-full justify-end">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="bg-white dark:bg-slate-800/50 border-black/20 cursor-pointer dark:border-slate-700/50">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All statuses">All statuses</SelectItem>
+                    {activeTab === "Customers" ? (
+                      <>
+                        {customerStatus.map((state, index) => (
+                          <SelectItem key={index} value={state}>
+                            {state}
+                          </SelectItem>
+                        ))}
+                      </>
+                    ) : activeTab === "Leads" ? (
+                      <>
+                        {leadStatus.map((state, index) => (
+                          <SelectItem key={index} value={state}>
+                            {state}
+                          </SelectItem>
+                        ))}
+                      </>
+                    ) : (
+                      <>
+                        {dealStatus.map((state, index) => (
+                          <SelectItem key={index} value={state}>
+                            {state}
+                          </SelectItem>
+                        ))}
+                      </>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+              {/* <Select value={sourceFilter} onValueChange={setSourceFilter}>
                 <SelectTrigger className="bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50">
                   <SelectValue placeholder="Filter by source" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All sources">All sources</SelectItem>
-                  <SelectItem value="Website">Website</SelectItem>
-                  <SelectItem value="Referral">Referral</SelectItem>
-                  <SelectItem value="Campaign">Campaign</SelectItem>
-                  <SelectItem value="LinkedIn">LinkedIn</SelectItem>
+                  {leadSources.map((source, index) => (
+                    <SelectItem key={index} value={source}>
+                      {source}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <Select value={monthFilter} onValueChange={setMonthFilter}>
@@ -2115,12 +701,13 @@ export default function CRM() {
                   <SelectValue placeholder="Filter by month" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="All time">All time</SelectItem>
-                  <SelectItem value="2024-12">December 2024</SelectItem>
-                  <SelectItem value="2024-11">November 2024</SelectItem>
-                  <SelectItem value="2024-10">October 2024</SelectItem>
+                  {monthFilters.map((month, index) => (
+                    <SelectItem key={index} value={month}>
+                      {month}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
-              </Select>
+              </Select> */}
             </div>
           </CardContent>
         </Card>
@@ -2144,88 +731,41 @@ export default function CRM() {
         </TabsContent>
 
         <TabsContent value="Leads" className="space-y-6">
-          <div className="overflow-y-hidden">
-            {leadStatus
+          <div className="grid grid-cols-1  md:grid-cols-3 gap-6">
+            {leadsData
               .filter(
-                (leadState) =>
-                  statusFilter === "All statuses" || leadState === statusFilter
+                (lead) =>
+                  statusFilter === "All statuses" ||
+                  lead.status === statusFilter
               )
-              .map((leadState) => (
-                <Card
-                  key={leadState}
-                  className="mt-4 h-[35vh] relative overflow-hidden"
-                >
-                  <CardContent className="flex flex-col md:flex-row h-full p-0">
-                    <div className="w-full md:w-[15%] absolute md:left-0 top-0 md:bottom-0 bg-gray-300 dark:bg-slate-800 flex items-center text-center justify-center py-3 md:py-1 px-2 md:p-1 text-xl font-bold text-slate-800 dark:text-white z-10 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700">
-                      {leadState}
-                    </div>
-
-                    <div
-                      className="w-full md:ml-[15%] md:w-[85%] 
-                          h-[calc(35vh-40px)] md:h-full 
-                          overflow-y-auto p-2 md:p-4"
-                    >
-                      <Sheet>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-6 min-w-fit">
-                          {leadsData
-                            .filter((lead) => lead.status === leadState)
-                            .map((l) => (
-                              <LeadCard
-                                key={l.id}
-                                lead={l}
-                                setData={setLeadsData}
-                                onChange={() => {
-                                  fetchLeads();
-                                }}
-                              />
-                            ))}
-                        </div>
-                      </Sheet>
-                    </div>
-                  </CardContent>
-                </Card>
+              .map((lead) => (
+                <LeadCard
+                  key={lead.id}
+                  lead={lead}
+                  onChange={fetchLeads}
+                  fetchLeads={fetchLeads}
+                  fetchDeals={fetchDeals}
+                />
               ))}
           </div>
         </TabsContent>
 
         <TabsContent value="Deals" className="space-y-6">
-          <div className="overflow-y-hidden">
-            {dealStatus
+          <div className="grid grid-cols-1  md:grid-cols-3 gap-6">
+            {dealsData
               .filter(
-                (dealState) =>
-                  statusFilter === "All statuses" || dealState === statusFilter
+                (deal) =>
+                  statusFilter === "All statuses" ||
+                  deal.status === statusFilter
               )
-              .map((dealState) => (
-                <Card
-                  key={dealState}
-                  className="mt-4 h-[45vh] relative overflow-hidden"
-                >
-                  <CardContent className="flex flex-col md:flex-row h-full p-0">
-                    <div className="w-full md:w-[15%] absolute md:left-0 top-0 md:bottom-0 bg-gray-300 dark:bg-slate-800 flex items-center justify-center py-3 md:py-1 px-2 md:p-1 text-xl font-bold text-slate-800 dark:text-white z-10 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700">
-                      {dealState}
-                    </div>
-
-                    <div
-                      className="w-full md:ml-[15%] md:w-[85%] 
-                          h-[calc(35vh-40px)] md:h-full 
-                          overflow-y-auto p-2 md:p-4"
-                    >
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-6 min-w-fit">
-                        {dealsData
-                          .filter((deal) => deal.status === dealState)
-                          .map((deal) => (
-                            <DealCard
-                              key={deal.id}
-                              deal={deal}
-                              onChange={() => {
-                                fetchDeals();
-                              }}
-                            />
-                          ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+              .map((deal) => (
+                <DealCard
+                  key={deal.id}
+                  deal={deal}
+                  onChange={fetchDeals}
+                  fetchDeals={fetchDeals}
+                  fetchCustomers={fetchCustomers}
+                />
               ))}
           </div>
         </TabsContent>

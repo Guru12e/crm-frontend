@@ -115,7 +115,7 @@ const MultipleSelector = ({
   const [open, setOpen] = React.useState(false);
   const [onScrollbar, setOnScrollbar] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
-  const dropdownRef = React.useRef(null); // Added this
+  const dropdownRef = React.useRef(null);
 
   const [selected, setSelected] = React.useState(value || []);
   const [options, setOptions] = React.useState(

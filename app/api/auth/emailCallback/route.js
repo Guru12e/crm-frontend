@@ -26,10 +26,9 @@ export async function GET(req) {
     })
     .eq("email", session.user.email);
 
-
   if (error) {
     console.error(error);
-    return NextResponse.redirect("http://localhost:3000/home");
+    return NextResponse.redirect("http://localhost:3000/");
   }
-  return NextResponse.redirect("http://localhost:3000/home");
+  return NextResponse.redirect("http://localhost:3000/");
 }

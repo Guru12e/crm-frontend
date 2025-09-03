@@ -1,4 +1,6 @@
-import { Card, CardContent } from "./ui/card";
+"use client";
+
+import { Card, CardContent } from "../ui/card";
 import {
   Sheet,
   SheetTrigger,
@@ -6,19 +8,19 @@ import {
   SheetTitle,
   SheetHeader,
   SheetContent,
-} from "./ui/sheet";
-import { Mail, Phone, Eye, LucideUpload, Trash2 } from "lucide-react";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
+} from "../ui/sheet";
+import { Mail, Phone, LucideUpload, Trash2 } from "lucide-react";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
-import EmailTemplate from "./EmailTemplate";
+import EmailTemplate from "../EmailTemplate";
 import { useState } from "react";
-import UpdateDeals from "./UpdateDeals";
+import UpdateDeals from "../UpdateDeals";
 import {
   Dialog,
   DialogTitle,
@@ -27,10 +29,19 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTrigger,
-} from "./ui/dialog";
-import { Textarea } from "./ui/textarea";
+} from "../ui/dialog";
+import { Textarea } from "../ui/textarea";
+import { supabase } from "@/utils/supabase/client";
+import { toast } from "react-toastify";
 
-export default function DealCard({ deal, setId, onChange }) {
+export default function DealCard({
+  fetchDeals,
+  deal,
+  setId,
+  onChange,
+  session,
+  fetchCustomers,
+}) {
   const dealStatus = [
     "New",
     "Proposal Sent",
@@ -70,10 +81,10 @@ export default function DealCard({ deal, setId, onChange }) {
       console.error("Error updating deal:", error);
       toast.error("Error updating deal");
     } else {
-      if (deal.status === "Closed-won") {
+      if (newState == "Closed-won") {
         const customerData = {
           name: deal.name,
-          phone: deal.phone,
+          phone: deal.number,
           email: deal.email,
           linkedIn: deal.linkedIn,
           price: deal.value,
@@ -88,8 +99,9 @@ export default function DealCard({ deal, setId, onChange }) {
           created_at: today,
           user_email: deal.user_email,
         };
+
         const { data, error } = await supabase
-          .from("customers")
+          .from("Customers")
           .select("*")
           .eq("email", deal.email)
           .eq("user_email", deal.user_email)
@@ -122,13 +134,15 @@ export default function DealCard({ deal, setId, onChange }) {
               ],
             })
             .eq("email", deal.email)
-            .eq("user_email", userEmail);
+            .eq("user_email", deal.user_email);
           if (error) {
             console.error("Error updating existing customer:", error);
           }
         }
         onChange();
       }
+      await fetchDeals();
+      await fetchCustomers();
       toast.success("Deal updated successfully");
     }
   };
@@ -141,6 +155,7 @@ export default function DealCard({ deal, setId, onChange }) {
       toast.error("Error deleting deal");
     } else {
       toast.success("Deal deleted successfully");
+      await fetchDeals();
       onChange();
     }
   };
@@ -148,7 +163,7 @@ export default function DealCard({ deal, setId, onChange }) {
   return (
     <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 hover:scale-103 hover:shadow-lg cursor-pointer dark:hover:bg-slate-800/60 transition-all duration-300 group">
       <CardContent className="p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div className="flex sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1 min-w-0">
             <Sheet>
               <SheetTrigger asChild key={deal.id}>
@@ -160,7 +175,12 @@ export default function DealCard({ deal, setId, onChange }) {
                 <SheetHeader>
                   <SheetTitle>Deal Data</SheetTitle>
                   <SheetDescription>
-                    <UpdateDeals deal_id={deal.id} onChange={onChange} />
+                    <UpdateDeals
+                      deal_id={deal.id}
+                      onChange={onChange}
+                      fetchCustomers={fetchCustomers}
+                      fetchDeals={fetchDeals}
+                    />
                   </SheetDescription>
                 </SheetHeader>
               </SheetContent>
@@ -168,7 +188,7 @@ export default function DealCard({ deal, setId, onChange }) {
             <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 break-words">
               {deal.company}
             </p>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-2 text-sm text-slate-500 dark:text-slate-400 gap-1 sm:gap-0">
+            <div className="flex sm:flex-row sm:items-center sm:space-x-4 mt-2 text-sm text-slate-500 dark:text-slate-400 gap-1 sm:gap-0">
               <span className="break-words">Owner: {deal.owner}</span>
               <span className="break-words">Source: {deal.source}</span>
             </div>
@@ -185,7 +205,7 @@ export default function DealCard({ deal, setId, onChange }) {
             </div>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-100  transition-opacity">
+        <div className="flex sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-100  transition-opacity">
           <div className="flex flex-wrap gap-2">
             <Dialog open={open} onOpenChange={setOpen}>
               <DropdownMenu className="relative">
