@@ -6,6 +6,7 @@ import { redirect, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-dropdown-menu";
+import { toast } from "react-toastify";
 
 export default function CampaignDetail({ params }) {
   const { slug } = React.use(params);
@@ -14,6 +15,8 @@ export default function CampaignDetail({ params }) {
   const [audience, setAudience] = useState([]);
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [sendLoading, setSendLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [userEmail, setUserEmail] = useState(null);
   const [user, setUser] = useState(null);
@@ -63,27 +66,26 @@ export default function CampaignDetail({ params }) {
     if (!campaign) return;
 
     setLoading(true);
-    setMessage("");
+
+    console.log("Updating campaign:", campaign);
 
     try {
       const { error } = await supabase
         .from("Campaigns")
         .update({
-          subject,
-          body,
-          audience: audience,
+          ...campaign,
         })
         .eq("id", campaign.id)
         .eq("user_email", userEmail);
 
       if (error) {
-        setMessage("❌ Update failed: " + error.message);
+        toast.error("❌ Update failed: " + error.message);
       } else {
-        setMessage("✅ Campaign updated successfully!");
+        toast.success("✅ Campaign updated successfully!");
       }
     } catch (err) {
       console.error(err);
-      setMessage("❌ Error updating campaign.");
+      toast.error("❌ Error updating campaign.");
     } finally {
       setLoading(false);
     }
@@ -131,7 +133,6 @@ export default function CampaignDetail({ params }) {
     if (!campaign) return;
 
     setLoading(true);
-    setMessage("");
 
     try {
       const res = await fetch("/api/sendMailCampaign", {
@@ -147,14 +148,14 @@ export default function CampaignDetail({ params }) {
       });
 
       if (res.ok) {
-        setMessage("✅ Campaign sent successfully!");
+        toast.success("✅ Campaign sent successfully!");
       } else {
         const err = await res.json();
-        setMessage(` Failed: ${err.error || "Unknown error"}`);
+        toast.error(` Failed: ${err.error || "Unknown error"}`);
       }
     } catch (err) {
       console.error(err);
-      setMessage(" Error sending campaign.");
+      toast.error(" Error sending campaign.");
     } finally {
       setLoading(false);
     }
@@ -339,21 +340,21 @@ export default function CampaignDetail({ params }) {
             <div className="flex justify-end gap-4 pt-2 border-t mt-2">
               <Button
                 onClick={handleUpdate}
-                disabled={loading}
+                disabled={saveLoading}
                 className="bg-transparent border border-green-600 text-green-600 hover:bg-green-100"
               >
-                {loading ? "Updating..." : "Save"}
+                {saveLoading ? "Saving..." : "Save"}
               </Button>
               <Button
                 onClick={handleSend}
-                disabled={loading}
+                disabled={sendLoading}
                 className={`px-5 py-2 rounded-xl font-medium shadow transition ${
                   loading
                     ? "bg-blue-400 text-white cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700"
                 }`}
               >
-                {loading ? "Sending..." : "Send"}
+                {sendLoading ? "Sending..." : "Send"}
               </Button>
               <Button
                 onClick={() => router.push("/campaigns")}

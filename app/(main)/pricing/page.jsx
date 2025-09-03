@@ -346,7 +346,6 @@ export default function PricingPage() {
                             key={fIndex}
                             className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white/70 dark:bg-slate-800/50 shadow-sm"
                           >
-                            {/* Feature Header (Name + Delete) */}
                             <div className="flex items-center justify-between mb-3">
                               <Input
                                 value={feature.name}
@@ -379,7 +378,6 @@ export default function PricingPage() {
                               </Button>
                             </div>
 
-                            {/* Configurations for Feature */}
                             <div className="flex flex-col gap-2 ml-2">
                               {feature.configurations.map((config, cIndex) => (
                                 <div
@@ -422,7 +420,6 @@ export default function PricingPage() {
                                 </div>
                               ))}
 
-                              {/* ➕ Add Configuration */}
                               <Button
                                 variant="outline"
                                 size="sm"
@@ -442,7 +439,6 @@ export default function PricingPage() {
                           </div>
                         ))}
 
-                        {/* ➕ Add Feature */}
                         <Button
                           variant="outline"
                           size="sm"
@@ -503,7 +499,6 @@ export default function PricingPage() {
                 >
                   <CardContent className=" h-[75vh] flex flex-col gap-2">
                     <div className="flex flex-col gap-2">
-                      {/* Name */}
                       <div className="flex gap-4">
                         <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Name
@@ -520,7 +515,6 @@ export default function PricingPage() {
                         />
                       </div>
 
-                      {/* Stock */}
                       <div className="flex gap-4">
                         <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Stock
@@ -537,7 +531,6 @@ export default function PricingPage() {
                         />
                       </div>
 
-                      {/* Price */}
                       <div className="flex gap-4">
                         <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Price
@@ -560,7 +553,6 @@ export default function PricingPage() {
                         />
                       </div>
 
-                      {/* Category */}
                       <div className="flex gap-4">
                         <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Category
@@ -577,7 +569,6 @@ export default function PricingPage() {
                         />
                       </div>
 
-                      {/* Description */}
                       <div className="flex gap-4">
                         <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
                           Description
@@ -604,7 +595,6 @@ export default function PricingPage() {
                               key={fIndex}
                               className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white/70 dark:bg-slate-800/50 shadow-sm"
                             >
-                              {/* Feature Header (Name + Delete) */}
                               <div className="flex items-center justify-between mb-3">
                                 <Input
                                   value={feature.name}
@@ -637,7 +627,6 @@ export default function PricingPage() {
                                 </Button>
                               </div>
 
-                              {/* Configurations for Feature */}
                               <div className="flex flex-col gap-2 ml-2">
                                 {feature.configurations.map(
                                   (config, cIndex) => (
@@ -688,7 +677,6 @@ export default function PricingPage() {
                                   )
                                 )}
 
-                                {/* ➕ Add Configuration */}
                                 <Button
                                   variant="outline"
                                   size="sm"
@@ -708,8 +696,8 @@ export default function PricingPage() {
                             </div>
                           ))}
 
-                          {/* ➕ Add Feature */}
                           <Button
+                            asChild
                             variant="outline"
                             size="sm"
                             className="mt-2 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
@@ -728,14 +716,13 @@ export default function PricingPage() {
                         </div>
                       </div>
 
-                      {/* Actions */}
                       <div className="flex justify-end mt-3 w-full">
-                        <button
+                        <Button
                           onClick={() => removeProduct(product.id)}
                           className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg flex items-center gap-2 transition"
                         >
                           <Trash2 className="w-4 h-4" /> Remove
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
@@ -745,7 +732,6 @@ export default function PricingPage() {
           )}
         </div>
 
-        {/* Global Save Buttons */}
         <div className="flex gap-4">
           <Button onClick={handleSaveChanges} variant="secondary">
             <Save className="mr-2 w-4 h-4" /> Save Changes Locally

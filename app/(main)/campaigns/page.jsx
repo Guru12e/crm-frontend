@@ -36,6 +36,7 @@ export default function Campaigns() {
   const [savedCampaigns, setSavedCampaigns] = useState([]);
   const [sentCampaigns, setSentCampaigns] = useState([]);
   const [campaignsTab, setCampaignsTab] = useState("Saved");
+  const [selectedCampaign, setSelectedCampaign] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
@@ -114,7 +115,7 @@ export default function Campaigns() {
 
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [newContacts, setNewContacts] = useState([{ name: "", email: "" }]);
-  const [campaign, setCampaign] = useState({ name: "", subject: "", body: "" });
+  const [campaign, setCampaign] = useState({});
 
   const toggleSelect = (contact) => {
     setSelectedContacts((prev) =>
@@ -125,37 +126,36 @@ export default function Campaigns() {
   };
 
   const handleSend = async () => {
-    if (!campaign) return;
+    if (!selectedCampaign) return;
 
     setLoading(true);
-    setMessage("");
 
     try {
       const res = await fetch("/api/sendMailCampaign", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: campaign.name,
-          subject: campaign.subject,
-          body: campaign.body,
-          recipients: campaign.audience,
+          name: selectedCampaign.name,
+          subject: selectedCampaign.subject,
+          body: selectedCampaign.body,
+          recipients: selectedCampaign.audience,
           user,
         }),
       });
 
       if (res.ok) {
-        setMessage("✅ Campaign sent successfully!");
+        toast.success("✅ Campaign sent successfully!");
       } else {
         const err = await res.json();
-        setMessage(` Failed: ${err.error || "Unknown error"}`);
+        toast.error(` Failed: ${err.error || "Unknown error"}`);
       }
     } catch (err) {
       console.error(err);
-      setMessage(" Error sending campaign.");
+      toast.error(" Error sending campaign.");
     } finally {
       setLoading(false);
     }
-    router.push("/campaigns");
+    await fetchData();
     sessionStorage.setItem("campaignsTab", "Sent");
   };
 
@@ -676,7 +676,10 @@ export default function Campaigns() {
                             Edit
                           </Button>
                           <Button
-                            onClick={() => handleSend}
+                            onClick={() => {
+                              handleSend();
+                              setSelectedCampaign(c);
+                            }}
                             className="text-sm px-3 py-1 rounded-lg border border-green-300 dark:border-green-600 
                       bg-transparent hover:bg-green-200 dark:hover:bg-green-600 text-green-600 dark:text-green-400
                        transition-colors"
