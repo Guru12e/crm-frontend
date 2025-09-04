@@ -118,9 +118,7 @@ export default function Layout({ children }) {
                       <div
                         className={cn(
                           "h-5 w-5 flex-shrink-0",
-                          isActive
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-slate-500"
+                          isActive ? "text-white" : "text-slate-500"
                         )}
                       >
                         {item.icon}
@@ -212,9 +210,7 @@ export default function Layout({ children }) {
                       <div
                         className={cn(
                           "h-5 w-5 flex-shrink-0",
-                          isActive
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-slate-500"
+                          isActive ? "text-white" : "text-slate-500"
                         )}
                       >
                         {item.icon}
