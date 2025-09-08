@@ -392,7 +392,6 @@ export default function Updateleads(lead_id, onChange) {
           "Data updated permanently. All changes made are permanent.",
           { position: "top-right" }
         );
-        localStorage.removeItem("companyDataCache");
         setLoading(false);
         fetchLeadData();
       }
