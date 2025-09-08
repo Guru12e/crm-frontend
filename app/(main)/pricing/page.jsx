@@ -54,7 +54,7 @@ export default function PricingPage() {
   const [companyData, setCompanyData] = useState({});
   const [products, setProducts] = useState([]);
   const [result, setResult] = useState(null);
-  const [show, setShow] = useState(-1);
+  const today = new Date();
   const [newProduct, setNewProduct] = useState({
     name: "",
     category: "",
@@ -106,9 +106,30 @@ export default function PricingPage() {
 
   const handleProductChange = (index, field, value) => {
     const updatedProducts = [...products];
-    updatedProducts[index] = { ...updatedProducts[index], [field]: value };
+    updatedProducts[index] = {
+      ...updatedProducts[index],
+      [field]: value,
+      stock: 0,
+    };
     setProducts(updatedProducts);
     setCompanyData((prev) => ({ ...prev, products: updatedProducts }));
+    const handleUpdate = async () => {
+      const { error } = await supabase
+        .from("Users")
+        .update({ ...companyData, products: updatedProducts })
+        .eq("email", userEmail);
+      if (error) {
+        toast.error("Failed to update products. Please try again.", {
+          position: "top-right",
+        });
+        console.error("Error updating products:", error);
+      } else {
+        toast.success("Products updated successfully!", {
+          position: "top-right",
+        });
+      }
+    };
+    handleUpdate();
   };
 
   const validateNewProduct = () => {
@@ -220,34 +241,119 @@ export default function PricingPage() {
                   product.isActive ? "flex" : "hidden"
                 }`}
               >
-                <Button
-                  className="bg-transparent border-2 border-blue-500 hover:bg-blue-200 hover:border-blue-600 text-blue-500 cursor-pointer"
-                  onClick={() => {
-                    setEdit(true);
-                    setEdit(false);
-                  }}
-                >
-                  {edit && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  <Edit />
-                  Edit Basic Product Info
-                </Button>
-                <Button
-                  className="bg-transparent border-2 border-gray-500 hover:bg-gray-200 hover:border-gray-600 text-gray-500 mt-2 md:mt-0 md:ml-2 cursor-pointer"
-                  onClick={() => {
-                    setConfig(true);
-                    setConfig(false);
-                  }}
-                >
-                  {config && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  <Wrench />
-                  Edit Product Configuration Info
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      className="bg-transparent border-2 border-blue-500 hover:bg-blue-200 hover:border-blue-600 text-blue-500 cursor-pointer"
+                      onClick={() => {
+                        setEdit(true);
+                        setEdit(false);
+                      }}
+                    >
+                      {edit && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      <Edit />
+                      Edit Basic Product Info
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogTitle>Edit Product Information</DialogTitle>
+                    <DialogDescription asChild>
+                      <div className="flex flex-col gap-4 py-4">
+                        <div className=" flex flex-col gap-3">
+                          <Label htmlFor="name">Product Name</Label>
+                          <Input
+                            id="name"
+                            value={product.name}
+                            onChange={(e) =>
+                              handleProductChange(index, "name", e.target.value)
+                            }
+                          />
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          <Label htmlFor="description">
+                            Product Description
+                          </Label>
+                          <Input
+                            id="description"
+                            value={product.description}
+                            onChange={(e) =>
+                              handleProductChange(
+                                index,
+                                "description",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          <Label htmlFor="stock">Product Stock</Label>
+                          <Input
+                            id="stock"
+                            type="number"
+                            value={product.stock}
+                            onChange={(e) =>
+                              handleProductChange(
+                                index,
+                                "stock",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          <Label htmlFor="category">Product Category</Label>
+                          <Input
+                            id="category"
+                            value={product.category}
+                            onChange={(e) =>
+                              handleProductChange(
+                                index,
+                                "category",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
+                    </DialogDescription>
+
+                    <DialogFooter>
+                      <Button
+                        className="bg-blue-500 hover:bg-blue-600 text-white"
+                        onClick={() => {
+                          setEdit(false);
+                        }}
+                      >
+                        Save Changes
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button
+                      className="bg-transparent border-2 border-gray-500 hover:bg-gray-200 hover:border-gray-600 text-gray-500 mt-2 md:mt-0 md:ml-2 cursor-pointer"
+                      onClick={() => {
+                        setConfig(true);
+                        setConfig(false);
+                      }}
+                    >
+                      {config && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      <Wrench />
+                      Edit Product Configuration Info
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent className="sm:max-w-[425px]"></SheetContent>
+                </Sheet>
                 <Button
                   className="bg-transparent border-2 border-red-500 hover:bg-red-200 hover:border-red-600 text-red-500 mt-2 md:mt-0 md:ml-2 cursor-pointer"
                   onClick={() => {
                     setDiscontinue(true);
                     handleProductChange(index, "isActive", false);
-                    handleUpdate();
                     setDiscontinue(false);
                   }}
                 >
@@ -267,7 +373,11 @@ export default function PricingPage() {
                   className="bg-transparent border-2 cursor-pointer border-green-500 hover:bg-green-200 hover:border-green-600 text-green-500"
                   onClick={() => {
                     setReinstate(true);
-                    setNewProduct({ ...product, isActive: true });
+                    setNewProduct({
+                      ...product,
+                      isActive: true,
+                      name: product.name + "-" + today.getFullYear(),
+                    });
                     addProduct();
                     handleUpdate();
                     setReinstate(false);

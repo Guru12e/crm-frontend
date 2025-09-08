@@ -220,7 +220,10 @@ export default function CompanyProfile() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user_email: userEmail,
-          description: companyData,
+          description: {
+            ...companyData,
+            products: companyData.products.filter((p) => p.isActive),
+          },
         }),
       });
 
@@ -314,7 +317,6 @@ export default function CompanyProfile() {
           <CardTitle>Products & Services</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Add New Product Form */}
           <div className="border border-blue-200 dark:border-blue-800 rounded-lg p-4 bg-blue-50/50 dark:bg-blue-900/20">
             <div className="flex items-center mb-4">
               <Package className="w-5 h-5 mr-2 text-blue-600" />
@@ -408,62 +410,67 @@ export default function CompanyProfile() {
             </Button>
           </div>
 
-          {/* Existing Products List */}
-          {products.length > 0 && (
+          {products.filter((product) => product.isActive).length > 0 && (
             <div className="space-y-3">
               <h4 className="font-medium text-slate-900 dark:text-white">
                 Your Products & Services
               </h4>
-              {products.map((product, idx) => (
-                <div
-                  key={product.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border border-slate-200 dark:border-slate-700 rounded-lg bg-white/30 dark:bg-slate-800/30"
-                >
-                  <div className="flex-1 space-y-3">
-                    <Input
-                      value={product.name}
-                      onChange={(e) =>
-                        handleProductChange(idx, "name", e.target.value)
-                      }
-                      className="text-base font-bold bg-transparent border-0 p-0 h-auto focus-visible:ring-0"
-                    />
-                    <Textarea
-                      value={product.description}
-                      onChange={(e) =>
-                        handleProductChange(idx, "description", e.target.value)
-                      }
-                      placeholder="Description"
-                      className="text-sm text-slate-600 dark:text-slate-400 bg-transparent border p-2 rounded-md w-full"
-                    />
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Input
-                        value={product.category}
-                        onChange={(e) =>
-                          handleProductChange(idx, "category", e.target.value)
-                        }
-                        placeholder="Category"
-                        className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded h-7"
-                      />
-                      <Input
-                        value={product.price}
-                        onChange={(e) =>
-                          handleProductChange(idx, "price", e.target.value)
-                        }
-                        placeholder="Price"
-                        className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded h-7"
-                      />
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => removeProduct(product.id)}
-                    variant="outline"
-                    size="icon"
-                    className="bg-red-50 hover:bg-red-100 border-red-200 text-red-700 dark:bg-red-900/50 dark:hover:bg-red-900 dark:text-red-300 dark:border-red-800 p-2"
+              {products
+                .filter((product) => product.isActive)
+                .map((product, idx) => (
+                  <div
+                    key={product.id}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border border-slate-200 dark:border-slate-700 rounded-lg bg-white/30 dark:bg-slate-800/30"
                   >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
+                    <div className="flex-1 space-y-3">
+                      <Input
+                        value={product.name}
+                        onChange={(e) =>
+                          handleProductChange(idx, "name", e.target.value)
+                        }
+                        className="text-base font-bold bg-transparent border-0 p-0 h-auto focus-visible:ring-0"
+                      />
+                      <Textarea
+                        value={product.description}
+                        onChange={(e) =>
+                          handleProductChange(
+                            idx,
+                            "description",
+                            e.target.value
+                          )
+                        }
+                        placeholder="Description"
+                        className="text-sm text-slate-600 dark:text-slate-400 bg-transparent border p-2 rounded-md w-full"
+                      />
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Input
+                          value={product.category}
+                          onChange={(e) =>
+                            handleProductChange(idx, "category", e.target.value)
+                          }
+                          placeholder="Category"
+                          className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded h-7"
+                        />
+                        <Input
+                          value={product.price}
+                          onChange={(e) =>
+                            handleProductChange(idx, "price", e.target.value)
+                          }
+                          placeholder="Price"
+                          className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded h-7"
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => removeProduct(product.id)}
+                      variant="outline"
+                      size="icon"
+                      className="bg-red-50 hover:bg-red-100 border-red-200 text-red-700 dark:bg-red-900/50 dark:hover:bg-red-900 dark:text-red-300 dark:border-red-800 p-2"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
             </div>
           )}
 
@@ -476,6 +483,16 @@ export default function CompanyProfile() {
               </p>
             </div>
           )}
+          {products.length > 0 &&
+            products.filter((product) => product.isActive).length === 0 && (
+              <div className="text-center py-6 text-slate-500 dark:text-slate-400">
+                <AlertCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p className="text-sm">
+                  All you products have been discontinued. Please add a new
+                  product or reinstate an existing products.
+                </p>
+              </div>
+            )}
         </CardContent>
       </Card>
 
@@ -493,7 +510,6 @@ export default function CompanyProfile() {
         </Button>
       </div>
 
-      {/* ICP Details Card */}
       {icpData && icpData.icp && (
         <Card className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm">
           <CardHeader>

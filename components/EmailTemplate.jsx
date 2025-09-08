@@ -4,14 +4,12 @@ import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog_1"; // ShadCN Dialog
 import {
   X,
-  Minus,
   Maximize2,
   ChevronDown,
   Bold,
   Italic,
   Underline,
   Paperclip,
-  Trash2,
 } from "lucide-react";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { supabase } from "@/utils/supabase/client";
