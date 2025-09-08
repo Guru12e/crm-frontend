@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,7 +10,6 @@ import {
   Calendar,
   Phone,
   DollarSign,
-  ToggleLeft,
   ToggleRight,
   PieChart,
   BarChart3,
@@ -19,10 +18,30 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/utils/supabase/client";
 import { round } from "lodash";
 import { redirect } from "next/navigation";
+import { ToggleLeft } from "@/components/ui/ToggleLeft";
 
 export default function Home() {
   const [leads, setLeads] = useState([]);
   const [deals, setDeals] = useState([]);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const fetchTheme = () => {
+      const theme = localStorage.getItem("theme");
+      if (theme !== null) {
+        setDarkMode(theme === "false");
+      }
+    };
+
+    fetchTheme();
+
+    const intervalId = setInterval(() => {
+      fetchTheme();
+    }, 200);
+
+    return () => clearInterval(intervalId);
+  }, [setDarkMode]);
+
   const fetchData = async () => {
     const { data: leadsData, error: leadsError } = await supabase
       .from("Leads")
@@ -511,7 +530,11 @@ export default function Home() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+          <h1
+            className={`text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white ${
+              darkMode ? "dark" : ""
+            }`}
+          >
             Dashboard
           </h1>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">
@@ -525,11 +548,12 @@ export default function Home() {
           variant="outline"
           className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 w-full sm:w-auto"
         >
-          {chartsMode === "graphic" ? (
+          {/* {chartsMode === "graphic" ? (
             <ToggleRight className="w-4 h-4 mr-2" />
           ) : (
             <ToggleLeft className="w-4 h-4 mr-2" />
-          )}
+          )} */}
+          <ToggleLeft isDarkMode={darkMode} />
           <span className="hidden sm:inline">
             {chartsMode === "graphic" ? "Graphic Mode" : "Numeric Mode"}
           </span>

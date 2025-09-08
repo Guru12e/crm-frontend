@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import {
   ChevronDown,
   ChevronRight,
@@ -18,6 +18,7 @@ import { usePathname, useRouter } from "next/navigation";
 import UserButton from "@/components/UserButton";
 import { Label } from "@/components/ui/label";
 import { navigation, ROLE_PERMISSIONS } from "@/constants/constant";
+import Hamburger from "hamburger-react";
 
 export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -61,6 +62,10 @@ export default function Layout({ children }) {
     document.documentElement.classList.toggle("dark");
   };
 
+  useEffect(() => {
+    localStorage.setItem("theme", darkMode);
+  }, [darkMode]);
+
   return (
     <div
       className={cn(
@@ -83,7 +88,11 @@ export default function Layout({ children }) {
         )}
       >
         <div className="flex h-full flex-col backdrop-blur-xl bg-white/40 dark:bg-sky-900/90 border-r border-teal/30 dark:border-sky-700/50">
-          <div className="flex h-16 items-center justify-between px-4">
+          <div
+            className={`flex h-16 items-center ${
+              sidebarOpen ? "justify-between" : "justify-center"
+            } px-4`}
+          >
             {sidebarOpen && (
               <span className="text-xl font-bold bg-gradient-to-r from-teal-500 to-sky-700 dark:from-teal-200 dark:to-sky-300 bg-clip-text text-transparent">
                 GTM Engine
@@ -95,7 +104,11 @@ export default function Layout({ children }) {
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="p-2 hover:bg-teal/30 dark:hover:bg-slate-800/50"
             >
-              <Menu className="h-4 w-4" />
+              <Hamburger
+                toggled={sidebarOpen}
+                toggle={setSidebarOpen}
+                size={20}
+              />
             </Button>
           </div>
 
@@ -118,11 +131,13 @@ export default function Layout({ children }) {
                     >
                       <Link
                         href={item.href}
-                        className="group flex flex-1 items-center"
+                        className={`group flex flex-1 items-center ${
+                          sidebarOpen ? "" : "justify-center pr-1"
+                        }`}
                       >
                         <div
                           className={cn(
-                            "h-5 w-5 flex-shrink-0",
+                            "h-5 w-5 flex-shrink-0 ",
                             isActive ? "text-white" : "text-slate-500"
                           )}
                         >
@@ -187,7 +202,11 @@ export default function Layout({ children }) {
               onClick={() => setMobileSidebarOpen(false)}
               className="p-2 hover:bg-teal/30 dark:hover:bg-sky-800/50"
             >
-              <Menu className="h-4 w-4" />
+              <Hamburger
+                toggled={mobileSidebarOpen}
+                toggle={setMobileSidebarOpen}
+                size={20}
+              />
             </Button>
           </div>
 
@@ -276,7 +295,11 @@ export default function Layout({ children }) {
               onClick={() => setMobileSidebarOpen(true)}
               className="p-2 hover:bg-teal/30 dark:hover:bg-sky-800/50 sm:hidden"
             >
-              <Menu className="h-5 w-5" />
+              <Hamburger
+                toggled={mobileSidebarOpen}
+                toggle={setMobileSidebarOpen}
+                size={20}
+              />
             </Button>
             <div className="flex-1">
               <div className="max-w-md min-w-0 ml-2 sm:ml-0"></div>
