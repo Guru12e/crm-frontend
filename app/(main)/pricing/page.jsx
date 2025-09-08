@@ -1,12 +1,23 @@
 "use client";
+import { ToastContainer, toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Save, Upload, Plus, Trash2, Package, AlertCircle } from "lucide-react";
+import {
+  Save,
+  Upload,
+  Plus,
+  Trash2,
+  Package,
+  AlertCircle,
+  Wrench,
+  FlagOff,
+  Edit,
+  Loader2,
+} from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ToastContainer, toast } from "react-toastify";
 import isEqual from "lodash/isEqual";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -17,7 +28,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -26,17 +42,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { add, set } from "lodash";
 
-const ErrorMessage = ({ error }) => {
-  if (!error) return null;
-  return (
-    <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-      <AlertCircle className="w-4 h-4" />
-      {error}
-    </p>
-  );
-};
 export default function PricingPage() {
+  const [discontinue, setDiscontinue] = useState(false);
+  const [reinstate, setReinstate] = useState(false);
+  const [edit, setEdit] = useState(false);
+  const [config, setConfig] = useState(false);
   const [loading, setLoading] = useState(false);
   const [companyData, setCompanyData] = useState({});
   const [products, setProducts] = useState([]);
@@ -91,37 +104,6 @@ export default function PricingPage() {
     }
   };
 
-  useEffect(() => {
-    if (!userEmail) return;
-
-    const cachedData = localStorage.getItem("companyDataCache");
-    if (cachedData) {
-      try {
-        const parsed = JSON.parse(cachedData);
-        setCompanyData(parsed);
-        setProducts(Array.isArray(parsed.products) ? parsed.products : []);
-        console.log("Loaded from cache:", parsed);
-      } catch (error) {
-        console.error("Failed to parse cached data:", error);
-        localStorage.removeItem("companyDataCache");
-      }
-      return;
-    }
-
-    fetchData();
-  }, [userEmail]);
-
-  // ✅ Log whenever state changes (no stale logs!)
-  useEffect(() => {
-    if (companyData && Object.keys(companyData).length > 0) {
-      console.log("Company data updated:", companyData);
-    }
-  }, [companyData]);
-
-  const handleCompanyChange = (field, value) => {
-    setCompanyData((prev) => ({ ...prev, [field]: value }));
-  };
-
   const handleProductChange = (index, field, value) => {
     const updatedProducts = [...products];
     updatedProducts[index] = { ...updatedProducts[index], [field]: value };
@@ -148,15 +130,14 @@ export default function PricingPage() {
     setNewProduct({
       name: "",
       category: "",
-      price: "",
+      basePrice: "",
+      lowestBasePrice: "",
+      HighestBasePrice: "",
       description: "",
       stock: "",
-      features: [
-        {
-          name: "",
-          configurations: [""],
-        },
-      ],
+      isActive: true,
+      isConfigurable: false,
+      configurations: {},
     });
     setErrors({ newProduct: {} });
     const { error } = await supabase
@@ -167,697 +148,141 @@ export default function PricingPage() {
       .single();
   };
 
-  const removeProduct = (id) => {
-    setProducts(products.filter((p) => p.id !== id));
-  };
-
-  const handleSaveChanges = () => {
-    setLoading(true);
-    localStorage.setItem(
-      "companyDataCache",
-      JSON.stringify({ ...companyData, products })
-    );
-    toast.info(
-      "Changes saved locally. Don't clear browser history or the changes will be lost!",
-      {
-        position: "top-right",
-      }
-    );
-    setLoading(false);
-  };
-
-  const handleUpdateDB = async () => {
-    setLoading(true);
-    const dataToUpdate = {
-      products: products,
-    };
-    const { data: companyDetails, error: companyDetailsError } = await supabase
+  const handleUpdate = async () => {
+    const { error } = await supabase
       .from("Users")
-      .select("*")
-      .eq("email", userEmail)
-      .single();
-
-    const noChanges = companyDetails.products === companyData.products;
-
-    if (noChanges) {
-      toast.info("No changes detected.", { position: "top-right" });
-      setLoading(false);
-      return;
+      .update(companyData)
+      .eq("email", userEmail);
+    if (error) {
+      toast.error("Failed to update products. Please try again.", {
+        position: "top-right",
+      });
+      console.error("Error updating products:", error);
     } else {
-      const { error } = await supabase
-        .from("Users")
-        .update(dataToUpdate)
-        .eq("email", userEmail);
-
-      if (error) {
-        console.error("Error updating database:", error);
-        toast.error("Error updating database!", { position: "top-right" });
-      } else {
-        toast.success(
-          "Data updated permanently. All changes made are permanent.",
-          { position: "top-right" }
-        );
-        localStorage.removeItem("companyDataCache");
-      }
-      setLoading(false);
-      await fetchData();
+      toast.success("Products updated successfully!", {
+        position: "top-right",
+      });
     }
   };
 
+  useEffect(() => {
+    if (userEmail) {
+      fetchData();
+    }
+  }, [userEmail]);
+
   return (
     <div className="min-h-screen">
-      <div className="flex flex-col sm:flex-row sm:justify-left sm:items-center">
-        <Sheet>
-          <div className="flex justify-between items-center w-screen">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
-                Pricing and Inventory
-              </h1>
-              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">
-                Manage pricing and inventory
-              </p>
-            </div>
-            <SheetTrigger as Child>
-              <Button className="bg-gradient-to-r px-4 py-5 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white w-full ">
-                Add New Product
-              </Button>
-            </SheetTrigger>
-          </div>
-          <SheetContent className="overflow-y-scroll">
-            <SheetHeader>
-              <SheetTitle>Add New Product</SheetTitle>
-              <SheetDescription>
-                <>
-                  <div className="p-3 flex flex-col gap-4">
-                    <div>
-                      <Label className="mb-2 text-slate-700 dark:text-slate-300">
-                        Product Name
-                      </Label>
-                      <Input
-                        value={newProduct.name}
-                        onChange={(e) =>
-                          setNewProduct((prev) => ({
-                            ...prev,
-                            name: e.target.value,
-                          }))
-                        }
-                        className={`bg-white/70 dark:bg-slate-800/50 w-[50vh] ${
-                          errors.newProduct.name
-                            ? "border-red-500"
-                            : "border-slate-200 dark:border-slate-700"
-                        }`}
-                        placeholder="Enter product name"
-                      />
-                      <ErrorMessage error={errors.newProduct.name} />
-                    </div>
-                    <div>
-                      <Label className="mb-2 text-slate-700 dark:text-slate-300">
-                        Category
-                      </Label>
-                      <Input
-                        value={newProduct.category}
-                        onChange={(e) =>
-                          setNewProduct((prev) => ({
-                            ...prev,
-                            category: e.target.value,
-                          }))
-                        }
-                        className={`bg-white/70 dark:bg-slate-800/50 w-[50vh] ${
-                          errors.newProduct.category
-                            ? "border-red-500"
-                            : "border-slate-200 dark:border-slate-700"
-                        }`}
-                        placeholder="e.g., Analytics, Automation"
-                      />
-                      <ErrorMessage error={errors.newProduct.category} />
-                    </div>
-                    <div>
-                      <Label className="mb-2 text-slate-700 dark:text-slate-300">
-                        Price (Optional)
-                      </Label>
-                      <Input
-                        value={newProduct.price}
-                        onChange={(e) =>
-                          setNewProduct((prev) => ({
-                            ...prev,
-                            price: e.target.value,
-                          }))
-                        }
-                        className="bg-white/70 dark:bg-slate-800/50 w-[50vh] border-slate-200 dark:border-slate-700"
-                        placeholder="e.g., $99/month"
-                      />
-                    </div>
-                    <div>
-                      <Label className="mb-2 text-slate-700 dark:text-slate-300">
-                        Stock
-                      </Label>
-                      <Input
-                        value={newProduct.stock}
-                        onChange={(e) =>
-                          setNewProduct((prev) => ({
-                            ...prev,
-                            stock: e.target.value,
-                          }))
-                        }
-                        className="bg-white/70 dark:bg-slate-800/50 w-[50vh] border-slate-200 dark:border-slate-700"
-                        placeholder="e.g., 100"
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <Label className="mb-2 text-slate-700 dark:text-slate-300">
-                        Description
-                      </Label>
-                      <Textarea
-                        value={newProduct.description}
-                        onChange={(e) =>
-                          setNewProduct((prev) => ({
-                            ...prev,
-                            description: e.target.value,
-                          }))
-                        }
-                        className={`bg-white/70 dark:bg-slate-800/50 min-h-24 ${
-                          errors.newProduct.description
-                            ? "border-red-500"
-                            : "border-slate-200 dark:border-slate-700"
-                        }`}
-                        placeholder="Brief description"
-                      />
-                      <ErrorMessage error={errors.newProduct.description} />
-                    </div>
-                    <div>
-                      <Label className="mb-2 text-slate-700 dark:text-slate-300">
-                        Configurable Features
-                      </Label>
-
-                      <div className="flex flex-col gap-4">
-                        {newProduct.features.map((feature, fIndex) => (
-                          <div
-                            key={fIndex}
-                            className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white/70 dark:bg-slate-800/50 shadow-sm"
-                          >
-                            <div className="flex items-center justify-between mb-3">
-                              <Input
-                                value={feature.name}
-                                onChange={(e) => {
-                                  const updated = [...newProduct.features];
-                                  updated[fIndex].name = e.target.value;
-                                  setNewProduct((prev) => ({
-                                    ...prev,
-                                    features: updated,
-                                  }));
-                                }}
-                                className="bg-white/70 dark:bg-slate-800/50 w-[40vh] border-slate-300 dark:border-slate-600"
-                                placeholder="Feature name (e.g., SLA, Integration, Region)"
-                              />
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30"
-                                onClick={() => {
-                                  const updated = newProduct.features.filter(
-                                    (_, idx) => idx !== fIndex
-                                  );
-                                  setNewProduct((prev) => ({
-                                    ...prev,
-                                    features: updated,
-                                  }));
-                                }}
-                              >
-                                ✕
-                              </Button>
-                            </div>
-
-                            <div className="flex flex-col gap-2 ml-2">
-                              {feature.configurations.map((config, cIndex) => (
-                                <div
-                                  key={cIndex}
-                                  className="flex items-center gap-2"
-                                >
-                                  <Input
-                                    value={config}
-                                    onChange={(e) => {
-                                      const updated = [...newProduct.features];
-                                      updated[fIndex].configurations[cIndex] =
-                                        e.target.value;
-                                      setNewProduct((prev) => ({
-                                        ...prev,
-                                        features: updated,
-                                      }));
-                                    }}
-                                    className="bg-white/70 dark:bg-slate-800/50 w-[35vh] border-slate-300 dark:border-slate-600"
-                                    placeholder="Configuration (e.g., 99.9% SLA, Basic, Pro)"
-                                  />
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30"
-                                    onClick={() => {
-                                      const updated = [...newProduct.features];
-                                      updated[fIndex].configurations = updated[
-                                        fIndex
-                                      ].configurations.filter(
-                                        (_, idx) => idx !== cIndex
-                                      );
-                                      setNewProduct((prev) => ({
-                                        ...prev,
-                                        features: updated,
-                                      }));
-                                    }}
-                                  >
-                                    ✕
-                                  </Button>
-                                </div>
-                              ))}
-
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="mt-2 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
-                                onClick={() => {
-                                  const updated = [...newProduct.features];
-                                  updated[fIndex].configurations.push("");
-                                  setNewProduct((prev) => ({
-                                    ...prev,
-                                    features: updated,
-                                  }));
-                                }}
-                              >
-                                + Add Configuration
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="mt-2 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
-                          onClick={() =>
-                            setNewProduct((prev) => ({
-                              ...prev,
-                              features: [
-                                ...prev.features,
-                                { name: "", configurations: [""] },
-                              ],
-                            }))
-                          }
-                        >
-                          + Add Feature
-                        </Button>
-                      </div>
-                    </div>
-
-                    <Button
-                      disabled={loading}
-                      onClick={addProduct}
-                      className={`${
-                        loading
-                          ? "bg-purple-400 hover:bg-purple-500"
-                          : "bg-gradient-to-r from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600"
-                      }  cursor-pointer text-white`}
-                    >
-                      {loading && (
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      )}
-                      Add Product
-                    </Button>
-                  </div>
-                </>
-              </SheetDescription>
-            </SheetHeader>
-          </SheetContent>
-        </Sheet>
+      <div className="flex flex-col md:flex-row justify-between w-full gap-6 items-center ">
+        <div>
+          <h1 className="text-3xl font-bold text-start ">
+            Configure Your Products.
+          </h1>
+          <p className="text-start text-slate-800 text-md">
+            {" "}
+            Make sure to have the right plan for your needs.
+          </p>
+        </div>
+        <Button className="bg-gradient-to-r px-3 py-2 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white w-full md:w-auto cursor-pointer">
+          Add New Product
+        </Button>
       </div>
-
-      <div className="min-h-screen p-8">
-        <div className="shadow-lg rounded-2xl p-6 mb-8">
-          <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">
-            Available Products
-          </h2>
-
-          {products.length === 0 ? (
-            <p className="text-slate-500 dark:text-white">
-              No products available
-            </p>
-          ) : (
-            <div className="grid grid-cols-1 gap-6">
-              {products.map((product, idx) => (
-                <Card
-                  key={product.id}
-                  className="shadow-sm rounded-2xl border transition-all duration-200 hover:shadow-lg bg-white/70 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20 h-full"
-                  onMouseEnter={() => {
-                    setShow(product.id);
-                  }}
-                  onMouseLeave={() => {
-                    setShow(-1);
+      <div className="mt-10">
+        {products.map((product, index) => (
+          <Card key={product.id} className="mb-6">
+            <CardHeader className="flex justify-between items-center font-semibold">
+              {product.name}
+              <Badge
+                className={product.isActive ? "bg-green-500" : "bg-red-500"}
+              >
+                {product.isActive ? "Active" : "Inactive"}
+              </Badge>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2 gap-4">
+                <Label>
+                  Stock:
+                  {product.stock ? (
+                    <span>{product.stock}</span>
+                  ) : (
+                    <span className="text-red-500">
+                      Out of stock!!! Please update the stock.
+                    </span>
+                  )}
+                </Label>
+                <Label className="mt-2">Category: {product.category}</Label>
+                <Label className="mt-2">Price: ${product.price}</Label>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <div
+                className={`flex justify-end flex-col md:flex-row w-full ${
+                  product.isActive ? "flex" : "hidden"
+                }`}
+              >
+                <Button
+                  className="bg-transparent border-2 border-blue-500 hover:bg-blue-200 hover:border-blue-600 text-blue-500 cursor-pointer"
+                  onClick={() => {
+                    setEdit(true);
+                    setEdit(false);
                   }}
                 >
-                  <CardContent className="p flex flex-col h-full">
-                    <h3 className="font-semibold text-xl text-gray-900 dark:text-white">
-                      {product.name}
-                    </h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
-                      {product.category}
-                    </p>
-
-                    <p className="text-sm text-slate-900 dark:text-white line-clamp-3 flex-grow leading-relaxed mb-3">
-                      {product.description.length > 50
-                        ? `${product.description.slice(0, 50)}...`
-                        : product.description}
-                    </p>
-
-                    <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 mt-auto pt-3 border-t border-slate-200 dark:border-slate-700">
-                      <span>
-                        {product.stock > 0
-                          ? `${product.stock} in stock`
-                          : "No stock available"}
-                      </span>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex gap-2">
-                    <div
-                      className={`flex flex-col w-full md:flex-row gap-3 justify-end items-end ${
-                        show === product.id ? "block" : "hidden"
-                      }`}
-                    >
-                      <div className="flex flex-col w-full md:flex-row gap-2">
-                        <Sheet>
-                          <div className="flex justify-between items-center w-screen">
-                            <SheetTrigger as Child>
-                              <Button className="bg-gradient-to-r px-4 py-5 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white w-full ">
-                                Edit
-                              </Button>
-                            </SheetTrigger>
-                          </div>
-                          <SheetContent className="overflow-y-scroll">
-                            <SheetHeader>
-                              <SheetTitle>Add New Product</SheetTitle>
-                              <SheetDescription>
-                                <>
-                                  <div className="flex flex-col gap-2">
-                                    <div className="flex gap-4">
-                                      <Label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
-                                        Name
-                                      </Label>
-                                      <Input
-                                        type="text"
-                                        value={product.name}
-                                        onChange={(e) => {
-                                          const updated = [...products];
-                                          updated[idx].name = e.target.value;
-                                          handleProductChange(updated);
-                                        }}
-                                        className="mt-1 w-[110vh] border rounded-lg p-2  focus:ring-2 focus:ring-blue-400"
-                                      />
-                                    </div>
-
-                                    <div className="flex gap-4">
-                                      <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
-                                        Stock
-                                      </label>
-                                      <Input
-                                        type="number"
-                                        value={product.stock}
-                                        onChange={(e) => {
-                                          const updated = [...products];
-                                          updated[idx].stock = e.target.value;
-                                          handleProductChange(updated);
-                                        }}
-                                        className="mt-1 w-[110vh] border rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
-                                      />
-                                    </div>
-
-                                    <div className="flex gap-4">
-                                      <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
-                                        Price
-                                      </label>
-                                      <Input
-                                        type="text"
-                                        value={
-                                          Array.isArray(product.price)
-                                            ? product.price.join("-")
-                                            : product.price
-                                        }
-                                        onChange={(e) => {
-                                          const updated = [...products];
-                                          updated[idx].price =
-                                            e.target.value.includes("-")
-                                              ? e.target.value
-                                                  .split("-")
-                                                  .map(Number)
-                                              : Number(e.target.value);
-                                          handleProductChange(updated);
-                                        }}
-                                        className="mt-1 border rounded-lg p-2 w-[110vh] focus:ring-2 focus:ring-blue-400"
-                                      />
-                                    </div>
-
-                                    <div className="flex gap-4">
-                                      <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
-                                        Category
-                                      </label>
-                                      <Input
-                                        type="text"
-                                        value={product.category}
-                                        onChange={(e) => {
-                                          const updated = [...products];
-                                          updated[idx].category =
-                                            e.target.value;
-                                          handleProductChange(updated);
-                                        }}
-                                        className="mt-1 border rounded-lg p-2 w-[110vh] focus:ring-2 focus:ring-blue-400"
-                                      />
-                                    </div>
-
-                                    <div className="flex gap-4">
-                                      <label className="text-sm font-medium text-gray-600 dark:text-white w-[20vh]">
-                                        Description
-                                      </label>
-                                      <Input
-                                        type="text"
-                                        value={product.description}
-                                        onChange={(e) => {
-                                          const updated = [...products];
-                                          updated[idx].description =
-                                            e.target.value;
-                                          handleProductChange(updated);
-                                        }}
-                                        className="mt-1 border rounded-lg p-2 w-[110vh] focus:ring-2 focus:ring-blue-400"
-                                      />
-                                    </div>
-                                    <div>
-                                      <Label className="mb-2 text-slate-700 dark:text-slate-300">
-                                        Configurable Features
-                                      </Label>
-
-                                      <div className="flex flex-col gap-4">
-                                        {newProduct.features.map(
-                                          (feature, fIndex) => (
-                                            <div
-                                              key={fIndex}
-                                              className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white/70 dark:bg-slate-800/50 shadow-sm"
-                                            >
-                                              <div className="flex items-center justify-between mb-3">
-                                                <Input
-                                                  value={feature.name}
-                                                  onChange={(e) => {
-                                                    const updated = [
-                                                      ...newProduct.features,
-                                                    ];
-                                                    updated[fIndex].name =
-                                                      e.target.value;
-                                                    setNewProduct((prev) => ({
-                                                      ...prev,
-                                                      features: updated,
-                                                    }));
-                                                  }}
-                                                  className="bg-white/70 dark:bg-slate-800/50 w-[40vh] border-slate-300 dark:border-slate-600"
-                                                  placeholder="Feature name (e.g., SLA, Integration, Region)"
-                                                />
-                                                <Button
-                                                  variant="ghost"
-                                                  size="sm"
-                                                  className="text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30"
-                                                  onClick={() => {
-                                                    const updated =
-                                                      newProduct.features.filter(
-                                                        (_, idx) =>
-                                                          idx !== fIndex
-                                                      );
-                                                    setNewProduct((prev) => ({
-                                                      ...prev,
-                                                      features: updated,
-                                                    }));
-                                                  }}
-                                                >
-                                                  ✕
-                                                </Button>
-                                              </div>
-
-                                              <div className="flex flex-col gap-2 ml-2">
-                                                {feature.configurations.map(
-                                                  (config, cIndex) => (
-                                                    <div
-                                                      key={cIndex}
-                                                      className="flex items-center gap-2"
-                                                    >
-                                                      <Input
-                                                        value={config}
-                                                        onChange={(e) => {
-                                                          const updated = [
-                                                            ...newProduct.features,
-                                                          ];
-                                                          updated[
-                                                            fIndex
-                                                          ].configurations[
-                                                            cIndex
-                                                          ] = e.target.value;
-                                                          setNewProduct(
-                                                            (prev) => ({
-                                                              ...prev,
-                                                              features: updated,
-                                                            })
-                                                          );
-                                                        }}
-                                                        className="bg-white/70 dark:bg-slate-800/50 w-[35vh] border-slate-300 dark:border-slate-600"
-                                                        placeholder="Configuration (e.g., 99.9% SLA, Basic, Pro)"
-                                                      />
-                                                      <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30"
-                                                        onClick={() => {
-                                                          const updated = [
-                                                            ...newProduct.features,
-                                                          ];
-                                                          updated[
-                                                            fIndex
-                                                          ].configurations =
-                                                            updated[
-                                                              fIndex
-                                                            ].configurations.filter(
-                                                              (_, idx) =>
-                                                                idx !== cIndex
-                                                            );
-                                                          setNewProduct(
-                                                            (prev) => ({
-                                                              ...prev,
-                                                              features: updated,
-                                                            })
-                                                          );
-                                                        }}
-                                                      >
-                                                        ✕
-                                                      </Button>
-                                                    </div>
-                                                  )
-                                                )}
-
-                                                <Button
-                                                  variant="outline"
-                                                  size="sm"
-                                                  className="mt-2 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
-                                                  onClick={() => {
-                                                    const updated = [
-                                                      ...newProduct.features,
-                                                    ];
-                                                    updated[
-                                                      fIndex
-                                                    ].configurations.push("");
-                                                    setNewProduct((prev) => ({
-                                                      ...prev,
-                                                      features: updated,
-                                                    }));
-                                                  }}
-                                                >
-                                                  + Add Configuration
-                                                </Button>
-                                              </div>
-                                            </div>
-                                          )
-                                        )}
-
-                                        <Button
-                                          asChild
-                                          variant="outline"
-                                          size="sm"
-                                          className="mt-2 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
-                                          onClick={() =>
-                                            setNewProduct((prev) => ({
-                                              ...prev,
-                                              features: [
-                                                ...prev.features,
-                                                {
-                                                  name: "",
-                                                  configurations: [""],
-                                                },
-                                              ],
-                                            }))
-                                          }
-                                        >
-                                          + Add Feature
-                                        </Button>
-                                      </div>
-                                    </div>
-
-                                    <div className="flex justify-end mt-3 w-full">
-                                      <Button
-                                        onClick={() =>
-                                          removeProduct(product.id)
-                                        }
-                                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg flex items-center gap-2 transition"
-                                      >
-                                        <Trash2 className="w-4 h-4" /> Remove
-                                      </Button>
-                                    </div>
-                                  </div>
-                                </>
-                              </SheetDescription>
-                            </SheetHeader>
-                          </SheetContent>
-                        </Sheet>
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              className="text-sm px-3 py-1 rounded-lg border border-red-300 dark:border-red-600 
-                      bg-transparent hover:bg-red-200 dark:hover:bg-red-600 text-red-600 dark:text-red-400
-                       transition-colors cursor-pointer"
-                            >
-                              Delete
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogTitle>Delete Campaign</DialogTitle>
-                            <DialogDescription>
-                              Are you sure you want to delete this campaign?
-                            </DialogDescription>
-                            <DialogFooter className="flex justify-end gap-2 mt-4">
-                              <Button
-                                className="bg-transparent border border-red-300 dark:border-red-600 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-600"
-                                onClick={() => handleDeleteCampaign(c.id)}
-                              >
-                                Delete
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-                    </div>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="flex gap-4">
-          <Button onClick={handleSaveChanges} variant="secondary">
-            <Save className="mr-2 w-4 h-4" /> Save Changes Locally
-          </Button>
-          <Button onClick={handleUpdateDB}>
-            <Upload className="mr-2 w-4 h-4" /> Update Database
-          </Button>
-        </div>
+                  {edit && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  <Edit />
+                  Edit Basic Product Info
+                </Button>
+                <Button
+                  className="bg-transparent border-2 border-gray-500 hover:bg-gray-200 hover:border-gray-600 text-gray-500 mt-2 md:mt-0 md:ml-2 cursor-pointer"
+                  onClick={() => {
+                    setConfig(true);
+                    setConfig(false);
+                  }}
+                >
+                  {config && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  <Wrench />
+                  Edit Product Configuration Info
+                </Button>
+                <Button
+                  className="bg-transparent border-2 border-red-500 hover:bg-red-200 hover:border-red-600 text-red-500 mt-2 md:mt-0 md:ml-2 cursor-pointer"
+                  onClick={() => {
+                    setDiscontinue(true);
+                    handleProductChange(index, "isActive", false);
+                    handleUpdate();
+                    setDiscontinue(false);
+                  }}
+                >
+                  {discontinue && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  <FlagOff />
+                  Discontinue Product
+                </Button>
+              </div>
+              <div
+                className={`flex justify-end w-full ${
+                  !product.isActive ? "flex" : "hidden"
+                }`}
+              >
+                <Button
+                  className="bg-transparent border-2 cursor-pointer border-green-500 hover:bg-green-200 hover:border-green-600 text-green-500"
+                  onClick={() => {
+                    setReinstate(true);
+                    setNewProduct({ ...product, isActive: true });
+                    addProduct();
+                    handleUpdate();
+                    setReinstate(false);
+                  }}
+                >
+                  {reinstate && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  <Package />
+                  Reinstate Product
+                </Button>
+              </div>
+            </CardFooter>
+          </Card>
+        ))}
       </div>
     </div>
   );

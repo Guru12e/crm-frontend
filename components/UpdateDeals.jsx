@@ -420,7 +420,6 @@ export default function UpdateDeals(
           "Data updated permanently. All changes made are permanent.",
           { position: "top-right" }
         );
-        localStorage.removeItem("companyDataCache");
         setLoading(false);
       }
     }

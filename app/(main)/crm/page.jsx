@@ -219,9 +219,9 @@ export default function CRM() {
         <div className="flex sm:flex-col py-5 md:py-0 md:flex-row md:ml-auto">
           <Sheet>
             <SheetTrigger asChild>
-              <button className="bg-gradient-to-r px-3 py-2 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white w-full md:ml-5 cursor-pointer">
+              <Button className="bg-gradient-to-r px-3 py-2 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white w-full md:ml-5 cursor-pointer">
                 Upload {activeTab} CSV
-              </button>
+              </Button>
             </SheetTrigger>
             <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh]">
               <SheetHeader>
