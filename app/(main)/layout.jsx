@@ -17,7 +17,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import UserButton from "@/components/UserButton";
 import { Label } from "@/components/ui/label";
-import { navigation } from "@/constants/constant";
+import { navigation, ROLE_PERMISSIONS } from "@/constants/constant";
 
 export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -37,6 +37,9 @@ export default function Layout({ children }) {
       router.push("/");
     }
   }, []);
+
+  // const allowedPages = ROLE_PERMISSIONS[user?.role] || [];
+  // console.log(allowedPages);
 
   const toggleExpanded = (name) => {
     setExpandedItems((prev) =>
@@ -97,39 +100,41 @@ export default function Layout({ children }) {
           </div>
 
           <nav className="flex-1 space-y-1 px-2 py-4">
-            {navigation.map((item) => {
-              const isActive = item.href === location;
+            {navigation
+              // .filter((item) => allowedPages.includes(item.key))
+              .map((item) => {
+                const isActive = item.href === location;
 
-              return (
-                <div key={item.name}>
-                  <div
-                    className={cn(
-                      "flex items-center cursor-pointer rounded-lg px-2 py-2 text-sm font-medium transition-all",
-                      isActive
-                        ? "bg-gradient-to-r from-teal-500 to-sky-500 text-white "
-                        : "text-slate-700 dark:text-slate-300 hover:bg-teal/50 dark:hover:bg-sky-800/50"
-                    )}
-                    onClick={() => handleItemClick(item)}
-                  >
-                    <Link
-                      href={item.href}
-                      className="group flex flex-1 items-center"
-                    >
-                      <div
-                        className={cn(
-                          "h-5 w-5 flex-shrink-0",
-                          isActive ? "text-white" : "text-slate-500"
-                        )}
-                      >
-                        {item.icon}
-                      </div>
-                      {sidebarOpen && (
-                        <span className="ml-3 truncate max-sm:hidden">
-                          {item.name}
-                        </span>
+                return (
+                  <div key={item.name}>
+                    <div
+                      className={cn(
+                        "flex items-center cursor-pointer rounded-lg px-2 py-2 text-sm font-medium transition-all",
+                        isActive
+                          ? "bg-gradient-to-r from-teal-500 to-sky-500 text-white "
+                          : "text-slate-700 dark:text-slate-300 hover:bg-teal/50 dark:hover:bg-sky-800/50"
                       )}
-                    </Link>
-                    {/* {hasSubpages && sidebarOpen && (
+                      onClick={() => handleItemClick(item)}
+                    >
+                      <Link
+                        href={item.href}
+                        className="group flex flex-1 items-center"
+                      >
+                        <div
+                          className={cn(
+                            "h-5 w-5 flex-shrink-0",
+                            isActive ? "text-white" : "text-slate-500"
+                          )}
+                        >
+                          {item.icon}
+                        </div>
+                        {sidebarOpen && (
+                          <span className="ml-3 truncate max-sm:hidden">
+                            {item.name}
+                          </span>
+                        )}
+                      </Link>
+                      {/* {hasSubpages && sidebarOpen && (
                       <div className="p-1 max-sm:hidden">
                         {isExpanded ? (
                           <ChevronDown className="h-4 w-4" />
@@ -138,9 +143,9 @@ export default function Layout({ children }) {
                         )}
                       </div>
                     )} */}
-                  </div>
+                    </div>
 
-                  {/* {hasSubpages && isExpanded && sidebarOpen && (
+                    {/* {hasSubpages && isExpanded && sidebarOpen && (
                     <div className="ml-8 mt-1 space-y-1 max-sm:hidden">
                       {item.subpages.map((subpage) => (
                         <Link
@@ -158,9 +163,9 @@ export default function Layout({ children }) {
                       ))}
                     </div>
                   )} */}
-                </div>
-              );
-            })}
+                  </div>
+                );
+              })}
           </nav>
         </div>
       </div>
@@ -187,37 +192,39 @@ export default function Layout({ children }) {
           </div>
 
           <nav className="flex-1 space-y-1 px-2 py-4">
-            {navigation.map((item) => {
-              const isActive = location === item.href;
-              // const hasSubpages = item.subpages && item.subpages.length > 0;
-              // const isExpanded = expandedItems.includes(item.name);
+            {navigation
+              // .filter((item) => allowedPages.includes(item.key))
+              .map((item) => {
+                const isActive = location === item.href;
+                // const hasSubpages = item.subpages && item.subpages.length > 0;
+                // const isExpanded = expandedItems.includes(item.name);
 
-              return (
-                <div key={item.name}>
-                  <div
-                    className={cn(
-                      "flex items-center cursor-pointer rounded-lg px-2 py-2 text-sm font-medium transition-all",
-                      isActive
-                        ? "bg-gradient-to-r from-teal-800/20 to-blue-500/20 text-blue-600 dark:text-blue-400"
-                        : "text-slate-700 dark:text-slate-300 hover:bg-teal/50 dark:hover:bg-sky-800/50"
-                    )}
-                    onClick={() => handleItemClick(item)}
-                  >
-                    <Link
-                      href={item.href}
-                      className="group flex flex-1 items-center"
+                return (
+                  <div key={item.name}>
+                    <div
+                      className={cn(
+                        "flex items-center cursor-pointer rounded-lg px-2 py-2 text-sm font-medium transition-all",
+                        isActive
+                          ? "bg-gradient-to-r from-teal-800/20 to-blue-500/20 text-blue-600 dark:text-blue-400"
+                          : "text-slate-700 dark:text-slate-300 hover:bg-teal/50 dark:hover:bg-sky-800/50"
+                      )}
+                      onClick={() => handleItemClick(item)}
                     >
-                      <div
-                        className={cn(
-                          "h-5 w-5 flex-shrink-0",
-                          isActive ? "text-white" : "text-slate-500"
-                        )}
+                      <Link
+                        href={item.href}
+                        className="group flex flex-1 items-center"
                       >
-                        {item.icon}
-                      </div>
-                      <span className="ml-3 truncate">{item.name}</span>
-                    </Link>
-                    {/* {hasSubpages && (
+                        <div
+                          className={cn(
+                            "h-5 w-5 flex-shrink-0",
+                            isActive ? "text-white" : "text-slate-500"
+                          )}
+                        >
+                          {item.icon}
+                        </div>
+                        <span className="ml-3 truncate">{item.name}</span>
+                      </Link>
+                      {/* {hasSubpages && (
                       <div className="p-1">
                         {isExpanded ? (
                           <ChevronDown className="h-4 w-4" />
@@ -226,9 +233,9 @@ export default function Layout({ children }) {
                         )}
                       </div>
                     )} */}
-                  </div>
+                    </div>
 
-                  {/* {hasSubpages && isExpanded && (
+                    {/* {hasSubpages && isExpanded && (
                     <div className="ml-8 mt-1 space-y-1">
                       {item.subpages.map((subpage) => (
                         <Link
@@ -247,9 +254,9 @@ export default function Layout({ children }) {
                       ))}
                     </div>
                   )} */}
-                </div>
-              );
-            })}
+                  </div>
+                );
+              })}
           </nav>
         </div>
       </div>

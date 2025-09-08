@@ -224,17 +224,26 @@ export const monthFilters = [
 ];
 
 export const navigation = [
-  { name: "Home", href: "/home", icon: <Home /> },
-  {
-    name: "Prospects",
-    href: "/prospects",
-    icon: <Users />,
-    // subpages: [{ name: "Our Prospects", href: "/prospects/our-prospects" }],
-  },
+  { key: "home", name: "Home", href: "/home", icon: <Home /> },
+  { key: "prospects", name: "Prospects", href: "/prospects", icon: <Users /> },
   // { name: "Engagement", href: "/engagement", icon: MessageSquare },
-  { name: "CRM", href: "/crm", icon: <Database /> },
-  { name: "Pricing", href: "/pricing", icon: <Send /> },
-  { name: "Campaigns", href: "/campaigns", icon: <Megaphone /> },
+  { key: "crm", name: "CRM", href: "/crm", icon: <Database /> },
+  { key: "pricing", name: "Pricing", href: "/pricing", icon: <Send /> },
+  {
+    key: "campaigns",
+    name: "Campaigns",
+    href: "/campaigns",
+    icon: <Megaphone />,
+  },
   // { name: "Calendar", href: "/calendar", icon: Calendar },
   // { name: "Analytics", href: "/analytics", icon: BarChart3 },
 ];
+
+// export const ROLE_PERMISSIONS = {
+//   CEO: ["home", "prospects", "crm", "pricing", "campaigns"],
+//   CMO: ["home", "prospects", "crm", "campaigns"],
+//   "Sales Manager": ["home", "prospects", "crm"],
+//   "Marketing Manager": ["home", "prospects", "campaigns"],
+//   "Sales Representative": ["home", "prospects", "crm"],
+//   Other: ["home"],
+// };
