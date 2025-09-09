@@ -131,7 +131,7 @@ export default function LeadCard({
 
   return (
     <>
-      <Card className="backdrop-blur-sm bg-white/70 h-auto w-full sm:max-w-md md:max-w-lg lg:max-w-sm z-0  hover:shadow-lg dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-1000 group mx-auto cursor-pointer">
+      <Card className="backdrop-blur-sm bg-white/70 h-auto w-full sm:max-w-md md:max-w-full  z-0  hover:shadow-lg dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-1000 group mx-auto cursor-pointer">
         <CardContent className="p-3 pt-4">
           <div className="flex sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex items-start space-x-0 flex-1 min-w-0">
@@ -149,17 +149,17 @@ export default function LeadCard({
                 />
               </div>
               <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
-                <AvatarFallback className="bg-gradient-to-r from-sky-700 to-teal-500 text-white text-xl font-semibold">
+                <AvatarFallback className="bg-gradient-to-r from-sky-700 to-teal-500 text-white md:text-xl font-semibold xs:text-md">
                   {lead.name
                     .split(" ")
                     .map((n) => n[0])
                     .join("")}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 w-full">
                 <Sheet>
                   <SheetTrigger asChild key={lead.id}>
-                    <Label className="mt-2 ml-2 text-base sm:text-lg font-semibold text-slate-900 dark:text-white break-words bg-transparent hover:bg-transparent">
+                    <Label className="mt-2 ml-2 text-md md:text-[16px] min-w-full bg-transparent font-semibold text-slate-900 dark:text-white break-words  hover:bg-transparent">
                       {lead.name}
                     </Label>
                   </SheetTrigger>
@@ -211,9 +211,9 @@ export default function LeadCard({
               </div>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-100">
-            <div className="flex items-center justify-around gap-4">
-              <div>
+          <div className="flex items-center justify-center mt-4 opacity-100 sm:opacity-100">
+            <div className="flex items-center justify-between w-full">
+              <div className="flex justify-center gap-6">
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button

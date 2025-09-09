@@ -161,7 +161,7 @@ export default function DealCard({
   };
 
   return (
-    <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 hover:scale-103 hover:shadow-lg cursor-pointer dark:hover:bg-slate-800/60 transition-all duration-300 group">
+    <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 hover:shadow-lg cursor-pointer dark:hover:bg-slate-800/60 transition-all duration-300 group">
       <CardContent className="p-4 sm:p-6">
         <div className="flex sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1 min-w-0">

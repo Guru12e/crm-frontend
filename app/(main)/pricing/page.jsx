@@ -236,7 +236,7 @@ export default function PricingPage() {
                   )}
                 </Label>
                 <Label className="mt-2">Category: {product.category}</Label>
-                <Label className="mt-2">Price: ${product.price}</Label>
+                <Label className="mt-2">Price: {product.price}</Label>
               </div>
             </CardContent>
             <CardFooter>
@@ -351,7 +351,7 @@ export default function PricingPage() {
                       Edit Product Configuration Info
                     </Button>
                   </SheetTrigger>
-                  <SheetContent className="sm:max-w-[425px]">
+                  <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] md:min-w-[85vw] min-w-screen ">
                     <SheetHeader>
                       <SheetTitle>
                         Customise Your Product Configuration Settings Here

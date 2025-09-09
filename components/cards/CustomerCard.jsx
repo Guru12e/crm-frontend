@@ -30,9 +30,9 @@ export default function CustomerCard({ customer, onChange }) {
   const [email, setEmail] = useState(false);
   return (
     <Sheet>
-      <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group">
+      <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 group xs:max-w-[290px] sm:max-w-full cursor-pointer">
         <CardContent className="p-4 sm:p-6">
-          <div className="flex flex-row items-center justify-between gap-4">
+          <div className="flex sm:flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center space-x-3 sm:space-x-4 flex-1 w-full">
               <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
                 <AvatarFallback className="bg-gradient-to-r from-sky-700 to-teal-500 text-white text-sm">
@@ -45,10 +45,10 @@ export default function CustomerCard({ customer, onChange }) {
               <div className="flex-1 w-full">
                 <SheetTrigger asChild>
                   <div>
-                    <h3 className="text-base sm:text-lg cursor-pointer text-start font-semibold text-slate-900 dark:text-white break-words">
+                    <h3 className="text-md md:text-lg cursor-pointer text-start font-semibold text-slate-900 dark:text-white break-words">
                       {customer.name}
                     </h3>
-                    <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 break-words">
+                    <p className="text-sm sm:text-xs text-slate-600 dark:text-slate-400 break-words">
                       {customer.email}
                     </p>
                   </div>
@@ -56,18 +56,22 @@ export default function CustomerCard({ customer, onChange }) {
                 <div className="flex flex-row sm:items-center sm:space-x-4 mt-2 text-sm text-slate-500 dark:text-slate-400 gap-1 sm:gap-0">
                   <div className="flex items-center">
                     <Building2 className="h-4 w-4 mr-1 flex-shrink-0" />
-                    <span className="break-words">{customer.industry}</span>
+                    <span className="break-words text-[10px] md:text-sm">
+                      {customer.industry}
+                    </span>
                   </div>
                   <div className="flex items-center">
                     <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
-                    <span className="break-words">{customer.address}</span>
+                    <span className="break-words text-[10px] md:text-sm">
+                      {customer.address}
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
             <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2">
               <div className="text-left flex items-end flex-col sm:text-right">
-                <div className="text-base sm:text-lg font-bold text-green-600">
+                <div className="text-sm md:text-lg font-bold text-green-600">
                   {customer.value}
                 </div>
                 <Badge
@@ -78,17 +82,18 @@ export default function CustomerCard({ customer, onChange }) {
                       ? "destructive"
                       : "secondary"
                   }
+                  className="text-[10px] md:text-xs"
                 >
                   {customer.status}
                 </Badge>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 break-words">
+                <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 mt-1 break-words ">
                   Created At: {customer.created_at.split("T")[0]}
                 </p>
               </div>
             </div>
           </div>
           <div className="flex flex-col items-start mt-4 gap-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-            <div className="gap-6 flex justify-between">
+            <div className="gap-6 flex w-full justify-between">
               <div>
                 <Dialog>
                   <DialogTrigger asChild>
@@ -121,18 +126,6 @@ export default function CustomerCard({ customer, onChange }) {
                   <Phone className="h-4 w-4 mr-1" />
                   <span className="hidden md:block">Call</span>
                 </Button>
-              </div>
-              <div>
-                <SheetTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="bg-white/50 dark:bg-slate-800/50 border-white/20 flex-1 sm:flex-none"
-                  >
-                    <Eye className="h-4 w-4" />
-                    <span className="hidden md:block">View </span>Details
-                  </Button>
-                </SheetTrigger>
               </div>
               <div>
                 <Dialog>

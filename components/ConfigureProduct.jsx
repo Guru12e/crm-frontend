@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
-import { Switch } from "@radix-ui/react-switch";
+import { Switch } from "./ui/switch";
 
 export default function ConfigureProduct() {
   const [isConfig, setIsConfig] = useState(true);
