@@ -19,6 +19,7 @@ import { supabase } from "@/utils/supabase/client";
 import { round } from "lodash";
 import { redirect } from "next/navigation";
 import { ToggleLeft } from "@/components/ui/ToggleLeft";
+import { Switch } from "@/components/ui/switch";
 
 export default function Home() {
   const [leads, setLeads] = useState([]);
@@ -541,26 +542,20 @@ export default function Home() {
             Welcome back, {userName}! Here's your GTM overview.
           </p>
         </div>
-        <Button
-          onClick={() =>
-            setChartsMode(chartsMode === "graphic" ? "numeric" : "graphic")
-          }
-          variant="outline"
-          className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 w-full sm:w-auto"
-        >
-          {/* {chartsMode === "graphic" ? (
-            <ToggleRight className="w-4 h-4 mr-2" />
-          ) : (
-            <ToggleLeft className="w-4 h-4 mr-2" />
-          )} */}
-          <ToggleLeft isDarkMode={darkMode} />
+        <div className="flex items-center space-x-2 bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200/50 dark:border-white/20 rounded-lg px-4 py-2">
+          <Switch
+            checked={chartsMode === "graphic"}
+            onCheckedChange={() =>
+              setChartsMode(chartsMode === "graphic" ? "numeric" : "graphic")
+            }
+          />
           <span className="hidden sm:inline">
             {chartsMode === "graphic" ? "Graphic Mode" : "Numeric Mode"}
           </span>
           <span className="sm:hidden">
             {chartsMode === "graphic" ? "Graphic" : "Numeric"}
           </span>
-        </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">

@@ -1,6 +1,7 @@
+"use client";
 import React, { useState } from "react";
 import { Button } from "./ui/button";
-import { Label } from "@radix-ui/react-dropdown-menu";
+import { Label } from "./ui/label";
 
 export default function ConfigureProduct() {
   const [isConfig, setIsConfig] = useState(true);
@@ -10,7 +11,6 @@ export default function ConfigureProduct() {
         <h1>Customise Your Product Configuration Settings Here</h1>
         <div className="flex gap-4">
           <Label>Is your product configurable?</Label>
-          <Button></Button>
         </div>
       </div>
     </div>

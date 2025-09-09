@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { add, set } from "lodash";
+import ConfigureProduct from "@/components/ConfigureProduct";
 
 export default function PricingPage() {
   const [discontinue, setDiscontinue] = useState(false);
@@ -347,7 +348,9 @@ export default function PricingPage() {
                       Edit Product Configuration Info
                     </Button>
                   </SheetTrigger>
-                  <SheetContent className="sm:max-w-[425px]"></SheetContent>
+                  <SheetContent className="sm:max-w-[425px]">
+                    <ConfigureProduct />
+                  </SheetContent>
                 </Sheet>
                 <Button
                   className="bg-transparent border-2 border-red-500 hover:bg-red-200 hover:border-red-600 text-red-500 mt-2 md:mt-0 md:ml-2 cursor-pointer"
