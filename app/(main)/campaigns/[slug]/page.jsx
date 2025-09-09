@@ -231,7 +231,10 @@ export default function CampaignDetail({ params }) {
           </h1>
           <div className="max-w-3xl mx-auto mt-10 bg-white/70 dark:bg-slate-800/50 shadow rounded-2xl p-6">
             <div className="mb-4">
-              <Label className={"mb-4 text-gray-600"} htmlFor="name">
+              <Label
+                className={"mb-4 text-slate-900 dark:text-slate-400"}
+                htmlFor="name"
+              >
                 Campaign Name
               </Label>
               <Input
@@ -243,7 +246,10 @@ export default function CampaignDetail({ params }) {
             </div>
 
             <div className="mb-4">
-              <Label className={"mb-4 text-gray-600"} htmlFor="subject">
+              <Label
+                className={"mb-4 text-slate-900 dark:text-slate-400"}
+                htmlFor="subject"
+              >
                 Subject
               </Label>
               <Input
@@ -255,7 +261,10 @@ export default function CampaignDetail({ params }) {
             </div>
 
             <div className="mb-4">
-              <Label className={"mb-4 text-gray-600"} htmlFor="body">
+              <Label
+                className={"mb-4 text-slate-900 dark:text-slate-400"}
+                htmlFor="body"
+              >
                 Body
               </Label>
               <Input
@@ -267,7 +276,9 @@ export default function CampaignDetail({ params }) {
             </div>
 
             <div>
-              <h2 className="font-semibold mb-2">Audience</h2>
+              <h2 className="font-semibold mb-2 text-slate-900 dark:text-slate-400">
+                Audience
+              </h2>
               {campaign.audience?.length > 0 ? (
                 <div className="list-disc list-inside">
                   {campaign.audience.map((email, idx) => (

@@ -216,14 +216,14 @@ export default function CRM() {
           </p>
         </div>
 
-        <div className="flex sm:flex-col py-5 md:py-0 md:flex-row md:ml-auto">
+        <div className="flex sm:flex-col py-5 md:py-0 md:flex-row md:ml-auto gap-2 mr-2">
           <Sheet>
             <SheetTrigger asChild>
               <Button className="bg-gradient-to-r px-3 py-2 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white w-full md:ml-5 cursor-pointer">
                 Upload {activeTab} CSV
               </Button>
             </SheetTrigger>
-            <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh]">
+            <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6">
               <SheetHeader>
                 <SheetTitle>Upload {activeTab} CSV</SheetTitle>
                 <SheetDescription>
@@ -237,7 +237,7 @@ export default function CRM() {
                         <h3 className="font-semibold text-lg mb-2">
                           📄 CSV Format Requirements
                         </h3>
-                        <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                        <ul className="list-disc pl-5 space-y-1 text-sm text-slate-900 dark:text-slate-400">
                           <li>
                             Required Columns:
                             <ul className="list-disc pl-5 mt-1 space-y-1">
@@ -257,7 +257,7 @@ export default function CRM() {
                           </li>
                           <li>
                             Optional Columns:
-                            <ul className="list-disc pl-5 mt-1 space-y-1">
+                            <ul className="list-disc pl-5 mt-1 space-y-1 text-slate-900 dark:text-slate-400">
                               <li>address</li>
                               <li>website</li>
                               <li>industry</li>
@@ -313,7 +313,7 @@ export default function CRM() {
                           <h3 className="font-semibold text-lg mb-2">
                             💡 Pro Tips
                           </h3>
-                          <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                          <ul className="list-disc pl-5 space-y-1 text-sm text-slate-900 dark:text-slate-400">
                             <li>Double-check for typos before uploading.</li>
                             <li>
                               Keep file size under 5MB for faster uploads.
@@ -537,7 +537,7 @@ export default function CRM() {
               Add New {activeTab}
             </Button>
           </SheetTrigger>
-          <SheetContent>
+          <SheetContent className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6">
             <SheetHeader>
               <SheetTitle>Add New {activeTab}</SheetTitle>
               <SheetDescription>

@@ -211,7 +211,10 @@ export default function PricingPage() {
       </div>
       <div className="mt-10">
         {products.map((product, index) => (
-          <Card key={product.id} className="mb-6">
+          <Card
+            key={product.id}
+            className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6"
+          >
             <CardHeader className="flex justify-between items-center font-semibold">
               {product.name}
               <Badge
@@ -258,7 +261,7 @@ export default function PricingPage() {
                       Edit Basic Product Info
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
+                  <DialogContent className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6">
                     <DialogTitle>Edit Product Information</DialogTitle>
                     <DialogDescription asChild>
                       <div className="flex flex-col gap-4 py-4">
@@ -349,6 +352,14 @@ export default function PricingPage() {
                     </Button>
                   </SheetTrigger>
                   <SheetContent className="sm:max-w-[425px]">
+                    <SheetHeader>
+                      <SheetTitle>
+                        Customise Your Product Configuration Settings Here
+                      </SheetTitle>
+                      <SheetDescription>
+                        Configure the settings as per your product's design.
+                      </SheetDescription>
+                    </SheetHeader>
                     <ConfigureProduct />
                   </SheetContent>
                 </Sheet>

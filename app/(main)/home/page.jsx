@@ -10,7 +10,6 @@ import {
   Calendar,
   Phone,
   DollarSign,
-  ToggleRight,
   PieChart,
   BarChart3,
 } from "lucide-react";
@@ -18,7 +17,6 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/utils/supabase/client";
 import { round } from "lodash";
 import { redirect } from "next/navigation";
-import { ToggleLeft } from "@/components/ui/ToggleLeft";
 import { Switch } from "@/components/ui/switch";
 
 export default function Home() {

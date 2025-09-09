@@ -371,7 +371,10 @@ export default function Campaigns() {
               </Button>
             </SheetTrigger>
           </div>
-          <SheetContent side="right" className="min-w-[85vw] overflow-y-auto">
+          <SheetContent
+            side="right"
+            className="min-w-[85vw] overflow-y-auto backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6"
+          >
             <SheetHeader>
               <SheetTitle>Create Email Campaign</SheetTitle>
               <SheetDescription asChild>
@@ -549,12 +552,12 @@ export default function Campaigns() {
               placeholder="Search campaigns..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="border rounded-lg px-3 py-2 w-full sm:w-1/2 focus:ring-2 focus:ring-sky-500 dark:bg-slate-900 dark:text-white"
+              className="border rounded-lg px-3 py-2 w-full sm:w-1/2 focus:ring-2 focus:ring-sky-500 backdrop-blur-sm dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20"
             />
             <select
               value={monthFilter}
               onChange={(e) => setMonthFilter(e.target.value)}
-              className="border rounded-lg px-3 py-2 dark:bg-slate-900 dark:text-white"
+              className="border rounded-lg px-3 py-2 backdrop-blur-sm dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20"
             >
               <option value="">All time</option>
               <option value="1">January</option>
@@ -573,7 +576,7 @@ export default function Campaigns() {
             <select
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
-              className="border rounded-lg px-3 py-2 dark:bg-slate-900 dark:text-white"
+              className="border rounded-lg px-3 py-2 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20"
             >
               <option value="">All time</option>
               <option value="last2days">Last 2 days</option>
@@ -584,7 +587,7 @@ export default function Campaigns() {
             <select
               value={audienceFilter}
               onChange={(e) => setAudienceFilter(e.target.value)}
-              className="border rounded-lg px-3 py-2 dark:bg-slate-900 dark:text-white"
+              className="border rounded-lg px-3 py-2 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20"
             >
               <option value="">All audiences</option>
               <option value="lt10">Less than 10</option>
@@ -614,7 +617,7 @@ export default function Campaigns() {
             }}
             className="w-full"
           >
-            <TabsList className="mb-1 w-full">
+            <TabsList className="mb-1 w-full backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
               <TabsTrigger value="Saved">Saved Campaigns</TabsTrigger>
               <TabsTrigger value="Sent">Sent Campaigns</TabsTrigger>
             </TabsList>
@@ -719,9 +722,12 @@ export default function Campaigns() {
               </div>
             </TabsContent>
             <TabsContent value="Sent">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ">
                 {filteredSent.map((c) => (
-                  <Card key={c.id}>
+                  <Card
+                    key={c.id}
+                    className="shadow-sm rounded-2xl border transition-all duration-200 hover:shadow-lg bg-white/70 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20 h-full"
+                  >
                     <CardContent>
                       <Link href={`/campaigns/${c.name}`}>
                         <h3 className="font-semibold text-lg">{c.name}</h3>
