@@ -45,16 +45,19 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { add, set } from "lodash";
 import ConfigureProduct from "@/components/ConfigureProduct";
+import { Switch } from "@/components/ui/switch";
 
 export default function PricingPage() {
   const [discontinue, setDiscontinue] = useState(false);
   const [reinstate, setReinstate] = useState(false);
   const [edit, setEdit] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [config, setConfig] = useState(false);
   const [loading, setLoading] = useState(false);
   const [companyData, setCompanyData] = useState({});
   const [products, setProducts] = useState([]);
   const [result, setResult] = useState(null);
+  const [configurable, setConfigurable] = useState(false);
   const today = new Date();
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -62,13 +65,11 @@ export default function PricingPage() {
     price: "",
     stock: "",
     description: "",
-    features: [
-      {
-        name: "",
-        configurations: [""],
-      },
-    ],
+    isActive: true,
+    isConfigurable: false,
+    configurations: {},
   });
+  const [editProductIndex, setEditProductIndex] = useState(null);
   const [errors, setErrors] = useState({ newProduct: {} });
   const [userEmail, setUserEmail] = useState(null);
   useEffect(() => {
@@ -98,8 +99,6 @@ export default function PricingPage() {
           ? JSON.parse(data.products || "[]")
           : data.products || []
       );
-
-      console.log("Fetched company data:", data);
     } catch (err) {
       console.error("Error fetching data from Supabase:", err);
     }
@@ -131,6 +130,16 @@ export default function PricingPage() {
       }
     };
     handleUpdate();
+  };
+
+  const handleProductEditor = (index, field, value) => {
+    const updatedProducts = [...products];
+    updatedProducts[index] = {
+      ...updatedProducts[index],
+      [field]: value,
+    };
+    setProducts(updatedProducts);
+    setCompanyData((prev) => ({ ...prev, products: updatedProducts }));
   };
 
   const validateNewProduct = () => {
@@ -217,11 +226,21 @@ export default function PricingPage() {
           >
             <CardHeader className="flex justify-between items-center font-semibold">
               {product.name}
-              <Badge
-                className={product.isActive ? "bg-green-500" : "bg-red-500"}
-              >
-                {product.isActive ? "Active" : "Inactive"}
-              </Badge>
+              <div className="flex gap-2">
+                {product.isConfigurable &&
+                  (product.config === null || product.config === undefined) && (
+                    <Badge className="bg-yellow-500">
+                      {product.config === null || product.config === undefined
+                        ? "Unconfigured"
+                        : ""}
+                    </Badge>
+                  )}
+                <Badge
+                  className={product.isActive ? "bg-green-500" : "bg-red-500"}
+                >
+                  {product.isActive ? "Active" : "Inactive"}
+                </Badge>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 gap-4">
@@ -237,6 +256,10 @@ export default function PricingPage() {
                 </Label>
                 <Label className="mt-2">Category: {product.category}</Label>
                 <Label className="mt-2">Price: {product.price}</Label>
+                <Label className="mt-2">
+                  Configuration:{" "}
+                  {product.isConfigurable ? "Enabled" : "Disabled"}
+                </Label>
               </div>
             </CardContent>
             <CardFooter>
@@ -245,16 +268,18 @@ export default function PricingPage() {
                   product.isActive ? "flex" : "hidden"
                 }`}
               >
-                <Dialog>
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                   <DialogTrigger asChild>
                     <Button
                       className="bg-transparent border-2 border-blue-500 hover:bg-blue-200 hover:border-blue-600 text-blue-500 cursor-pointer"
                       onClick={() => {
                         setEdit(true);
+                        setDialogOpen(true);
+                        setEditProductIndex(index);
                         setEdit(false);
                       }}
                     >
-                      {edit && (
+                      {edit === product.id && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
                       <Edit />
@@ -263,71 +288,132 @@ export default function PricingPage() {
                   </DialogTrigger>
                   <DialogContent className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6">
                     <DialogTitle>Edit Product Information</DialogTitle>
-                    <DialogDescription asChild>
-                      <div className="flex flex-col gap-4 py-4">
-                        <div className=" flex flex-col gap-3">
-                          <Label htmlFor="name">Product Name</Label>
-                          <Input
-                            id="name"
-                            value={product.name}
-                            onChange={(e) =>
-                              handleProductChange(index, "name", e.target.value)
-                            }
-                          />
+                    {editProductIndex !== null && (
+                      <DialogDescription asChild>
+                        <div className="flex flex-col gap-4 py-4">
+                          <div className=" flex flex-col gap-3">
+                            <Label htmlFor="name">Product Name</Label>
+                            <Input
+                              id="name"
+                              value={products[editProductIndex].name}
+                              onChange={(e) =>
+                                handleProductEditor(
+                                  editProductIndex,
+                                  "name",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-3">
+                            <Label htmlFor="description">
+                              Product Description
+                            </Label>
+                            <Input
+                              id="description"
+                              value={
+                                products[editProductIndex].description || ""
+                              }
+                              onChange={(e) =>
+                                handleProductEditor(
+                                  editProductIndex,
+                                  "description",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-3">
+                            <Label htmlFor="stock">Product Stock</Label>
+                            <Input
+                              id="stock"
+                              type="number"
+                              value={products[editProductIndex].stock || ""}
+                              onChange={(e) =>
+                                handleProductEditor(
+                                  editProductIndex,
+                                  "stock",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-3">
+                            <Label htmlFor="category">Product Category</Label>
+                            <Input
+                              id="category"
+                              value={products[editProductIndex].category}
+                              onChange={(e) =>
+                                handleProductEditor(
+                                  editProductIndex,
+                                  "category",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-3">
+                            <Label htmlFor="price">
+                              Enable Product Configuration
+                            </Label>
+                            <div>
+                              {products[editProductIndex].isConfigurable ===
+                              undefined ? (
+                                <div>
+                                  <Switch
+                                    id="isConfigurable"
+                                    checked={configurable}
+                                    onCheckedChange={(value) => {
+                                      setConfigurable(value);
+                                      handleProductEditor(
+                                        editProductIndex,
+                                        "isConfigurable",
+                                        value
+                                      );
+                                    }}
+                                  />
+                                  <span className="ml-2">
+                                    {products[editProductIndex].isConfigurable
+                                      ? "Enabled"
+                                      : "Disabled"}
+                                  </span>
+                                </div>
+                              ) : (
+                                <div>
+                                  <Switch
+                                    id="isConfigurable"
+                                    checked={
+                                      products[editProductIndex].isConfigurable
+                                    }
+                                    onCheckedChange={(value) => {
+                                      setConfigurable(value);
+                                      handleProductEditor(
+                                        editProductIndex,
+                                        "isConfigurable",
+                                        value
+                                      );
+                                    }}
+                                  />
+                                  <span className="ml-2">
+                                    {products[editProductIndex].isConfigurable
+                                      ? "Enabled"
+                                      : "Disabled"}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex flex-col gap-3">
-                          <Label htmlFor="description">
-                            Product Description
-                          </Label>
-                          <Input
-                            id="description"
-                            value={product.description}
-                            onChange={(e) =>
-                              handleProductChange(
-                                index,
-                                "description",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-                        <div className="flex flex-col gap-3">
-                          <Label htmlFor="stock">Product Stock</Label>
-                          <Input
-                            id="stock"
-                            type="number"
-                            value={product.stock}
-                            onChange={(e) =>
-                              handleProductChange(
-                                index,
-                                "stock",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-                        <div className="flex flex-col gap-3">
-                          <Label htmlFor="category">Product Category</Label>
-                          <Input
-                            id="category"
-                            value={product.category}
-                            onChange={(e) =>
-                              handleProductChange(
-                                index,
-                                "category",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-                      </div>
-                    </DialogDescription>
+                      </DialogDescription>
+                    )}
 
                     <DialogFooter>
                       <Button
                         className="bg-blue-500 hover:bg-blue-600 text-white"
                         onClick={() => {
                           setEdit(false);
+                          handleUpdate();
+                          setDialogOpen(false);
                         }}
                       >
                         Save Changes
@@ -335,34 +421,39 @@ export default function PricingPage() {
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <Button
-                      className="bg-transparent border-2 border-gray-500 hover:bg-gray-200 hover:border-gray-600 text-gray-500 mt-2 md:mt-0 md:ml-2 cursor-pointer"
-                      onClick={() => {
-                        setConfig(true);
-                        setConfig(false);
-                      }}
-                    >
-                      {config && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      )}
-                      <Wrench />
-                      Edit Product Configuration Info
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] md:min-w-[85vw] min-w-screen ">
-                    <SheetHeader>
-                      <SheetTitle>
-                        Customise Your Product Configuration Settings Here
-                      </SheetTitle>
-                      <SheetDescription>
-                        Configure the settings as per your product's design.
-                      </SheetDescription>
-                    </SheetHeader>
-                    <ConfigureProduct />
-                  </SheetContent>
-                </Sheet>
+                {product.isConfigurable && (
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button
+                        className="bg-transparent border-2 border-gray-500 hover:bg-gray-200 hover:border-gray-600 text-gray-500 mt-2 md:mt-0 md:ml-2 cursor-pointer"
+                        onClick={() => {
+                          setConfig(true);
+                          setConfig(false);
+                        }}
+                      >
+                        {config && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        <Wrench />
+                        Edit Product Configuration Info
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] md:min-w-[85vw] min-w-screen backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+                      <SheetHeader>
+                        <SheetTitle>
+                          Customise Your Product Configuration Settings Here
+                        </SheetTitle>
+                        <SheetDescription>
+                          Configure the settings as per your product's design.
+                        </SheetDescription>
+                      </SheetHeader>
+                      <ConfigureProduct
+                        product={product}
+                        config={product.config}
+                      />
+                    </SheetContent>
+                  </Sheet>
+                )}
                 <Button
                   className="bg-transparent border-2 border-red-500 hover:bg-red-200 hover:border-red-600 text-red-500 mt-2 md:mt-0 md:ml-2 cursor-pointer"
                   onClick={() => {
