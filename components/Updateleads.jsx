@@ -972,7 +972,7 @@ export default function Updateleads(lead_id, onChange) {
 
         <CardContent>
           <Card className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm">
-            <CardContent>
+            <CardContent className={"p-0 pt-0"}>
               {stageHistory.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">

@@ -5,12 +5,26 @@ import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
 import { Input } from "./ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Textarea } from "./ui/textarea";
-import { ChevronDown, ClipboardListIcon, Cog, Trash2 } from "lucide-react";
+import {
+  ChevronDown,
+  ClipboardListIcon,
+  Cog,
+  Edit,
+  Trash2,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
 
 export default function ConfigureProduct({ product, config }) {
   const [configuration, setConfiguration] = useState({});
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [componentChange, setComponentChange] = useState({});
   const [newComponent, setNewComponent] = useState({
     name: "",
     description: "",
@@ -35,15 +49,11 @@ export default function ConfigureProduct({ product, config }) {
   };
 
   const handleAddComponent = (category) => {
+    console.log(category, newComponent);
     if (newComponent.name.trim() === "") return;
-    const componentToAdd = { ...newComponent };
-    componentToAdd.additionalCost = newComponent.additionalCost
-      ? parseFloat(newComponent.additionalCost)
-      : 0;
-
     setConfiguration((prevConfig) => ({
       ...prevConfig,
-      [category]: [...(prevConfig[category] || []), componentToAdd],
+      [category]: [...(prevConfig[category] || []), newComponent],
     }));
     setNewComponent({
       name: "",
@@ -52,10 +62,6 @@ export default function ConfigureProduct({ product, config }) {
       isDefault: false,
     });
   };
-
-  const isAddComponentDisabled =
-    newComponent.name.trim() === "" ||
-    (!newComponent.isDefault && newComponent.additionalCost === "");
 
   const removeCategory = (cat) => {
     const newConfig = { ...configuration };
@@ -66,7 +72,7 @@ export default function ConfigureProduct({ product, config }) {
 
   return (
     <div className=" px-10">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 border-t border-gray-300 dark:border-gray-700 py-4">
         <h1 className="text-2xl font-bold">Product Configuration Settings</h1>
         <Button className="bg-gradient-to-r from-sky-700 to-teal-500 dark:from-sky-500 to:teal-700 text-white">
           Save Changes
@@ -105,8 +111,8 @@ export default function ConfigureProduct({ product, config }) {
         <Card
           key={category}
           className={`${
-            open.includes(category) ? "h-full" : "h-14"
-          } p-0 flex flex-col justify-start items-start gap-4 mb-6 bg-gray-700/10 dark:bg-gray-200/10 border-0 backdrop-blur-sm transition-all duration-300 w-full`}
+            open.includes(category) ? "max-h-full" : "h-14"
+          } p-0 flex flex-col justify-start items-start gap-4 mb-6 bg-white/10 dark:bg-gray-200/10 border-0 backdrop-blur-sm transition-all duration-300 w-full`}
         >
           <CardHeader
             className="w-full pt-2 px-4 cursor-pointer"
@@ -140,8 +146,8 @@ export default function ConfigureProduct({ product, config }) {
           <CardContent className="p-2 w-full">
             <div onClick={(e) => e.stopPropagation()}>
               {open.includes(category) && (
-                <div className="w-full mt-4">
-                  <table className="min-w-full border-collapse">
+                <div className="w-full mt-4 overflow-x-auto">
+                  <table className="min-w-full border-collapse divide-y divide-gray-200">
                     <thead>
                       <tr>
                         <th className="text-left p-2">Component Name</th>
@@ -165,28 +171,152 @@ export default function ConfigureProduct({ product, config }) {
                               : `$${component.additionalCost.toFixed(2)}`}
                           </td>
                           <td className="p-2">
-                            <Button
-                              className=" h-6 bg-transparent text-red-500 border border-red-500 hover:bg-red-800/20 cursor-pointer"
-                              onClick={() => {
-                                const newConfig = { ...configuration };
-                                newConfig[category] = newConfig[
-                                  category
-                                ].filter((_, i) => i !== idx);
-                                setConfiguration(newConfig);
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete Component
-                            </Button>
+                            <div className="flex gap-2">
+                              <Button
+                                className=" h-6 bg-transparent text-red-500 border border-red-500 hover:bg-red-800/20 cursor-pointer"
+                                onClick={() => {
+                                  const newConfig = { ...configuration };
+                                  newConfig[category] = newConfig[
+                                    category
+                                  ].filter((_, i) => i !== idx);
+                                  setConfiguration(newConfig);
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete Component
+                              </Button>
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button
+                                    className=" h-6 bg-transparent text-blue-500 border border-blue-500 hover:bg-blue-800/20 cursor-pointer"
+                                    onClick={() => {
+                                      setComponentChange(component);
+                                    }}
+                                  >
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Edit Component
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-[425px]">
+                                  <DialogHeader>
+                                    <DialogTitle>Edit Component</DialogTitle>
+                                  </DialogHeader>
+                                  <div className="grid gap-4 py-4">
+                                    <div className="grid gap-2">
+                                      <Label htmlFor="componentName">
+                                        Component Name
+                                      </Label>
+                                      <Input
+                                        id="componentName"
+                                        defaultValue={component.name}
+                                        onChange={(e) => {
+                                          setComponentChange({
+                                            ...componentChange,
+                                            name: e.target.value,
+                                          });
+                                        }}
+                                      />
+                                    </div>
+                                    <div className="grid gap-2">
+                                      <Label htmlFor="componentDescription">
+                                        Description
+                                      </Label>
+                                      <Input
+                                        id="componentDescription"
+                                        defaultValue={component.description}
+                                        onChange={(e) => {
+                                          setComponentChange({
+                                            ...componentChange,
+                                            description: e.target.value,
+                                          });
+                                        }}
+                                      />
+                                    </div>
+                                    <div className="grid gap-2">
+                                      <Label htmlFor="componentIsDefault">
+                                        Is Default
+                                      </Label>
+                                      <Switch
+                                        checked={
+                                          componentChange.isDefault === true
+                                        }
+                                        onCheckedChange={(val) => {
+                                          setComponentChange((prev) => ({
+                                            ...prev,
+                                            isDefault: val,
+                                          }));
+                                        }}
+                                        className={
+                                          " data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-sky-500 data-[state=checked]:to-teal-700"
+                                        }
+                                      />
+                                    </div>
+                                    {!componentChange.isDefault ? (
+                                      <div className="grid gap-2">
+                                        <Label htmlFor="componentAdditionalCost">
+                                          Additional Cost
+                                        </Label>
+                                        <Input
+                                          id="componentAdditionalCost"
+                                          type="number"
+                                          value={component.additionalCost}
+                                          onChange={(e) => {
+                                            setComponentChange({
+                                              ...componentChange,
+                                              additionalCost: parseFloat(
+                                                e.target.value
+                                              ),
+                                            });
+                                          }}
+                                        />
+                                      </div>
+                                    ) : (
+                                      <div className="text-gray-500 italic"></div>
+                                    )}
+                                  </div>
+                                  <DialogFooter>
+                                    <Button
+                                      className=" bg-transparent text-green-500 border border-green-500 hover:bg-green-800/20 cursor-pointer"
+                                      onClick={() => {
+                                        const newConfig = { ...configuration };
+                                        newConfig[category][idx] =
+                                          componentChange;
+                                        setConfiguration(newConfig);
+                                      }}
+                                    >
+                                      Save Changes
+                                    </Button>
+                                  </DialogFooter>
+                                </DialogContent>
+                              </Dialog>
+                            </div>
                           </td>
                         </tr>
                       ))}
                       <tr className="border-t">
                         <td className="p-2">
-                          <Input placeholder="Component Name" />
+                          <Input
+                            placeholder="Component Name"
+                            value={newComponent.name}
+                            onChange={(e) =>
+                              setNewComponent((prev) => ({
+                                ...prev,
+                                name: e.target.value,
+                              }))
+                            }
+                          />
                         </td>
                         <td className="p-2">
-                          <Input placeholder="Description" />
+                          <Input
+                            placeholder="Description"
+                            value={newComponent.description}
+                            onChange={(e) =>
+                              setNewComponent((prev) => ({
+                                ...prev,
+                                description: e.target.value,
+                              }))
+                            }
+                          />
                         </td>
                         <td className="p-2">
                           <div>
@@ -209,18 +339,31 @@ export default function ConfigureProduct({ product, config }) {
                             </span>
                           </div>
                         </td>
-                        <td className="p-2">
-                          <Input placeholder="Additional Cost" />
-                        </td>
+                        {isDefault ? (
+                          <td className="p-2">
+                            <span className="text-gray-500 italic">0</span>
+                          </td>
+                        ) : (
+                          <td className="p-2">
+                            <Input
+                              placeholder="Additional Cost"
+                              value={newComponent.additionalCost}
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              onChange={(e) =>
+                                setNewComponent((prev) => ({
+                                  ...prev,
+                                  additionalCost: parseFloat(e.target.value),
+                                }))
+                              }
+                            />
+                          </td>
+                        )}
                         <td className="p-2">
                           <Button
-                            className={` h-6 bg-transparent text-green-500 border border-green-500 hover:bg-green-800/20 cursor-pointer ${
-                              isAddComponentDisabled
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                            }`}
+                            className={` h-6 bg-transparent text-green-500 border border-green-500 hover:bg-green-800/20 cursor-pointer`}
                             onClick={() => handleAddComponent(category)}
-                            disabled={isAddComponentDisabled}
                           >
                             <Cog className="h-4 w-4 mr-2" />
                             Add Component
