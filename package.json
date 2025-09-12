@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@everapi/currencyapi-js": "^1.0.6",
     "@langchain/core": "^0.3.69",
     "@langchain/google-genai": "^0.2.16",
     "@radix-ui/react-avatar": "^1.1.10",

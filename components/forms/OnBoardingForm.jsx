@@ -26,6 +26,7 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import PhoneInput from "../PhoneInput";
+import { CurrencyDropdown } from "../ui/CurrencyDropDown";
 
 export default function OnBoardingForm({ session }) {
   const router = useRouter();
@@ -49,6 +50,8 @@ export default function OnBoardingForm({ session }) {
     description: "",
     price: "",
     category: "",
+    currency: "",
+    billingCycle: "one-time",
   });
 
   const [errors, setErrors] = useState({
@@ -538,7 +541,7 @@ export default function OnBoardingForm({ session }) {
                     />
                     <ErrorMessage error={errors.companyDescription} />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     <div>
                       <Label
                         htmlFor="industry"
@@ -622,7 +625,7 @@ export default function OnBoardingForm({ session }) {
                         Add Product or Service
                       </h4>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4">
                       <div>
                         <Label className="mb-2 text-slate-700 dark:text-slate-300">
                           Product Name
@@ -663,21 +666,98 @@ export default function OnBoardingForm({ session }) {
                       </div>
                       <div>
                         <Label className="mb-2 text-slate-700 dark:text-slate-300">
-                          Price (Optional)
+                          Base Price
                         </Label>
-                        <Input
-                          value={newProduct.price}
-                          onChange={(e) =>
-                            setNewProduct((prev) => ({
-                              ...prev,
-                              price: e.target.value,
-                            }))
-                          }
-                          className={`bg-white/70 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                            errors.newProduct.price ? "border-red-500" : ""
-                          }`}
-                          placeholder="e.g., $99/month"
-                        />
+                        <div className="flex gap-2 ">
+                          <CurrencyDropdown
+                            value={newProduct.currency}
+                            onValueChange={(value) =>
+                              setNewProduct((prev) => ({
+                                ...prev,
+                                currency: value,
+                              }))
+                            }
+                          />
+                          <Input
+                            value={newProduct.price}
+                            onChange={(e) =>
+                              setNewProduct((prev) => ({
+                                ...prev,
+                                price: e.target.value,
+                              }))
+                            }
+                            className={`bg-white/70 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
+                              errors.newProduct.price ? "border-red-500" : ""
+                            }`}
+                            placeholder="e.g., 99 or 99.99"
+                          />
+                          <Select className="mt-2">
+                            <SelectTrigger className="bg-white/70 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white w-full">
+                              <SelectValue
+                                placeholder="Select billing cycle"
+                                value={newProduct.billingCycle}
+                                onValueChange={(value) =>
+                                  setNewProduct((prev) => ({
+                                    ...prev,
+                                    billingCycle: value,
+                                  }))
+                                }
+                              />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="/month">/month</SelectItem>
+                              <SelectItem value="/year">/year</SelectItem>
+                              <SelectItem value="one-time">One-time</SelectItem>
+                              <SelectItem value="/kg">/kg</SelectItem>
+                              <SelectItem value="/g">/g</SelectItem>
+                              <SelectItem value="/lb">/lb</SelectItem>
+                              <SelectItem value="/unit">/unit</SelectItem>
+                              <SelectItem value="/GB">/GB</SelectItem>
+                              <SelectItem value="/TB">/TB</SelectItem>
+                              <SelectItem value="/API call">
+                                /API call
+                              </SelectItem>
+                              <SelectItem value="/request">/request</SelectItem>
+                              <SelectItem value="/minute">/minute</SelectItem>
+                              <SelectItem value="/second">/second</SelectItem>
+                              <SelectItem value="/piece">/piece</SelectItem>
+                              <SelectItem value="/session">/session</SelectItem>
+                              <SelectItem value="/transaction">
+                                /transaction
+                              </SelectItem>
+                              <SelectItem value="/item">/item</SelectItem>
+                              <SelectItem value="/event">/event</SelectItem>
+                              <SelectItem value="/call">/call</SelectItem>
+                              <SelectItem value="/visit">/visit</SelectItem>
+                              <SelectItem value="/lead">/lead</SelectItem>
+                              <SelectItem value="/campaign">
+                                /campaign
+                              </SelectItem>
+                              <SelectItem value="/meter">/meter</SelectItem>
+                              <SelectItem value="/km">/km</SelectItem>
+                              <SelectItem value="/hour">/hour</SelectItem>
+                              <SelectItem value="/day">/day</SelectItem>
+                              <SelectItem value="/week">/week</SelectItem>
+                              <SelectItem value="/liter">/liter</SelectItem>
+                              <SelectItem value="/user">/user</SelectItem>
+                              <SelectItem value="/device">/device</SelectItem>
+                              <SelectItem value="/project">/project</SelectItem>
+                              <SelectItem value="/subscription">
+                                /subscription
+                              </SelectItem>
+                              <SelectItem value="/team">/team</SelectItem>
+                              <SelectItem value="/license">/license</SelectItem>
+                              <SelectItem value="/seat">/seat</SelectItem>
+                              <SelectItem value="/month/user">
+                                /month/user
+                              </SelectItem>
+                              <SelectItem value="/year/user">
+                                /year/user
+                              </SelectItem>
+                              <SelectItem value="/token">/token</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                         <ErrorMessage error={errors.newProduct.price} />
                       </div>
                       <div>
@@ -734,7 +814,8 @@ export default function OnBoardingForm({ session }) {
                                 )}
                                 {product.price && (
                                   <span className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded">
-                                    {product.price}
+                                    {product.currency} {product.price} {}
+                                    {product.billingCycle}
                                   </span>
                                 )}
                               </div>
