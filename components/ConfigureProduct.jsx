@@ -20,8 +20,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
+import { supabase } from "@/utils/supabase/client";
 
-export default function ConfigureProduct({ product, config }) {
+export default function ConfigureProduct({ userEmail, product, config }) {
   const [configuration, setConfiguration] = useState({});
   const [newCategoryName, setNewCategoryName] = useState("");
   const [componentChange, setComponentChange] = useState({});
@@ -70,11 +71,39 @@ export default function ConfigureProduct({ product, config }) {
   };
   const [open, setOpen] = useState([]);
 
+  const handleSaveConfiguration = async (productId, config) => {
+    const { data, error } = await supabase
+      .from("Users")
+      .select("*")
+      .eq("email", userEmail)
+      .single();
+    const { error: updateError } = await supabase
+      .from("Users")
+      .update({
+        ...data,
+        products: data.products.map((p) =>
+          p.id === productId ? { ...p, config } : p
+        ),
+      })
+      .eq("email", userEmail);
+    if (updateError) {
+      console.error("Error updating configuration:", updateError);
+      alert("Failed to save configuration. Please try again.");
+    } else {
+      alert("Configuration saved successfully!");
+    }
+  };
+
   return (
     <div className=" px-10">
       <div className="flex items-center justify-between mb-6 border-t border-gray-300 dark:border-gray-700 py-4">
         <h1 className="text-2xl font-bold">Product Configuration Settings</h1>
-        <Button className="bg-gradient-to-r from-sky-700 to-teal-500 dark:from-sky-500 to:teal-700 text-white">
+        <Button
+          className="bg-gradient-to-r from-sky-700 to-teal-500 dark:from-sky-500 to:teal-700 text-white cursor-pointer"
+          onClick={() => {
+            handleSaveConfiguration(product.id, configuration);
+          }}
+        >
           Save Changes
         </Button>
       </div>

@@ -4,21 +4,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Save,
-  Upload,
-  Plus,
-  Trash2,
-  Package,
-  AlertCircle,
-  Wrench,
-  FlagOff,
-  Edit,
-  Loader2,
-} from "lucide-react";
+import { Package, Wrench, FlagOff, Edit, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import isEqual from "lodash/isEqual";
 import "react-toastify/dist/ReactToastify.css";
 import {
   Sheet,
@@ -43,7 +30,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { add, set } from "lodash";
 import ConfigureProduct from "@/components/ConfigureProduct";
 import { Switch } from "@/components/ui/switch";
 
@@ -450,6 +436,7 @@ export default function PricingPage() {
                       <ConfigureProduct
                         product={product}
                         config={product.config}
+                        userEmail={userEmail}
                       />
                     </SheetContent>
                   </Sheet>
