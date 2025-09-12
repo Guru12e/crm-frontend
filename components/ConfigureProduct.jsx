@@ -20,7 +20,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table";
 import { supabase } from "@/utils/supabase/client";
+import { toast } from "react-toastify";
 
 export default function ConfigureProduct({ userEmail, product, config }) {
   const [configuration, setConfiguration] = useState({});
@@ -77,7 +87,7 @@ export default function ConfigureProduct({ userEmail, product, config }) {
       .select("*")
       .eq("email", userEmail)
       .single();
-    const { error: updateError } = await supabase
+    const { data: updatedData, error: updateError } = await supabase
       .from("Users")
       .update({
         ...data,
@@ -88,18 +98,18 @@ export default function ConfigureProduct({ userEmail, product, config }) {
       .eq("email", userEmail);
     if (updateError) {
       console.error("Error updating configuration:", updateError);
-      alert("Failed to save configuration. Please try again.");
+      toast.error("Failed to save configuration. Please try again.");
     } else {
-      alert("Configuration saved successfully!");
+      toast.success("Configuration saved successfully!");
     }
   };
 
   return (
     <div className=" px-10">
-      <div className="flex items-center justify-between mb-6 border-t border-gray-300 dark:border-gray-700 py-4">
+      <div className="flex flex-col md:flex-row items-center justify-between mb-6 border-t border-gray-300 dark:border-gray-700 py-4 gap-2 w-full">
         <h1 className="text-2xl font-bold">Product Configuration Settings</h1>
         <Button
-          className="bg-gradient-to-r from-sky-700 to-teal-500 dark:from-sky-500 to:teal-700 text-white cursor-pointer"
+          className="bg-gradient-to-r from-sky-700 to-teal-500 dark:from-sky-500 to:teal-700 text-white cursor-pointer w-full md:w-auto  "
           onClick={() => {
             handleSaveConfiguration(product.id, configuration);
           }}
@@ -113,8 +123,10 @@ export default function ConfigureProduct({ userEmail, product, config }) {
             <ClipboardListIcon className="h-5 w-5 mr-2" />
             Add Component Category
           </CardTitle>
-          <CardContent>
-            <div className="flex space-x-2">
+          <CardContent
+            className={"flex flex-col lg:flex-row gap-4 lg:items-center mt-4"}
+          >
+            <div className="flex flex-col md:flex-row gap-4">
               <Label htmlFor="categoryName" className="sr-only">
                 Category Name
               </Label>
@@ -167,8 +179,8 @@ export default function ConfigureProduct({ userEmail, product, config }) {
                 className=" h-6 bg-transparent text-red-500 border border-red-500 hover:bg-red-800/20 "
                 onClick={() => removeCategory(category)}
               >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Category
+                <Trash2 className="h-4 w-4 lg:mr-2" />
+                <span className="hidden lg:flex">Delete Category</span>
               </Button>
             </div>
           </CardHeader>
@@ -176,33 +188,43 @@ export default function ConfigureProduct({ userEmail, product, config }) {
             <div onClick={(e) => e.stopPropagation()}>
               {open.includes(category) && (
                 <div className="w-full mt-4 overflow-x-auto">
-                  <table className="min-w-full border-collapse divide-y divide-gray-200">
-                    <thead>
-                      <tr>
-                        <th className="text-left p-2">Component Name</th>
-                        <th className="text-left p-2">Description</th>
-                        <th className="text-left p-2">Is Default</th>
-                        <th className="text-left p-2">Additional Cost</th>
-                        <th className="text-left p-2">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                  <Table className="table-fixed w-full">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-left p-2 xs:text-xs md:text-base w-1/8">
+                          Component Name
+                        </TableHead>
+                        <TableHead className="text-left p-2 xs:text-xs md:text-base w-1/8">
+                          Description
+                        </TableHead>
+                        <TableHead className="text-left p-2 xs:text-xs md:text-base w-1/8">
+                          Is Default
+                        </TableHead>
+                        <TableHead className="text-left p-2 xs:text-xs md:text-base w-1/8">
+                          Additional Cost
+                        </TableHead>
+                        <TableHead className="text-left p-2 xs:text-xs md:text-base w-[10%]">
+                          Actions
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
                       {(configuration[category] || []).map((component, idx) => (
-                        <tr key={idx} className="border-t">
-                          <td className="p-2">{component.name}</td>
-                          <td className="p-2">{component.description}</td>
-                          <td className="p-2">
+                        <TableRow key={idx}>
+                          <TableCell>{component.name}</TableCell>
+                          <TableCell>{component.description}</TableCell>
+                          <TableCell>
                             {component.isDefault ? "Yes" : "No"}
-                          </td>
-                          <td className="p-2">
+                          </TableCell>
+                          <TableCell>
                             {component.isDefault
                               ? "-"
                               : `$${component.additionalCost.toFixed(2)}`}
-                          </td>
-                          <td className="p-2">
+                          </TableCell>
+                          <TableCell>
                             <div className="flex gap-2">
                               <Button
-                                className=" h-6 bg-transparent text-red-500 border border-red-500 hover:bg-red-800/20 cursor-pointer"
+                                className="h-6 bg-transparent text-red-500 border border-red-500 hover:bg-red-800/20 cursor-pointer"
                                 onClick={() => {
                                   const newConfig = { ...configuration };
                                   newConfig[category] = newConfig[
@@ -211,19 +233,17 @@ export default function ConfigureProduct({ userEmail, product, config }) {
                                   setConfiguration(newConfig);
                                 }}
                               >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete Component
+                                <Trash2 className="h-4 w-4" />
                               </Button>
                               <Dialog>
                                 <DialogTrigger asChild>
                                   <Button
-                                    className=" h-6 bg-transparent text-blue-500 border border-blue-500 hover:bg-blue-800/20 cursor-pointer"
+                                    className="h-6 bg-transparent text-blue-500 border border-blue-500 hover:bg-blue-800/20 cursor-pointer"
                                     onClick={() => {
                                       setComponentChange(component);
                                     }}
                                   >
-                                    <Edit className="h-4 w-4 mr-2" />
-                                    Edit Component
+                                    <Edit className="h-4 w-4" />
                                   </Button>
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-[425px]">
@@ -275,9 +295,7 @@ export default function ConfigureProduct({ userEmail, product, config }) {
                                             isDefault: val,
                                           }));
                                         }}
-                                        className={
-                                          " data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-sky-500 data-[state=checked]:to-teal-700"
-                                        }
+                                        className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-sky-500 data-[state=checked]:to-teal-700"
                                       />
                                     </div>
                                     {!componentChange.isDefault ? (
@@ -305,7 +323,7 @@ export default function ConfigureProduct({ userEmail, product, config }) {
                                   </div>
                                   <DialogFooter>
                                     <Button
-                                      className=" bg-transparent text-green-500 border border-green-500 hover:bg-green-800/20 cursor-pointer"
+                                      className="bg-transparent text-green-500 border border-green-500 hover:bg-green-800/20 cursor-pointer"
                                       onClick={() => {
                                         const newConfig = { ...configuration };
                                         newConfig[category][idx] =
@@ -319,11 +337,11 @@ export default function ConfigureProduct({ userEmail, product, config }) {
                                 </DialogContent>
                               </Dialog>
                             </div>
-                          </td>
-                        </tr>
+                          </TableCell>
+                        </TableRow>
                       ))}
-                      <tr className="border-t">
-                        <td className="p-2">
+                      <TableRow>
+                        <TableCell>
                           <Input
                             placeholder="Component Name"
                             value={newComponent.name}
@@ -334,8 +352,8 @@ export default function ConfigureProduct({ userEmail, product, config }) {
                               }))
                             }
                           />
-                        </td>
-                        <td className="p-2">
+                        </TableCell>
+                        <TableCell>
                           <Input
                             placeholder="Description"
                             value={newComponent.description}
@@ -346,8 +364,8 @@ export default function ConfigureProduct({ userEmail, product, config }) {
                               }))
                             }
                           />
-                        </td>
-                        <td className="p-2">
+                        </TableCell>
+                        <TableCell>
                           <div>
                             <Switch
                               checked={isDefault}
@@ -359,21 +377,19 @@ export default function ConfigureProduct({ userEmail, product, config }) {
                                 }));
                               }}
                               onClick={(e) => e.stopPropagation()}
-                              className={
-                                " data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-sky-500 data-[state=checked]:to-teal-700"
-                              }
+                              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-sky-500 data-[state=checked]:to-teal-700"
                             />
                             <span className="ml-2">
                               {isDefault ? "Yes" : "No"}
                             </span>
                           </div>
-                        </td>
+                        </TableCell>
                         {isDefault ? (
-                          <td className="p-2">
+                          <TableCell>
                             <span className="text-gray-500 italic">0</span>
-                          </td>
+                          </TableCell>
                         ) : (
-                          <td className="p-2">
+                          <TableCell>
                             <Input
                               placeholder="Additional Cost"
                               value={newComponent.additionalCost}
@@ -387,20 +403,21 @@ export default function ConfigureProduct({ userEmail, product, config }) {
                                 }))
                               }
                             />
-                          </td>
+                          </TableCell>
                         )}
-                        <td className="p-2">
+                        <TableCell>
                           <Button
-                            className={` h-6 bg-transparent text-green-500 border border-green-500 hover:bg-green-800/20 cursor-pointer`}
+                            className="h-6 bg-transparent text-green-500 border border-green-500 hover:bg-green-800/20 cursor-pointer"
                             onClick={() => handleAddComponent(category)}
                           >
                             <Cog className="h-4 w-4 mr-2" />
-                            Add Component
+                            Add
+                            <span className="hidden lg:inline"> Component</span>
                           </Button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
                 </div>
               )}
             </div>
