@@ -26,7 +26,8 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import PhoneInput from "../PhoneInput";
-import { CurrencyDropdown } from "../ui/CurrencyDropDown";
+import { CurrencyDropDown } from "../ui/CurrencyDropDown";
+import { BillingCycleSelect } from "../BillingCycleSelect";
 
 export default function OnBoardingForm({ session }) {
   const router = useRouter();
@@ -668,30 +669,40 @@ export default function OnBoardingForm({ session }) {
                         <Label className="mb-2 text-slate-700 dark:text-slate-300">
                           Base Price
                         </Label>
-                        <div className="flex gap-2 ">
-                          <CurrencyDropdown
-                            value={newProduct.currency}
-                            onValueChange={(value) =>
-                              setNewProduct((prev) => ({
-                                ...prev,
-                                currency: value,
-                              }))
-                            }
-                          />
-                          <Input
-                            value={newProduct.price}
-                            onChange={(e) =>
-                              setNewProduct((prev) => ({
-                                ...prev,
-                                price: e.target.value,
-                              }))
-                            }
-                            className={`bg-white/70 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
-                              errors.newProduct.price ? "border-red-500" : ""
-                            }`}
-                            placeholder="e.g., 99 or 99.99"
-                          />
-                          <Select className="mt-2">
+                        <div className="flex flex-col gap-2 ">
+                          <div className="flex mt-2 gap-2">
+                            <Label className="mb-2 text-slate-700 dark:text-slate-300 w-1/5">
+                              Currency
+                            </Label>
+                            <CurrencyDropDown
+                              value={newProduct.currency}
+                              onValueChange={(value) =>
+                                setNewProduct((prev) => ({
+                                  ...prev,
+                                  currency: value,
+                                }))
+                              }
+                            />
+                          </div>
+                          <div className="flex mt-2 gap-2">
+                            <Label className="mb-2 text-slate-700 dark:text-slate-300 w-1/5">
+                              Monetary Value
+                            </Label>
+                            <Input
+                              value={newProduct.price}
+                              onChange={(e) =>
+                                setNewProduct((prev) => ({
+                                  ...prev,
+                                  price: e.target.value,
+                                }))
+                              }
+                              className={`bg-white/70 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
+                                errors.newProduct.price ? "border-red-500" : ""
+                              } w-1/2`}
+                              placeholder="e.g., 99 or 99.99"
+                            />
+                          </div>
+                          {/* <Select className="mt-2">
                             <SelectTrigger className="bg-white/70 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white w-full">
                               <SelectValue
                                 placeholder="Select billing cycle"
@@ -756,7 +767,22 @@ export default function OnBoardingForm({ session }) {
                               </SelectItem>
                               <SelectItem value="/token">/token</SelectItem>
                             </SelectContent>
-                          </Select>
+                          </Select> */}
+                          <div className="flex mt-2">
+                            <Label className="mb-2 text-slate-700 dark:text-slate-300 w-1/5">
+                              Billing Cycle
+                            </Label>
+                            <BillingCycleSelect
+                              value={newProduct.billingCycle}
+                              onChange={(value) =>
+                                setNewProduct((prev) => ({
+                                  ...prev,
+                                  billingCycle: value,
+                                }))
+                              }
+                              className=" bg-white/70 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white"
+                            />
+                          </div>
                         </div>
                         <ErrorMessage error={errors.newProduct.price} />
                       </div>
