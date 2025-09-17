@@ -20,7 +20,10 @@ export default function UserButton() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await fetch("/api/auth/session");
+      const res = await fetch("/api/getUserEmail", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
       if (res.status === 200) {
         const data = await res.json();
         localStorage.setItem("session", JSON.stringify(data));

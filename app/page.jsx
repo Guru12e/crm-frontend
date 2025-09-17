@@ -10,7 +10,11 @@ export default function Home() {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
-      if (res.status !== 200) {
+      if (res.status == 401) {
+        redirect("/on-boarding");
+      }
+
+      if (res.status != 200) {
         return;
       }
       const data = await res.json();

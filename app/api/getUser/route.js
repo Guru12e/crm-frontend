@@ -12,6 +12,10 @@ export async function GET() {
       .eq("email", session.user.email)
       .single();
 
+    if (!data) {
+      return NextResponse.json({ user: null }, { status: 401 });
+    }
+
     return NextResponse.json(data, { status: 200 });
   } else {
     return NextResponse.json({ user: null }, { status: 400 });
