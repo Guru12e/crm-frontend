@@ -1,4 +1,14 @@
-import { Database, Home, Megaphone, Send, Users, Wrench } from "lucide-react";
+import {
+  Cog,
+  Database,
+  DollarSign,
+  FileText,
+  Home,
+  Megaphone,
+  Send,
+  Users,
+  Wrench,
+} from "lucide-react";
 
 export const analyticsData = {
   overview: {
@@ -228,7 +238,7 @@ export const navigation = [
   { key: "prospects", name: "Prospects", href: "/prospects", icon: <Users /> },
   // { name: "Engagement", href: "/engagement", icon: MessageSquare },
   { key: "crm", name: "CRM", href: "/crm", icon: <Database /> },
-  { key: "pricing", name: "Pricing", href: "/pricing", icon: <Send /> },
+  // { key: "pricing", name: "Pricing", href: "/pricing", icon: <Send /> },
   {
     key: "campaigns",
     name: "Campaigns",
@@ -249,9 +259,13 @@ export const navigation = [
     href: "/revenueengine/configureproducts",
     icon: <Wrench />,
     subpages: [
-      { name: "Configure Products", href: "/revenueengine/configureproducts" },
-      { name: "Pricing", href: "/revenueengine/pricing" },
-      { name: "Quotes", href: "/revenueengine/quotes" },
+      {
+        name: "Configure Products",
+        href: "/revenueengine/configureproducts",
+        icon: <Cog />,
+      },
+      { name: "Pricing", href: "/revenueengine/pricing", icon: <DollarSign /> },
+      { name: "Quotes", href: "/revenueengine/quotes", icon: <FileText /> },
     ],
   },
 ];

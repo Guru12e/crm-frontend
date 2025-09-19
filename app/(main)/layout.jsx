@@ -1,10 +1,9 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ChevronDown,
   ChevronRight,
-  Menu,
   Sun,
   Moon,
   HelpCircle,
@@ -29,7 +28,6 @@ export default function Layout({ children }) {
   const [alertMessage, setAlertMessage] = useState(false);
   const [user, setUser] = useState(null);
   const router = useRouter();
-  const [hasSubpages, setHasSubpages] = useState(false);
 
   useEffect(() => {
     const user = localStorage.getItem("user");
@@ -54,8 +52,9 @@ export default function Layout({ children }) {
   const handleItemClick = (item) => {
     if (item.subpages && item.subpages.length > 0) {
       toggleExpanded(item.name);
+    } else {
+      setMobileSidebarOpen(false);
     }
-    setMobileSidebarOpen(false);
   };
 
   const toggleTheme = () => {
@@ -119,7 +118,7 @@ export default function Layout({ children }) {
               .map((item) => {
                 const isActive = item.href === location;
                 item.subpages &&
-                  item.subpages.some((sub) => location.pathname === sub.href);
+                  item.subpages.some((sub) => location === sub.href);
                 const hasSubpages = item.subpages && item.subpages.length > 0;
                 const isExpanded = expandedItems.includes(item.name);
 
@@ -139,6 +138,11 @@ export default function Layout({ children }) {
                         className={`group flex flex-1 items-center ${
                           sidebarOpen ? "" : "justify-center pr-1"
                         }`}
+                        onClick={(e) => {
+                          if (hasSubpages) {
+                            e.preventDefault();
+                          }
+                        }}
                       >
                         <div
                           className={cn(
@@ -165,20 +169,29 @@ export default function Layout({ children }) {
                       )}
                     </div>
 
-                    {hasSubpages && isExpanded && sidebarOpen && (
-                      <div className="ml-8 mt-1 space-y-1 max-sm:hidden">
+                    {hasSubpages && isExpanded && (
+                      <div className="ml-4 mt-1 space-y-1 max-sm:hidden">
                         {item.subpages.map((subpage) => (
                           <Link
                             key={subpage.href}
                             href={subpage.href}
                             className={cn(
-                              "block rounded-md px-3 py-2 text-sm transition-all",
-                              location.pathname === subpage.href
+                              "block rounded-md px-1 py-2 text-sm transition-all",
+                              location === subpage.href
                                 ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                                : "text-slate-600 dark:text-slate-400 hover:bg-teal/30 dark:hover:bg-sky-800/30"
+                                : "text-slate-600 dark:text-slate-400 hover:bg-white/30 dark:hover:bg-slate-800/30"
                             )}
                           >
-                            {subpage.name}
+                            <span className="flex items-center gap-2">
+                              {subpage.icon}
+                              <span
+                                className={`ml-2 ${
+                                  sidebarOpen ? "" : "hidden"
+                                }`}
+                              >
+                                {subpage.name}
+                              </span>
+                            </span>
                           </Link>
                         ))}
                       </div>
@@ -222,6 +235,8 @@ export default function Layout({ children }) {
                 const isActive = location === item.href;
                 const hasSubpages = item.subpages && item.subpages.length > 0;
                 const isExpanded = expandedItems.includes(item.name);
+                item.subpages &&
+                  item.subpages.some((sub) => location === sub.href);
 
                 return (
                   <div key={item.name}>
@@ -229,7 +244,7 @@ export default function Layout({ children }) {
                       className={cn(
                         "flex items-center cursor-pointer rounded-lg px-2 py-2 text-sm font-medium transition-all",
                         isActive
-                          ? "bg-gradient-to-r from-teal-800/20 to-blue-500/20 text-blue-600 dark:text-blue-400"
+                          ? "bg-gradient-to-r from-teal-500 to-sky-500 text-white "
                           : "text-slate-700 dark:text-slate-300 hover:bg-teal/50 dark:hover:bg-sky-800/50"
                       )}
                       onClick={() => handleItemClick(item)}
@@ -237,6 +252,11 @@ export default function Layout({ children }) {
                       <Link
                         href={item.href}
                         className="group flex flex-1 items-center"
+                        onClick={(e) => {
+                          if (hasSubpages) {
+                            e.preventDefault();
+                          }
+                        }}
                       >
                         <div
                           className={cn(
@@ -260,20 +280,23 @@ export default function Layout({ children }) {
                     </div>
 
                     {hasSubpages && isExpanded && (
-                      <div className="ml-8 mt-1 space-y-1">
+                      <div className="ml-2 mt-1 space-y-1">
                         {item.subpages.map((subpage) => (
                           <Link
                             key={subpage.href}
                             href={subpage.href}
                             onClick={() => setMobileSidebarOpen(false)}
                             className={cn(
-                              "block rounded-md px-3 py-2 text-sm transition-all",
-                              location.pathname === subpage.href
+                              "block rounded-md px-1 py-2 text-sm transition-all",
+                              location === subpage.href
                                 ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                                : "text-slate-600 dark:text-slate-400 hover:bg-teal/30 dark:hover:bg-sky-800/30"
+                                : "text-slate-600 dark:text-slate-400 hover:bg-white/30 dark:hover:bg-slate-800/30"
                             )}
                           >
-                            {subpage.name}
+                            <span className="flex items-center gap-2">
+                              {subpage.icon}
+                              {subpage.name}
+                            </span>
                           </Link>
                         ))}
                       </div>
