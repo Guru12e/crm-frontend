@@ -30,7 +30,7 @@ export async function POST(request) {
         .from("Customers")
         .insert({
           name: formData.name,
-          number: formData.number,
+          number: formData.phone,
           email: formData.email || null,
           linkedIn: formData.linkedIn || null,
           address: formData.address || null,

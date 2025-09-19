@@ -333,6 +333,10 @@ export default function UpdateDeals(
       dealDetails.description === DealsData.description &&
       dealDetails.open_activities === openActivities;
     if (dealDetails.status != DealsData.status) {
+      const stage_history = DealsData.stage_history || [];
+      const length = stage_history.length;
+      const start_date =
+        stage_history[length - 1]?.end_date || DealsData.created_at;
       const current_history = {
         old_status: dealDetails.status,
         new_status: DealsData.status,
@@ -340,14 +344,14 @@ export default function UpdateDeals(
         end_date: new Date().toISOString().split("T")[0],
         state_description: "",
       };
-      DealsData.stage_history = [...stageHistory, current_history];
+      stage_history.push(current_history);
+      DealsData.stage_history = [...stage_history, current_history];
 
       if (DealsData.status == "Closed-won") {
         const customerData = {
           name: DealsData.name,
           phone: DealsData.number,
           email: DealsData.email,
-          linkedIn: DealsData.linkedIn,
           price: DealsData.value,
           location: DealsData.location,
           purchase_history: {

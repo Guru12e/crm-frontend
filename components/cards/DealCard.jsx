@@ -86,9 +86,8 @@ export default function DealCard({
           name: deal.name,
           phone: deal.number,
           email: deal.email,
-          linkedIn: deal.linkedIn,
           price: deal.value,
-          location: deal.location,
+          address: deal.location,
           purchase_history: {
             product: deal.product,
             price: deal.value,
@@ -98,6 +97,7 @@ export default function DealCard({
           status: "Active",
           created_at: today,
           user_email: deal.user_email,
+          session: session,
         };
 
         const { data, error } = await supabase
@@ -119,7 +119,7 @@ export default function DealCard({
           });
         } else {
           const { error } = await supabase
-            .from("customers")
+            .from("Customers")
             .update({
               ...customerData,
               price: data.price + deal.value,

@@ -29,6 +29,7 @@ export default function Layout({ children }) {
   const [alertMessage, setAlertMessage] = useState(false);
   const [user, setUser] = useState(null);
   const router = useRouter();
+  const [hasSubpages, setHasSubpages] = useState(false);
 
   useEffect(() => {
     const user = localStorage.getItem("user");
@@ -117,6 +118,10 @@ export default function Layout({ children }) {
               // .filter((item) => allowedPages.includes(item.key))
               .map((item) => {
                 const isActive = item.href === location;
+                item.subpages &&
+                  item.subpages.some((sub) => location.pathname === sub.href);
+                const hasSubpages = item.subpages && item.subpages.length > 0;
+                const isExpanded = expandedItems.includes(item.name);
 
                 return (
                   <div key={item.name}>
@@ -149,35 +154,35 @@ export default function Layout({ children }) {
                           </span>
                         )}
                       </Link>
-                      {/* {hasSubpages && sidebarOpen && (
-                      <div className="p-1 max-sm:hidden">
-                        {isExpanded ? (
-                          <ChevronDown className="h-4 w-4" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4" />
-                        )}
-                      </div>
-                    )} */}
+                      {hasSubpages && sidebarOpen && (
+                        <div className="p-1 max-sm:hidden">
+                          {isExpanded ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
+                        </div>
+                      )}
                     </div>
 
-                    {/* {hasSubpages && isExpanded && sidebarOpen && (
-                    <div className="ml-8 mt-1 space-y-1 max-sm:hidden">
-                      {item.subpages.map((subpage) => (
-                        <Link
-                          key={subpage.href}
-                          href={subpage.href}
-                          className={cn(
-                            "block rounded-md px-3 py-2 text-sm transition-all",
-                            location.pathname === subpage.href
-                              ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                              : "text-slate-600 dark:text-slate-400 hover:bg-teal/30 dark:hover:bg-sky-800/30"
-                          )}
-                        >
-                          {subpage.name}
-                        </Link>
-                      ))}
-                    </div>
-                  )} */}
+                    {hasSubpages && isExpanded && sidebarOpen && (
+                      <div className="ml-8 mt-1 space-y-1 max-sm:hidden">
+                        {item.subpages.map((subpage) => (
+                          <Link
+                            key={subpage.href}
+                            href={subpage.href}
+                            className={cn(
+                              "block rounded-md px-3 py-2 text-sm transition-all",
+                              location.pathname === subpage.href
+                                ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                                : "text-slate-600 dark:text-slate-400 hover:bg-teal/30 dark:hover:bg-sky-800/30"
+                            )}
+                          >
+                            {subpage.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -215,8 +220,8 @@ export default function Layout({ children }) {
               // .filter((item) => allowedPages.includes(item.key))
               .map((item) => {
                 const isActive = location === item.href;
-                // const hasSubpages = item.subpages && item.subpages.length > 0;
-                // const isExpanded = expandedItems.includes(item.name);
+                const hasSubpages = item.subpages && item.subpages.length > 0;
+                const isExpanded = expandedItems.includes(item.name);
 
                 return (
                   <div key={item.name}>
@@ -243,36 +248,36 @@ export default function Layout({ children }) {
                         </div>
                         <span className="ml-3 truncate">{item.name}</span>
                       </Link>
-                      {/* {hasSubpages && (
-                      <div className="p-1">
-                        {isExpanded ? (
-                          <ChevronDown className="h-4 w-4" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4" />
-                        )}
-                      </div>
-                    )} */}
+                      {hasSubpages && (
+                        <div className="p-1">
+                          {isExpanded ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
+                        </div>
+                      )}
                     </div>
 
-                    {/* {hasSubpages && isExpanded && (
-                    <div className="ml-8 mt-1 space-y-1">
-                      {item.subpages.map((subpage) => (
-                        <Link
-                          key={subpage.href}
-                          href={subpage.href}
-                          onClick={() => setMobileSidebarOpen(false)}
-                          className={cn(
-                            "block rounded-md px-3 py-2 text-sm transition-all",
-                            location.pathname === subpage.href
-                              ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                              : "text-slate-600 dark:text-slate-400 hover:bg-teal/30 dark:hover:bg-sky-800/30"
-                          )}
-                        >
-                          {subpage.name}
-                        </Link>
-                      ))}
-                    </div>
-                  )} */}
+                    {hasSubpages && isExpanded && (
+                      <div className="ml-8 mt-1 space-y-1">
+                        {item.subpages.map((subpage) => (
+                          <Link
+                            key={subpage.href}
+                            href={subpage.href}
+                            onClick={() => setMobileSidebarOpen(false)}
+                            className={cn(
+                              "block rounded-md px-3 py-2 text-sm transition-all",
+                              location.pathname === subpage.href
+                                ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                                : "text-slate-600 dark:text-slate-400 hover:bg-teal/30 dark:hover:bg-sky-800/30"
+                            )}
+                          >
+                            {subpage.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })}

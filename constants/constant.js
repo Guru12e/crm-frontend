@@ -1,4 +1,4 @@
-import { Database, Home, Megaphone, Send, Users } from "lucide-react";
+import { Database, Home, Megaphone, Send, Users, Wrench } from "lucide-react";
 
 export const analyticsData = {
   overview: {
@@ -237,6 +237,23 @@ export const navigation = [
   },
   // { name: "Calendar", href: "/calendar", icon: Calendar },
   // { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  // {
+  //   key: "configureproducts",
+  //   name: "Configure Products",
+  //   href: "/revenueengine/configureproducts",
+  //   icon: <Wrench />,
+  // },
+  {
+    key: "revenueengine",
+    name: "Revenue Engine",
+    href: "/revenueengine/configureproducts",
+    icon: <Wrench />,
+    subpages: [
+      { name: "Configure Products", href: "/revenueengine/configureproducts" },
+      { name: "Pricing", href: "/revenueengine/pricing" },
+      { name: "Quotes", href: "/revenueengine/quotes" },
+    ],
+  },
 ];
 
 // export const ROLE_PERMISSIONS = {

@@ -765,6 +765,7 @@ export default function CRM() {
                   onChange={fetchDeals}
                   fetchDeals={fetchDeals}
                   fetchCustomers={fetchCustomers}
+                  session={session}
                 />
               ))}
           </div>
