@@ -147,7 +147,9 @@ export default function PricingPage() {
     setNewProduct({
       name: "",
       category: "",
+      currency: "",
       basePrice: "",
+      billingCycle: "",
       lowestBasePrice: "",
       HighestBasePrice: "",
       description: "",
@@ -200,15 +202,88 @@ export default function PricingPage() {
             Make sure to have the right plan for your needs.
           </p>
         </div>
-        <Button className="bg-gradient-to-r px-3 py-2 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white w-full md:w-auto cursor-pointer">
-          Add New Product
-        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white cursor-pointer">
+              Add New Product
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 bg-white/70 mb-6">
+            <DialogTitle>Add New Product</DialogTitle>
+            <DialogDescription>
+              Please fill in the details of the new product you want to add.
+            </DialogDescription>
+            <div className="flex flex-col gap-4 py-4">
+              <div className=" flex flex-col gap-3">
+                <Label htmlFor="name">Product Name</Label>
+                <Input
+                  id="name"
+                  value={newProduct.name}
+                  onChange={(e) =>
+                    setNewProduct({ ...newProduct, name: e.target.value })
+                  }
+                />
+              </div>
+              <div className="flex flex-col gap-3">
+                <Label htmlFor="description">Product Description</Label>
+                <Input
+                  id="description"
+                  value={newProduct.description}
+                  onChange={(e) =>
+                    setNewProduct({
+                      ...newProduct,
+                      description: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="flex flex-col gap-3">
+                <Label htmlFor="stock">Product Stock</Label>
+                <Input
+                  id="stock"
+                  value={newProduct.stock}
+                  onChange={(e) =>
+                    setNewProduct({ ...newProduct, stock: e.target.value })
+                  }
+                />
+              </div>
+              <div className="flex flex-col gap-3">
+                <Label htmlFor="category">Product Category</Label>
+                <Input
+                  id="category"
+                  value={newProduct.category}
+                  onChange={(e) =>
+                    setNewProduct({ ...newProduct, category: e.target.value })
+                  }
+                />
+              </div>
+              <div className="flex flex-col gap-3">
+                <Label htmlFor="price">Product Base Price</Label>
+                <Input
+                  id="price"
+                  value={newProduct.price}
+                  onChange={(e) =>
+                    setNewProduct({ ...newProduct, price: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+                onClick={addProduct}
+              >
+                Add Product
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
       <div className="mt-10">
         {products.map((product, index) => (
           <Card
             key={product.id}
-            className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6"
+            className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6 bg-white/50"
           >
             <CardHeader className="flex justify-between items-center font-semibold">
               {product.name}
@@ -259,10 +334,8 @@ export default function PricingPage() {
                     <Button
                       className="bg-transparent border-2 border-blue-500 hover:bg-blue-200 hover:border-blue-600 text-blue-500 cursor-pointer"
                       onClick={() => {
-                        setEdit(true);
-                        setDialogOpen(true);
+                        setEdit(product.id);
                         setEditProductIndex(index);
-                        setEdit(false);
                       }}
                     >
                       {edit === product.id && (
@@ -275,122 +348,118 @@ export default function PricingPage() {
                   <DialogContent className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6">
                     <DialogTitle>Edit Product Information</DialogTitle>
                     {editProductIndex !== null && (
-                      <DialogDescription asChild>
-                        <div className="flex flex-col gap-4 py-4">
-                          <div className=" flex flex-col gap-3">
-                            <Label htmlFor="name">Product Name</Label>
-                            <Input
-                              id="name"
-                              value={products[editProductIndex].name}
-                              onChange={(e) =>
-                                handleProductEditor(
-                                  editProductIndex,
-                                  "name",
-                                  e.target.value
-                                )
-                              }
-                            />
-                          </div>
-                          <div className="flex flex-col gap-3">
-                            <Label htmlFor="description">
-                              Product Description
-                            </Label>
-                            <Input
-                              id="description"
-                              value={
-                                products[editProductIndex].description || ""
-                              }
-                              onChange={(e) =>
-                                handleProductEditor(
-                                  editProductIndex,
-                                  "description",
-                                  e.target.value
-                                )
-                              }
-                            />
-                          </div>
-                          <div className="flex flex-col gap-3">
-                            <Label htmlFor="stock">Product Stock</Label>
-                            <Input
-                              id="stock"
-                              type="number"
-                              value={products[editProductIndex].stock || ""}
-                              onChange={(e) =>
-                                handleProductEditor(
-                                  editProductIndex,
-                                  "stock",
-                                  e.target.value
-                                )
-                              }
-                            />
-                          </div>
-                          <div className="flex flex-col gap-3">
-                            <Label htmlFor="category">Product Category</Label>
-                            <Input
-                              id="category"
-                              value={products[editProductIndex].category}
-                              onChange={(e) =>
-                                handleProductEditor(
-                                  editProductIndex,
-                                  "category",
-                                  e.target.value
-                                )
-                              }
-                            />
-                          </div>
-                          <div className="flex flex-col gap-3">
-                            <Label htmlFor="price">
-                              Enable Product Configuration
-                            </Label>
-                            <div>
-                              {products[editProductIndex].isConfigurable ===
-                              undefined ? (
-                                <div>
-                                  <Switch
-                                    id="isConfigurable"
-                                    checked={configurable}
-                                    onCheckedChange={(value) => {
-                                      setConfigurable(value);
-                                      handleProductEditor(
-                                        editProductIndex,
-                                        "isConfigurable",
-                                        value
-                                      );
-                                    }}
-                                  />
-                                  <span className="ml-2">
-                                    {products[editProductIndex].isConfigurable
-                                      ? "Enabled"
-                                      : "Disabled"}
-                                  </span>
-                                </div>
-                              ) : (
-                                <div>
-                                  <Switch
-                                    id="isConfigurable"
-                                    checked={
-                                      products[editProductIndex].isConfigurable
-                                    }
-                                    onCheckedChange={(value) => {
-                                      setConfigurable(value);
-                                      handleProductEditor(
-                                        editProductIndex,
-                                        "isConfigurable",
-                                        value
-                                      );
-                                    }}
-                                  />
-                                  <span className="ml-2">
-                                    {products[editProductIndex].isConfigurable
-                                      ? "Enabled"
-                                      : "Disabled"}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
+                      <div className="flex flex-col gap-4 py-4">
+                        <div className=" flex flex-col gap-3">
+                          <Label htmlFor="name">Product Name</Label>
+                          <Input
+                            id="name"
+                            value={products[editProductIndex].name}
+                            onChange={(e) =>
+                              handleProductEditor(
+                                editProductIndex,
+                                "name",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          <Label htmlFor="description">
+                            Product Description
+                          </Label>
+                          <Input
+                            id="description"
+                            value={products[editProductIndex].description || ""}
+                            onChange={(e) =>
+                              handleProductEditor(
+                                editProductIndex,
+                                "description",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          <Label htmlFor="stock">Product Stock</Label>
+                          <Input
+                            id="stock"
+                            type="number"
+                            value={products[editProductIndex].stock || ""}
+                            onChange={(e) =>
+                              handleProductEditor(
+                                editProductIndex,
+                                "stock",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          <Label htmlFor="category">Product Category</Label>
+                          <Input
+                            id="category"
+                            value={products[editProductIndex].category}
+                            onChange={(e) =>
+                              handleProductEditor(
+                                editProductIndex,
+                                "category",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          <Label htmlFor="price">
+                            Enable Product Configuration
+                          </Label>
+                          <div>
+                            {products[editProductIndex].isConfigurable ===
+                            undefined ? (
+                              <div>
+                                <Switch
+                                  id="isConfigurable"
+                                  checked={configurable}
+                                  onCheckedChange={(value) => {
+                                    setConfigurable(value);
+                                    handleProductEditor(
+                                      editProductIndex,
+                                      "isConfigurable",
+                                      value
+                                    );
+                                  }}
+                                />
+                                <span className="ml-2">
+                                  {products[editProductIndex].isConfigurable
+                                    ? "Enabled"
+                                    : "Disabled"}
+                                </span>
+                              </div>
+                            ) : (
+                              <div>
+                                <Switch
+                                  id="isConfigurable"
+                                  checked={
+                                    products[editProductIndex].isConfigurable
+                                  }
+                                  onCheckedChange={(value) => {
+                                    setConfigurable(value);
+                                    handleProductEditor(
+                                      editProductIndex,
+                                      "isConfigurable",
+                                      value
+                                    );
+                                  }}
+                                />
+                                <span className="ml-2">
+                                  {products[editProductIndex].isConfigurable
+                                    ? "Enabled"
+                                    : "Disabled"}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </div>
-                      </DialogDescription>
+                      </div>
                     )}
 
                     <DialogFooter>

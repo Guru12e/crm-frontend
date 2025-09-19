@@ -265,7 +265,7 @@ export default function CompanyProfile() {
         draggable
         pauseOnHover
       />
-      <Card className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm">
+      <Card className="bg-white/50 dark:bg-slate-800/50 rounded-xl shadow-sm">
         <CardHeader>
           <CardTitle>Company Profile</CardTitle>
         </CardHeader>
@@ -312,7 +312,7 @@ export default function CompanyProfile() {
         </CardContent>
       </Card>
 
-      <Card className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm">
+      <Card className="bg-white/50 dark:bg-slate-800/50 rounded-xl shadow-sm">
         <CardHeader>
           <CardTitle>Products & Services</CardTitle>
         </CardHeader>
@@ -511,7 +511,7 @@ export default function CompanyProfile() {
       </div>
 
       {icpData && icpData.icp && (
-        <Card className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm">
+        <Card className="bg-white/70 dark:bg-slate-800/50 rounded-xl shadow-sm">
           <CardHeader>
             <CardTitle>Ideal Customer Profile (ICP)</CardTitle>
           </CardHeader>
