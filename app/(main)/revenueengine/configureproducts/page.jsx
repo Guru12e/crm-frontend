@@ -32,6 +32,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import ConfigureProduct from "@/components/ConfigureProduct";
 import { Switch } from "@/components/ui/switch";
+import { BillingCycleSelect } from "@/components/BillingCycleSelect";
+import { CurrencyDropDown } from "@/components/ui/CurrencyDropDown";
 
 export default function PricingPage() {
   const [discontinue, setDiscontinue] = useState(false);
@@ -49,6 +51,8 @@ export default function PricingPage() {
     name: "",
     category: "",
     price: "",
+    currency: "",
+    billingCycle: "",
     stock: "",
     description: "",
     isActive: true,
@@ -150,8 +154,6 @@ export default function PricingPage() {
       currency: "",
       basePrice: "",
       billingCycle: "",
-      lowestBasePrice: "",
-      HighestBasePrice: "",
       description: "",
       stock: "",
       isActive: true,
@@ -257,15 +259,79 @@ export default function PricingPage() {
                   }
                 />
               </div>
+              <div>
+                <Label className="mb-2 text-slate-700 dark:text-slate-300">
+                  Base Price
+                </Label>
+                <div className="flex flex-col gap-2 ">
+                  <div className="flex mt-2 gap-2">
+                    <Label className="mb-2 text-slate-700 dark:text-slate-300 w-1/5">
+                      Currency
+                    </Label>
+                    <CurrencyDropDown
+                      value={newProduct.currency}
+                      onValueChange={(value) =>
+                        setNewProduct((prev) => ({
+                          ...prev,
+                          currency: value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="flex mt-2 gap-2">
+                    <Label className="mb-2 text-slate-700 dark:text-slate-300 w-1/5">
+                      Monetary Value
+                    </Label>
+                    <Input
+                      value={newProduct.price}
+                      onChange={(e) =>
+                        setNewProduct((prev) => ({
+                          ...prev,
+                          price: e.target.value,
+                        }))
+                      }
+                      className={`bg-white/70 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white ${
+                        errors.newProduct.price ? "border-red-500" : ""
+                      } w-1/2`}
+                      placeholder="e.g., 99 or 99.99"
+                    />
+                  </div>
+                  <div className="flex mt-2">
+                    <Label className="mb-2 text-slate-700 dark:text-slate-300 w-1/5">
+                      Billing Cycle
+                    </Label>
+                    <BillingCycleSelect
+                      value={newProduct.billingCycle}
+                      onChange={(value) =>
+                        setNewProduct((prev) => ({
+                          ...prev,
+                          billingCycle: value,
+                        }))
+                      }
+                      className=" bg-white/70 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/50 text-slate-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+              </div>
               <div className="flex flex-col gap-3">
-                <Label htmlFor="price">Product Base Price</Label>
-                <Input
-                  id="price"
-                  value={newProduct.price}
-                  onChange={(e) =>
-                    setNewProduct({ ...newProduct, price: e.target.value })
-                  }
-                />
+                <Label htmlFor="isConfigurable">
+                  Enable Product Configuration
+                </Label>
+                <div className="flex items-center">
+                  <Switch
+                    id="isConfigurable"
+                    checked={newProduct.isConfigurable}
+                    onCheckedChange={(checked) =>
+                      setNewProduct((prev) => ({
+                        ...prev,
+                        isConfigurable: checked,
+                      }))
+                    }
+                  />
+                  <span className="ml-2">
+                    {newProduct.isConfigurable ? "Enabled" : "Disabled"}
+                  </span>
+                </div>
               </div>
             </div>
             <DialogFooter>
