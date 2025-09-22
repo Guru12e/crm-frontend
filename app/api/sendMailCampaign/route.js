@@ -57,6 +57,7 @@ export async function POST(req) {
       .update({
         audience: results,
         status: "Sent",
+        sent_at: new Date().toISOString().split("T")[0],
       })
       .eq("user_email", user.email)
       .eq("name", name);

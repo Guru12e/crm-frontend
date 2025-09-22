@@ -617,7 +617,11 @@ export default function Campaigns() {
             }}
             className="w-full"
           >
-            <TabsList className="mb-1 w-full backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+            <TabsList
+              className={`${
+                campaignsTab === "Saved" ? "mb-1" : "mb-10"
+              } w-full backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20`}
+            >
               <TabsTrigger value="Saved">Saved Campaigns</TabsTrigger>
               <TabsTrigger value="Sent">Sent Campaigns</TabsTrigger>
             </TabsList>
@@ -722,11 +726,11 @@ export default function Campaigns() {
               </div>
             </TabsContent>
             <TabsContent value="Sent">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
                 {filteredSent.map((c) => (
                   <Card
                     key={c.id}
-                    className="shadow-sm rounded-2xl border transition-all duration-200 hover:shadow-lg bg-white/70 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20 h-full"
+                    className="relative shadow-sm border rounded-none -rotate-2 transition-all duration-200 hover:shadow-lg bg-blue-300/80 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20 h-full"
                   >
                     <CardContent>
                       <Link href={`/campaigns/${c.name}`}>
@@ -739,6 +743,9 @@ export default function Campaigns() {
                         </Button>
                       </div>
                     </CardContent>
+
+                    {/* Folded corner */}
+                    <div className="absolute bottom-0 right-0 w-12 h-12 bg-blue-200/80 [clip-path:polygon(100%_0,0_100%,100%_100%)] shadow-lg" />
                   </Card>
                 ))}
               </div>

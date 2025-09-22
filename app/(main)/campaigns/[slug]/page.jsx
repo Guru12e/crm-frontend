@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { toast } from "react-toastify";
+import { CircleArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 export default function CampaignDetail({ params }) {
   const { slug } = React.use(params);
@@ -22,6 +24,7 @@ export default function CampaignDetail({ params }) {
   const [user, setUser] = useState(null);
   const [newAudience, setNewAudience] = useState([{ email: "" }]);
   const router = useRouter();
+  const [sendDate, setSendDate] = useState(null);
 
   const handleUpdateAudience = () => {
     setAudience((prev) => [
@@ -123,6 +126,11 @@ export default function CampaignDetail({ params }) {
         setCampaign(data);
         setAudience(data.audience || []);
         setStatus(data.status || null);
+        if (data.sent_at !== null && data.sent_at !== undefined) {
+          setSendDate(data.sent_at.toISOString().split("T")[0]);
+        } else {
+          setSendDate(data.created_at.split("T")[0]);
+        }
       }
     };
 
@@ -171,7 +179,22 @@ export default function CampaignDetail({ params }) {
     <div className="min-h-screen">
       {status === "Sent" && (
         <div className="max-w-3xl mx-auto mt-10 bg-white/70 dark:bg-slate-800/50 shadow rounded-2xl p-6">
-          <h1 className="text-2xl font-bold mb-4">{campaign.name}</h1>
+          <div className="flex mb-4 gap-4">
+            <div className="self-start">
+              <Link
+                href="/campaigns"
+                className=" flex items-center gap-2 bg-transparent border-0 p-0 text-black hover:bg-gray-300 rounded-md px-3 py-1"
+              >
+                <CircleArrowLeft /> Back
+              </Link>
+            </div>
+            <div className=" self-center flex justify-center w-full">
+              <div className="flex justify-between w-full">
+                <h1 className="text-xl font-semibold">{campaign.name}</h1>
+                <h1 className="text-xs">Sent At: {sendDate}</h1>
+              </div>
+            </div>
+          </div>
 
           <div className="mb-4">
             <p className="text-gray-600">
@@ -226,10 +249,13 @@ export default function CampaignDetail({ params }) {
       )}
       {status === "Saved" && (
         <>
-          <h1 className="text-2xl font-bold mb-4 text-start max-w-3xl mx-auto  ">
+          <h1 className="text-2xl font-bold mb-2 text-start max-w-3xl mx-auto flex items-center gap-4">
+            <Link href="/campaigns">
+              <CircleArrowLeft />
+            </Link>
             Edit Campaign Details
           </h1>
-          <div className="max-w-3xl mx-auto mt-10 bg-white/70 dark:bg-slate-800/50 shadow rounded-2xl p-6">
+          <div className="max-w-3xl mx-auto mt-5 bg-white/70 dark:bg-slate-800/50 shadow rounded-2xl p-6">
             <div className="mb-4">
               <Label
                 className={"mb-4 text-slate-900 dark:text-slate-400"}
