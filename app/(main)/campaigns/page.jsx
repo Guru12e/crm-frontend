@@ -24,6 +24,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { redirect, useRouter } from "next/navigation";
+import { StickyNote } from "@/components/ui/StickyNote";
 
 export default function Campaigns() {
   const [campaigns, setCampaigns] = useState([]);
@@ -728,25 +729,22 @@ export default function Campaigns() {
             <TabsContent value="Sent">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
                 {filteredSent.map((c) => (
-                  <Card
+                  <StickyNote
                     key={c.id}
-                    className="relative shadow-sm border rounded-none -rotate-2 transition-all duration-200 hover:shadow-lg bg-blue-300/80 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20 h-full"
+                    color="bg-blue-200"
+                    rotation="-rotate-2"
+                    className="dark:bg-slate-800/50 dark:border-white/20 "
                   >
-                    <CardContent>
-                      <Link href={`/campaigns/${c.name}`}>
-                        <h3 className="font-semibold text-lg">{c.name}</h3>
-                      </Link>
-                      <p className="text-sm text-slate-600">{c.subject}</p>
-                      <div className="flex gap-2 mt-2">
-                        <Button onClick={() => handleDuplicateCampaign(c)}>
-                          Duplicate
-                        </Button>
-                      </div>
-                    </CardContent>
-
-                    {/* Folded corner */}
-                    <div className="absolute bottom-0 right-0 w-12 h-12 bg-blue-200/80 [clip-path:polygon(100%_0,0_100%,100%_100%)] shadow-lg" />
-                  </Card>
+                    <Link href={`/campaigns/${c.name}`}>
+                      <h3 className="font-semibold text-lg">{c.name}</h3>
+                    </Link>
+                    <p className="text-sm font-sans">{c.subject}</p>{" "}
+                    <div className="flex gap-2 mt-2">
+                      <Button onClick={() => handleDuplicateCampaign(c)}>
+                        Duplicate
+                      </Button>
+                    </div>
+                  </StickyNote>
                 ))}
               </div>
             </TabsContent>
