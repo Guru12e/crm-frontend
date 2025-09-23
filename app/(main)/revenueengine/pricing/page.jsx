@@ -1,12 +1,38 @@
 "use client";
 import { supabase } from "@/utils/supabase/client";
-import { Card, CardDescription, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+} from "@/components/ui/card";
 import { useEffect, useState } from "react";
-import { set } from "lodash";
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from "@/components/ui/command";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectLabel,
+  SelectGroup,
+} from "@/components/ui/select";
 export default function PricingPage() {
   const [dealsData, setDealsData] = useState([]);
   const [userEmail, setUserEmail] = useState("");
   const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [open, setOpen] = useState(false);
 
   const fetchData = async () => {
     const { data, error } = await supabase
@@ -50,7 +76,7 @@ export default function PricingPage() {
 
     const intervalId = setInterval(() => {
       fetchData();
-    }, 5000);
+    }, 1000);
     return () => clearInterval(intervalId);
   }, [userEmail]);
 
@@ -63,53 +89,44 @@ export default function PricingPage() {
         Manage your on-going deals and pricing strategies here.
       </p>
       <div className="mt-6">
-        <h2 className="text-xl font-semibold mb-4">Active Deals</h2>
-        {dealsData.length === 0 ? (
-          <Card
-            className="shadow-sm rounded-2xl bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 w-full flex flex-col items-center justify-center p-10 text-center"
-            style={{ minHeight: "30vh" }}
-          >
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-              No Active Deals Found
-            </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Your new deals will appear here once they are active.
-            </p>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {dealsData.map((deal) => (
-              <Card
-                key={deal.id}
-                className="shadow-sm rounded-lg bg-white dark:bg-slate-800 p-4 border border-slate-200/80 dark:border-white/20"
-              >
-                <CardHeader className="pb-2">
-                  {deal.name} {" - "} {deal.title}
-                </CardHeader>
-                <CardDescription className="text-sm">
-                  Amount:{" "}
-                  {deal.value !== null ? (
-                    <>
-                      {products.find((p) => p.name === deal.product)
-                        ?.currency || "$"}
-                      {deal.value} {""}
-                      {products.find((p) => p.name === deal.product)
-                        ?.billingCycle || "per month"}
-                    </>
-                  ) : (
-                    <>Deal Value Not Set</>
-                  )}
-                  <br />
-                  Status: {deal.status} <br />
-                  Expected Close Date: {deal.expected_close_date}
-                  Product: {deal.product} <br />
-                  Contact: {deal.contact_name} <br />
-                  Created At: {new Date(deal.created_at).toLocaleDateString()}
-                </CardDescription>
-              </Card>
-            ))}
+        <Command className={`rounded-lg`}>
+          <div className="w-full h-20 mt-6 overflow-visible bg-white rounded-2xl p-6 overflow-y-visible flex gap-4 justify-between">
+            <>
+              <CommandInput
+                placeholder="Search deals..."
+                value={searchTerm}
+                onValueChange={setSearchTerm}
+                className=" w-full max-w-sm "
+              />
+            </>
+
+            <Select>
+              <SelectTrigger className="w-full max-w-sm">
+                <SelectValue placeholder="Select Product" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Select a product</SelectLabel>
+                  {products?.map((product, index) => (
+                    <SelectItem key={index} value={product.name}>
+                      {product.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
-        )}
+          <CommandList
+            className={`w-20 ${searchTerm !== "" ? "border-t" : "hidden"}`}
+          >
+            <CommandEmpty>No results found.</CommandEmpty>
+            {dealsData.map((deal) => (
+              <CommandItem key={deal.id} value={deal.name}>
+                {deal.name}
+              </CommandItem>
+            ))}
+          </CommandList>
+        </Command>
       </div>
     </div>
   );
