@@ -117,6 +117,7 @@ export default function Campaigns() {
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [newContacts, setNewContacts] = useState([{ name: "", email: "" }]);
   const [campaign, setCampaign] = useState({});
+  const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
 
   const toggleSelect = (contact) => {
     setSelectedContacts((prev) =>
@@ -241,12 +242,18 @@ export default function Campaigns() {
   };
 
   const handleDuplicateCampaign = async (campaign) => {
+    let name = campaign.name + " (Copy)";
+    let a = 1;
+    while (campaigns.map((c) => c.name).includes(name)) {
+      name = campaign.name + " (Copy)" + a;
+      a++;
+    }
     const { error } = await supabase.from("Campaigns").insert({
       ...campaign,
       id: undefined,
       status: "Saved",
       audience: campaign.audience.map((a) => a.email),
-      name: campaign.name + " (Copy)",
+      name: name,
       created_at: new Date().toISOString().split("T")[0],
     });
 
@@ -302,6 +309,7 @@ export default function Campaigns() {
 
     return campaignMonth === filterMonth;
   };
+  console.log(campaigns);
 
   const filterByAudience = (campaign) => {
     if (!audienceFilter) return true;
@@ -352,6 +360,13 @@ export default function Campaigns() {
   });
 
   if (loading) return <p className="p-6">Loading...</p>;
+
+  const copyExists = (c) => {
+    const escapeRegex = (string) =>
+      string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const pattern = new RegExp(`^${escapeRegex(c.name)} \\(Copy\\)( \\d+)?$`);
+    return campaigns.some((campaign) => pattern.test(campaign.name));
+  };
 
   return (
     <div className="min-h-screen w-full rounded-lg">
@@ -740,9 +755,52 @@ export default function Campaigns() {
                     </Link>
                     <p className="text-sm font-sans">{c.subject}</p>{" "}
                     <div className="flex gap-2 mt-2">
-                      <Button onClick={() => handleDuplicateCampaign(c)}>
-                        Duplicate
-                      </Button>
+                      <Dialog
+                        open={duplicateDialogOpen}
+                        onOpenChange={setDuplicateDialogOpen}
+                      >
+                        <Button
+                          onClick={() => {
+                            if (copyExists(c)) {
+                              setDuplicateDialogOpen(true);
+                            } else {
+                              handleDuplicateCampaign(c);
+                            }
+                          }}
+                          className={`${
+                            copyExists(c)
+                              ? "opacity-50 cursor-auto text-gray-800 dark:text-gray-400 border border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700"
+                              : "bg-transparent text-black dark:text-white hover:bg-slate-200 dark:hover:bg-slate-600 cursor-pointer"
+                          }`}
+                        >
+                          Duplicate
+                        </Button>
+                        <DialogContent>
+                          <DialogTitle>Duplicate Campaign</DialogTitle>
+                          <DialogDescription>
+                            A campaign with the name "{c.name} (Copy)" already
+                            exists. Please rename the original campaign before
+                            duplicating.
+                          </DialogDescription>
+                          <DialogFooter className="flex justify-end gap-2 mt-4">
+                            <Button
+                              className="bg-transparent border border-slate-300 dark:border-slate-600 text-black dark:text-white hover:bg-slate-200 dark:hover:bg-slate-600"
+                              onClick={() => setDuplicateDialogOpen(false)}
+                            >
+                              Close
+                            </Button>
+                            <Button
+                              className="bg-sky-600 text-white hover:bg-sky-700"
+                              onClick={() => {
+                                handleDuplicateCampaign(c);
+                                setDuplicateDialogOpen(false);
+                              }}
+                            >
+                              Duplicate
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </StickyNote>
                 ))}
