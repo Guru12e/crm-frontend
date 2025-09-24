@@ -62,6 +62,7 @@ export default function PricingPage() {
   const [editProductIndex, setEditProductIndex] = useState(null);
   const [errors, setErrors] = useState({ newProduct: {} });
   const [userEmail, setUserEmail] = useState(null);
+
   useEffect(() => {
     try {
       const rawSession = localStorage.getItem("session");
@@ -73,6 +74,7 @@ export default function PricingPage() {
       console.error("Failed to parse session from localStorage:", error);
     }
   }, []);
+
   const fetchData = async () => {
     try {
       const { data, error } = await supabase
@@ -193,7 +195,7 @@ export default function PricingPage() {
   }, [userEmail]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
       <div className="flex flex-col md:flex-row justify-between w-full gap-6 items-center ">
         <div>
           <h1 className="text-3xl font-bold text-start ">
@@ -216,7 +218,7 @@ export default function PricingPage() {
               Please fill in the details of the new product you want to add.
             </DialogDescription>
             <div className="flex flex-col gap-4 py-4">
-              <div className=" flex flex-col gap-3">
+              <div className="flex flex-col gap-3">
                 <Label htmlFor="name">Product Name</Label>
                 <Input
                   id="name"
@@ -345,7 +347,7 @@ export default function PricingPage() {
           </DialogContent>
         </Dialog>
       </div>
-      <div className="mt-10">
+      <div className="mt-10 relative">
         {products.map((product, index) => (
           <Card
             key={product.id}
@@ -388,236 +390,244 @@ export default function PricingPage() {
                   {product.isConfigurable ? "Enabled" : "Disabled"}
                 </Label>
               </div>
-            </CardContent>
-            <CardFooter>
-              <div
-                className={`flex justify-end flex-col md:flex-row w-full ${
-                  product.isActive ? "flex" : "hidden"
-                }`}
-              >
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button
-                      className="bg-transparent border-2 border-blue-500 hover:bg-blue-200 hover:border-blue-600 text-blue-500 cursor-pointer"
-                      onClick={() => {
-                        setEdit(product.id);
-                        setEditProductIndex(index);
-                      }}
-                    >
-                      {edit === product.id && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      )}
-                      <Edit />
-                      Edit Basic Product Info
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6">
-                    <DialogTitle>Edit Product Information</DialogTitle>
-                    {editProductIndex !== null && (
-                      <div className="flex flex-col gap-4 py-4">
-                        <div className=" flex flex-col gap-3">
-                          <Label htmlFor="name">Product Name</Label>
-                          <Input
-                            id="name"
-                            value={products[editProductIndex].name}
-                            onChange={(e) =>
-                              handleProductEditor(
-                                editProductIndex,
-                                "name",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-                        <div className="flex flex-col gap-3">
-                          <Label htmlFor="description">
-                            Product Description
-                          </Label>
-                          <Input
-                            id="description"
-                            value={products[editProductIndex].description || ""}
-                            onChange={(e) =>
-                              handleProductEditor(
-                                editProductIndex,
-                                "description",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-                        <div className="flex flex-col gap-3">
-                          <Label htmlFor="stock">Product Stock</Label>
-                          <Input
-                            id="stock"
-                            type="number"
-                            value={products[editProductIndex].stock || ""}
-                            onChange={(e) =>
-                              handleProductEditor(
-                                editProductIndex,
-                                "stock",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-                        <div className="flex flex-col gap-3">
-                          <Label htmlFor="category">Product Category</Label>
-                          <Input
-                            id="category"
-                            value={products[editProductIndex].category}
-                            onChange={(e) =>
-                              handleProductEditor(
-                                editProductIndex,
-                                "category",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-                        <div className="flex flex-col gap-3">
-                          <Label htmlFor="price">
-                            Enable Product Configuration
-                          </Label>
-                          <div>
-                            {products[editProductIndex].isConfigurable ===
-                            undefined ? (
-                              <div>
-                                <Switch
-                                  id="isConfigurable"
-                                  checked={configurable}
-                                  onCheckedChange={(value) => {
-                                    setConfigurable(value);
-                                    handleProductEditor(
-                                      editProductIndex,
-                                      "isConfigurable",
-                                      value
-                                    );
-                                  }}
-                                />
-                                <span className="ml-2">
-                                  {products[editProductIndex].isConfigurable
-                                    ? "Enabled"
-                                    : "Disabled"}
-                                </span>
-                              </div>
-                            ) : (
-                              <div>
-                                <Switch
-                                  id="isConfigurable"
-                                  checked={
-                                    products[editProductIndex].isConfigurable
-                                  }
-                                  onCheckedChange={(value) => {
-                                    setConfigurable(value);
-                                    handleProductEditor(
-                                      editProductIndex,
-                                      "isConfigurable",
-                                      value
-                                    );
-                                  }}
-                                />
-                                <span className="ml-2">
-                                  {products[editProductIndex].isConfigurable
-                                    ? "Enabled"
-                                    : "Disabled"}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    <DialogFooter>
+              <div className="relative">
+                <div
+                  className={`flex justify-end flex-col md:flex-row w-full ${
+                    product.isActive ? "flex" : "hidden"
+                  }`}
+                >
+                  <Dialog
+                    open={dialogOpen}
+                    onOpenChange={() => {
+                      setDialogOpen(!dialogOpen);
+                      setEdit(false);
+                    }}
+                  >
+                    <DialogTrigger asChild>
                       <Button
-                        className="bg-blue-500 hover:bg-blue-600 text-white"
+                        className="bg-transparent border-2 border-blue-500 hover:bg-blue-200 hover:border-blue-600 text-blue-500 cursor-pointer"
                         onClick={() => {
-                          setEdit(false);
-                          handleUpdate();
-                          setDialogOpen(false);
+                          setEdit(product.id);
+                          setEditProductIndex(index);
                         }}
                       >
-                        Save Changes
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-                {product.isConfigurable && (
-                  <Sheet>
-                    <SheetTrigger asChild>
-                      <Button
-                        className="bg-transparent border-2 border-gray-500 hover:bg-gray-200 hover:border-gray-600 text-gray-500 mt-2 md:mt-0 md:ml-2 cursor-pointer"
-                        onClick={() => {
-                          setConfig(true);
-                          setConfig(false);
-                        }}
-                      >
-                        {config && (
+                        {edit === product.id && (
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         )}
-                        <Wrench />
-                        Edit Product Configuration Info
+                        <Edit />
+                        Edit Basic Product Info
                       </Button>
-                    </SheetTrigger>
-                    <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] md:min-w-[85vw] min-w-screen backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
-                      <SheetHeader>
-                        <SheetTitle>
-                          Customise Your Product Configuration Settings Here
-                        </SheetTitle>
-                        <SheetDescription>
-                          Configure the settings as per your product's design.
-                        </SheetDescription>
-                      </SheetHeader>
-                      <ConfigureProduct
-                        product={product}
-                        config={product.config}
-                        userEmail={userEmail}
-                      />
-                    </SheetContent>
-                  </Sheet>
-                )}
-                <Button
-                  className="bg-transparent border-2 border-red-500 hover:bg-red-200 hover:border-red-600 text-red-500 mt-2 md:mt-0 md:ml-2 cursor-pointer"
-                  onClick={() => {
-                    setDiscontinue(true);
-                    handleProductChange(index, "isActive", false);
-                    setDiscontinue(false);
-                  }}
-                >
-                  {discontinue && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    </DialogTrigger>
+                    <DialogContent className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6">
+                      <DialogTitle>Edit Product Information</DialogTitle>
+                      {editProductIndex !== null && (
+                        <div className="flex flex-col gap-4 py-4">
+                          <div className=" flex flex-col gap-3">
+                            <Label htmlFor="name">Product Name</Label>
+                            <Input
+                              id="name"
+                              value={products[editProductIndex].name}
+                              onChange={(e) =>
+                                handleProductEditor(
+                                  editProductIndex,
+                                  "name",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-3">
+                            <Label htmlFor="description">
+                              Product Description
+                            </Label>
+                            <Input
+                              id="description"
+                              value={
+                                products[editProductIndex].description || ""
+                              }
+                              onChange={(e) =>
+                                handleProductEditor(
+                                  editProductIndex,
+                                  "description",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-3">
+                            <Label htmlFor="stock">Product Stock</Label>
+                            <Input
+                              id="stock"
+                              type="number"
+                              value={products[editProductIndex].stock || ""}
+                              onChange={(e) =>
+                                handleProductEditor(
+                                  editProductIndex,
+                                  "stock",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-3">
+                            <Label htmlFor="category">Product Category</Label>
+                            <Input
+                              id="category"
+                              value={products[editProductIndex].category}
+                              onChange={(e) =>
+                                handleProductEditor(
+                                  editProductIndex,
+                                  "category",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-3">
+                            <Label htmlFor="price">
+                              Enable Product Configuration
+                            </Label>
+                            <div>
+                              {products[editProductIndex].isConfigurable ===
+                              undefined ? (
+                                <div>
+                                  <Switch
+                                    id="isConfigurable"
+                                    checked={configurable}
+                                    onCheckedChange={(value) => {
+                                      setConfigurable(value);
+                                      handleProductEditor(
+                                        editProductIndex,
+                                        "isConfigurable",
+                                        value
+                                      );
+                                    }}
+                                  />
+                                  <span className="ml-2">
+                                    {products[editProductIndex].isConfigurable
+                                      ? "Enabled"
+                                      : "Disabled"}
+                                  </span>
+                                </div>
+                              ) : (
+                                <div>
+                                  <Switch
+                                    id="isConfigurable"
+                                    checked={
+                                      products[editProductIndex].isConfigurable
+                                    }
+                                    onCheckedChange={(value) => {
+                                      setConfigurable(value);
+                                      handleProductEditor(
+                                        editProductIndex,
+                                        "isConfigurable",
+                                        value
+                                      );
+                                    }}
+                                  />
+                                  <span className="ml-2">
+                                    {products[editProductIndex].isConfigurable
+                                      ? "Enabled"
+                                      : "Disabled"}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      <DialogFooter>
+                        <Button
+                          className="bg-blue-500 hover:bg-blue-600 text-white"
+                          onClick={() => {
+                            setEdit(false);
+                            handleUpdate();
+                            setDialogOpen(false);
+                          }}
+                        >
+                          Save Changes
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                  {product.isConfigurable && (
+                    <Sheet>
+                      <SheetTrigger asChild>
+                        <Button
+                          className="bg-transparent border-2 border-gray-500 hover:bg-gray-200 hover:border-gray-600 text-gray-500 mt-2 md:mt-0 md:ml-2 cursor-pointer"
+                          onClick={() => {
+                            setConfig(true);
+                            setConfig(false);
+                          }}
+                        >
+                          {config && (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          )}
+                          <Wrench />
+                          Edit Product Configuration Info
+                        </Button>
+                      </SheetTrigger>
+                      <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] md:min-w-[85vw] min-w-screen backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+                        <SheetHeader>
+                          <SheetTitle>
+                            Customise Your Product Configuration Settings Here
+                          </SheetTitle>
+                          <SheetDescription>
+                            Configure the settings as per your product's design.
+                          </SheetDescription>
+                        </SheetHeader>
+                        <ConfigureProduct
+                          product={product}
+                          config={product.config}
+                          userEmail={userEmail}
+                        />
+                      </SheetContent>
+                    </Sheet>
                   )}
-                  <FlagOff />
-                  Discontinue Product
-                </Button>
-              </div>
-              <div
-                className={`flex justify-end w-full ${
-                  !product.isActive ? "flex" : "hidden"
-                }`}
-              >
-                <Button
-                  className="bg-transparent border-2 cursor-pointer border-green-500 hover:bg-green-200 hover:border-green-600 text-green-500"
-                  onClick={() => {
-                    setReinstate(true);
-                    setNewProduct({
-                      ...product,
-                      isActive: true,
-                      name: product.name + "-" + today.getFullYear(),
-                    });
-                    addProduct();
-                    handleUpdate();
-                    setReinstate(false);
-                  }}
+                  <Button
+                    className="bg-transparent border-2 border-red-500 hover:bg-red-200 hover:border-red-600 text-red-500 mt-2 md:mt-0 md:ml-2 cursor-pointer"
+                    onClick={() => {
+                      setDiscontinue(true);
+                      handleProductChange(index, "isActive", false);
+                      setDiscontinue(false);
+                    }}
+                  >
+                    {discontinue && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    <FlagOff />
+                    Discontinue Product
+                  </Button>
+                </div>
+                <div
+                  className={`flex justify-end w-full ${
+                    !product.isActive ? "flex" : "hidden"
+                  }`}
                 >
-                  {reinstate && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  <Package />
-                  Reinstate Product
-                </Button>
+                  <Button
+                    className="bg-transparent border-2 cursor-pointer border-green-500 hover:bg-green-200 hover:border-green-600 text-green-500"
+                    onClick={() => {
+                      setReinstate(true);
+                      setNewProduct({
+                        ...product,
+                        isActive: true,
+                        name: product.name + "-" + today.getFullYear(),
+                      });
+                      addProduct();
+                      handleUpdate();
+                      setReinstate(false);
+                    }}
+                  >
+                    {reinstate && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    <Package />
+                    Reinstate Product
+                  </Button>
+                </div>
               </div>
-            </CardFooter>
+            </CardContent>
           </Card>
         ))}
       </div>
