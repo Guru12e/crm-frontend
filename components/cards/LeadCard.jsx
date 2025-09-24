@@ -10,7 +10,7 @@ import {
   SheetHeader,
   SheetContent,
 } from "../ui/sheet";
-import { Mail, Phone, LucideUpload, Eye, Trash2 } from "lucide-react";
+import { Mail, Phone, LucideUpload, Eye, Trash2, Edit } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import {
@@ -131,8 +131,8 @@ export default function LeadCard({
 
   return (
     <>
-      <Card className="backdrop-blur-sm bg-white/70 h-auto w-full sm:max-w-md md:max-w-full  z-0  hover:shadow-lg dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-1000 group mx-auto cursor-pointer">
-        <CardContent className="p-3 pt-4">
+      <Card className="backdrop-blur-sm bg-white/70 h-auto w-full sm:max-w-md md:max-w-full  z-0  hover:shadow-lg dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-1000 group mx-auto ">
+        <CardContent>
           <div className="flex sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex items-start space-x-0 flex-1 min-w-0">
               <div>
@@ -159,8 +159,9 @@ export default function LeadCard({
               <div className="flex-1 w-full">
                 <Sheet>
                   <SheetTrigger asChild key={lead.id}>
-                    <Label className="mt-2 ml-2 text-md md:text-[16px] min-w-full bg-transparent font-semibold text-slate-900 dark:text-white break-words  hover:bg-transparent">
+                    <Label className="mt-2 ml-2 flex items-center gap-2 hover:text-blue-400 text-md md:text-[16px] min-w-full bg-transparent font-semibold text-slate-900 dark:text-white break-words  hover:bg-transparent">
                       {lead.name}
+                      <Edit className="h-4 w-4 text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer ml-1" />
                     </Label>
                   </SheetTrigger>
                   <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] md:min-w-[85vw] min-w-screen ">
