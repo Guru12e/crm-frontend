@@ -29,7 +29,13 @@ export default function PricingPage() {
       .from("Deals")
       .select("*")
       .eq("user_email", userEmail);
-    const activeStatuses = ["New", "Negotiation", "Proposal Sent", "Contacted"];
+    const activeStatuses = [
+      "New",
+      "Negotiation",
+      "Proposal Sent",
+      "Contacted",
+      "On-hold",
+    ];
 
     const filteredDeals = data.filter((deal) =>
       activeStatuses.includes(deal.status)
@@ -89,15 +95,21 @@ export default function PricingPage() {
     return () => clearInterval(intervalId);
   }, [userEmail]);
 
-  console.log(dealsData);
-
   const [dealsToShow, setDealsToShow] = useState([]);
+
+  console.log("dealsData:", dealsData);
+  console.log("filteredDeals:", filteredDeals);
+  console.log("dealsToShow:", dealsToShow);
+  console.log("selectedProduct:", selectedProduct);
+  console.log("searchTerm:", searchTerm);
 
   useEffect(() => {
     const filteredDeals = dealsData;
     if (selectedProduct !== null) {
       const filteredByProduct = filteredDeals.filter((deal) =>
-        deal.products?.some((product) => product.name === selectedProduct.name)
+        deal.products?.filter(
+          (product) => product.name === selectedProduct.name
+        )
       );
       if (searchTerm.trim() !== "") {
         const filteredBySearch = filteredByProduct.filter(
@@ -214,8 +226,8 @@ export default function PricingPage() {
                     </span>
                     {deal.products && deal.products.length > 0 ? (
                       <ul className="list-disc list-inside">
-                        {deal.products.map((product) => (
-                          <li key={product.id}>{product.name}</li>
+                        {deal.products.map((product, index) => (
+                          <li key={index}>{product}</li>
                         ))}
                       </ul>
                     ) : (
