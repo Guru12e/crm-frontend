@@ -64,7 +64,7 @@ const ErrorMessage = ({ error }) => {
   );
 };
 
-export default function Updateleads(lead_id, onChange) {
+export default function Updateleads(lead_id, onChange, fetchLeads, fetchDeals) {
   const today = new Date().toISOString().split("T")[0];
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);

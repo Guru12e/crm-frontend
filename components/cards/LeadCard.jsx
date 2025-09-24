@@ -167,7 +167,12 @@ export default function LeadCard({
                     <SheetHeader>
                       <SheetTitle>Lead Data</SheetTitle>
                       <SheetDescription>
-                        <Updateleads lead_id={lead.id} onChange={onChange} />
+                        <Updateleads
+                          lead_id={lead.id}
+                          onChange={onChange}
+                          fetchLeads={fetchLeads}
+                          fetchDeals={fetchDeals}
+                        />
                       </SheetDescription>
                     </SheetHeader>
                   </SheetContent>

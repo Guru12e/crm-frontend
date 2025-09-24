@@ -365,9 +365,15 @@ export default function PricingPage() {
                     </Badge>
                   )}
                 <Badge
-                  className={product.isActive ? "bg-green-500" : "bg-red-500"}
+                  className={
+                    product.isActive === undefined || product.isActive
+                      ? "bg-green-500"
+                      : "bg-red-500"
+                  }
                 >
-                  {product.isActive ? "Active" : "Inactive"}
+                  {product.isActive === undefined || product.isActive
+                    ? "Active"
+                    : "Inactive"}
                 </Badge>
               </div>
             </CardHeader>
@@ -393,7 +399,9 @@ export default function PricingPage() {
               <div className="relative">
                 <div
                   className={`flex justify-end flex-col md:flex-row w-full ${
-                    product.isActive ? "flex" : "hidden"
+                    product.isActive === undefined || product.isActive
+                      ? "flex"
+                      : "hidden"
                   }`}
                 >
                   <Dialog
