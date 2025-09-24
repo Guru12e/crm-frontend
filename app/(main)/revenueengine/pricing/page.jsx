@@ -1,23 +1,7 @@
 "use client";
 import { supabase } from "@/utils/supabase/client";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-} from "@/components/ui/card";
 import { useEffect, useState } from "react";
-import {
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-} from "@/components/ui/command";
+
 import {
   Select,
   SelectContent,
@@ -27,12 +11,16 @@ import {
   SelectLabel,
   SelectGroup,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { set } from "lodash";
+import { Search } from "lucide-react";
 export default function PricingPage() {
   const [dealsData, setDealsData] = useState([]);
   const [userEmail, setUserEmail] = useState("");
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [open, setOpen] = useState(false);
+  const [filteredDeals, setFilteredDeals] = useState([]);
+  const [suggestion, setSuggestion] = useState(true);
 
   const fetchData = async () => {
     const { data, error } = await supabase
@@ -64,6 +52,17 @@ export default function PricingPage() {
   };
 
   useEffect(() => {
+    if (searchTerm.trim() === "") {
+      return;
+    } else {
+      const deals = dealsData.filter((deal) =>
+        deal.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredDeals(deals);
+    }
+  }, [searchTerm]);
+
+  useEffect(() => {
     const user = localStorage.getItem("user");
     if (user) {
       const userObj = JSON.parse(user);
@@ -83,58 +82,61 @@ export default function PricingPage() {
   console.log(dealsData);
 
   return (
-    <div>
+    <div className="w-full min-h-[70vh] relative">
       <h1 className="text-2xl font-bold mb-4">Pricing Page</h1>
       <p className="text-md">
         Manage your on-going deals and pricing strategies here.
       </p>
-      <div className="mt-6 relative h-40">
-        <Command className="rounded-lg">
-          <div className="w-full h-20 mt-6 overflow-visible bg-white rounded-2xl p-6 flex gap-4 justify-between relative">
-            <div className="relative w-full max-w-sm">
-              <CommandInput
-                placeholder="Search deals..."
-                value={searchTerm}
-                onValueChange={setSearchTerm}
-                className="w-full"
-              />
-
-              {/* 🔑 Dropdown under input only */}
-              {searchTerm !== "" && (
-                <CommandList
-                  className="
-              absolute top-full left-0 mt-1
-              w-full max-h-40 overflow-y-auto 
-              bg-white rounded-md shadow border z-50
-            "
-                >
-                  <CommandEmpty>No results found.</CommandEmpty>
-                  {dealsData.map((deal) => (
-                    <CommandItem key={deal.id} value={deal.name}>
+      <div className="mt-6">
+        <div className="w-full mt-6 bg-white rounded-2xl p-6 flex gap-4 justify-between">
+          <div className="relative flex w-1/2">
+            {" "}
+            <Search className="absolute top-1/2 -translate-y-1/2 text-slate-400" />
+            <Input
+              placeholder="   Search deals..."
+              value={searchTerm}
+              type="text"
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className=" w-full max-w-sm "
+            />
+            {searchTerm.trim() !== "" && suggestion === true && (
+              <div className="absolute z-10 top-[120%] p-2 bg-white border border-slate-200 rounded-md shadow-md flex flex-col items-start w-full">
+                {filteredDeals.length > 0 ? (
+                  filteredDeals.map((deal) => (
+                    <button
+                      key={deal.id}
+                      value={deal.name}
+                      onClick={() => {
+                        setSearchTerm(deal.name);
+                        setSuggestion(false);
+                      }}
+                    >
                       {deal.name}
-                    </CommandItem>
-                  ))}
-                </CommandList>
-              )}
-            </div>
-
-            <Select>
-              <SelectTrigger className="w-full max-w-sm">
-                <SelectValue placeholder="Select Product" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Select a product</SelectLabel>
-                  {products?.map((product, index) => (
-                    <SelectItem key={index} value={product.name}>
-                      {product.name}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+                    </button>
+                  ))
+                ) : (
+                  <div>No deals found.</div>
+                )}
+              </div>
+            )}
           </div>
-        </Command>
+
+          <Select>
+            <SelectTrigger className="max-w-sm">
+              <SelectValue placeholder="Select Product" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Select a product</SelectLabel>
+                {products?.map((product, index) => (
+                  <SelectItem key={index} value={product.name}>
+                    {product.name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
   );
