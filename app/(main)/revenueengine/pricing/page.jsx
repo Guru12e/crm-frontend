@@ -58,6 +58,10 @@ export default function PricingPage() {
       const deals = dealsData.filter((deal) =>
         deal.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
+      const dealbytitle = dealsData.filter((deal) =>
+        deal.title?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      deals.push(...dealbytitle);
       setFilteredDeals(deals);
     }
   }, [searchTerm]);
@@ -90,8 +94,6 @@ export default function PricingPage() {
       <div className="mt-6">
         <div className="w-full mt-6 bg-white rounded-2xl p-6 flex gap-4 justify-between">
           <div className="relative flex w-1/2">
-            {" "}
-            <Search className="absolute top-1/2 -translate-y-1/2 text-slate-400" />
             <Input
               placeholder="   Search deals..."
               value={searchTerm}
@@ -105,13 +107,15 @@ export default function PricingPage() {
                   filteredDeals.map((deal) => (
                     <button
                       key={deal.id}
-                      value={deal.name}
+                      value={[deal.name, deal.title]}
                       onClick={() => {
                         setSearchTerm(deal.name);
                         setSuggestion(false);
                       }}
                     >
                       {deal.name}
+                      {" - "}
+                      {deal.title || "No Title"}
                     </button>
                   ))
                 ) : (
