@@ -88,17 +88,35 @@ export default function PricingPage() {
       <p className="text-md">
         Manage your on-going deals and pricing strategies here.
       </p>
-      <div className="mt-6">
-        <Command className={`rounded-lg`}>
-          <div className="w-full h-20 mt-6 overflow-visible bg-white rounded-2xl p-6 overflow-y-visible flex gap-4 justify-between">
-            <>
+      <div className="mt-6 relative h-40">
+        <Command className="rounded-lg">
+          <div className="w-full h-20 mt-6 overflow-visible bg-white rounded-2xl p-6 flex gap-4 justify-between relative">
+            <div className="relative w-full max-w-sm">
               <CommandInput
                 placeholder="Search deals..."
                 value={searchTerm}
                 onValueChange={setSearchTerm}
-                className=" w-full max-w-sm "
+                className="w-full"
               />
-            </>
+
+              {/* 🔑 Dropdown under input only */}
+              {searchTerm !== "" && (
+                <CommandList
+                  className="
+              absolute top-full left-0 mt-1
+              w-full max-h-40 overflow-y-auto 
+              bg-white rounded-md shadow border z-50
+            "
+                >
+                  <CommandEmpty>No results found.</CommandEmpty>
+                  {dealsData.map((deal) => (
+                    <CommandItem key={deal.id} value={deal.name}>
+                      {deal.name}
+                    </CommandItem>
+                  ))}
+                </CommandList>
+              )}
+            </div>
 
             <Select>
               <SelectTrigger className="w-full max-w-sm">
@@ -116,16 +134,6 @@ export default function PricingPage() {
               </SelectContent>
             </Select>
           </div>
-          <CommandList
-            className={`w-20 ${searchTerm !== "" ? "border-t" : "hidden"}`}
-          >
-            <CommandEmpty>No results found.</CommandEmpty>
-            {dealsData.map((deal) => (
-              <CommandItem key={deal.id} value={deal.name}>
-                {deal.name}
-              </CommandItem>
-            ))}
-          </CommandList>
         </Command>
       </div>
     </div>
