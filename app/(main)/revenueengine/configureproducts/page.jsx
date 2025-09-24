@@ -610,7 +610,7 @@ export default function PricingPage() {
                 </div>
                 <div
                   className={`flex justify-end w-full ${
-                    !product.isActive ? "flex" : "hidden"
+                    product.isActive === false ? "flex" : "hidden"
                   }`}
                 >
                   <Button
