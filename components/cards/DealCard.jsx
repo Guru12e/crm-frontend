@@ -9,7 +9,7 @@ import {
   SheetHeader,
   SheetContent,
 } from "../ui/sheet";
-import { Mail, Phone, LucideUpload, Trash2 } from "lucide-react";
+import { Mail, Phone, LucideUpload, Trash2, Edit } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import {
@@ -161,14 +161,15 @@ export default function DealCard({
   };
 
   return (
-    <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 hover:shadow-lg cursor-pointer dark:hover:bg-slate-800/60 transition-all duration-300 group">
-      <CardContent className="p-4 sm:p-6">
+    <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 hover:shadow-lg  dark:hover:bg-slate-800/60 transition-all duration-300 group">
+      <CardContent>
         <div className="flex sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1 min-w-0">
             <Sheet>
               <SheetTrigger asChild key={deal.id}>
-                <h3 className="text-base sm:text-lg font-semibold text-slate-900 hover:text-blue-500 dark:text-white break-words">
+                <h3 className="text-base flex items-center gap-2 sm:text-lg font-semibold text-slate-900 hover:text-blue-500 dark:text-white break-words">
                   {deal.name}
+                  <Edit className="h-4 w-4 text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer ml-1" />
                 </h3>
               </SheetTrigger>
               <SheetContent className="space-y-6 overflow-y-auto min-h-[80vh] md:min-w-[85vw] min-w-screen ">
@@ -188,9 +189,11 @@ export default function DealCard({
             <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 break-words">
               {deal.company}
             </p>
-            <div className="flex sm:flex-row sm:items-center sm:space-x-4 mt-2 text-sm text-slate-500 dark:text-slate-400 gap-1 sm:gap-0">
+            <div className="flex sm:flex-col justify-self-start mt-2 text-sm text-slate-500 dark:text-slate-400 sm:gap-0">
               <span className="break-words">Owner: {deal.owner}</span>
-              <span className="break-words">Source: {deal.source}</span>
+              <span className="break-words justify-self-start">
+                Source: {deal.source}
+              </span>
             </div>
           </div>
           <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2">
@@ -205,7 +208,7 @@ export default function DealCard({
             </div>
           </div>
         </div>
-        <div className="flex sm:flex-row sm:items-center sm:justify-between mt-4 gap-3 opacity-100 sm:opacity-100  transition-opacity">
+        <div className="flex sm:flex-row sm:items-center sm:justify-between mt-2 gap-3 opacity-100 sm:opacity-100  transition-opacity">
           <div className="flex flex-wrap gap-2">
             <Dialog open={open} onOpenChange={setOpen}>
               <DropdownMenu className="relative">
@@ -275,7 +278,7 @@ export default function DealCard({
               </DropdownMenu>
             </Dialog>
           </div>
-          <div>
+          <div className="flex flex-wrap gap-2">
             <Dialog>
               <DialogTrigger asChild>
                 <Button
