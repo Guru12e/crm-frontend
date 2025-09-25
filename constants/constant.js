@@ -1,11 +1,11 @@
 import {
+  BarChart3,
   Cog,
   Database,
   DollarSign,
   FileText,
   Home,
   Megaphone,
-  Send,
   Users,
   Wrench,
 } from "lucide-react";
@@ -246,7 +246,7 @@ export const navigation = [
     icon: <Megaphone />,
   },
   // { name: "Calendar", href: "/calendar", icon: Calendar },
-  { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "Analytics", href: "/analytics", icon: <BarChart3 /> },
   // {
   //   key: "configureproducts",
   //   name: "Configure Products",
