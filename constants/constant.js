@@ -263,11 +263,11 @@ export const navigation = [
     subpages: [
       {
         name: "Calendar",
-        href: "/hrms/calendar",
+        href: "/hrms/Calendar",
         icon: <Calendar />,
       },
-      { name: "Employee", href: "/hrms/employee", icon: <UserRoundCog /> },
-      { name: "Payroll", href: "/hrms/payroll", icon: <UserRoundCog /> },
+      { name: "Employee", href: "/hrms/Employee", icon: <UserRoundCog /> },
+      { name: "Payroll", href: "/hrms/Payroll", icon: <UserRoundCog /> },
     ],
   },
   {
