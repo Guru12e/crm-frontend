@@ -253,6 +253,7 @@ export const navigation = [
   //   href: "/revenueengine/configureproducts",
   //   icon: <Wrench />,
   // },
+  { name: "HRMS", href: "/hrms", icon: <BarChart3 /> },
   {
     key: "revenueengine",
     name: "Revenue Engine",
