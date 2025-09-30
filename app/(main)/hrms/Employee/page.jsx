@@ -36,20 +36,23 @@ export default function EmployeesPage() {
     if (!user) redirect("/");
 
     const sessionJSON = JSON.parse(localStorage.getItem("session"));
-    setUserEmail(sessionJSON.user.email);
+    setUserEmail("arsha.tajdeen23@gmail.com");
+    // setUserEmail(sessionJSON.user.email);
   }, []);
 
   const fetchEmployees = async () => {
+    console.log("userData", userEmail);
     const { company_id, error: companyError } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("user_email", userEmail)
-      .single();
+      .from("HRMS")
+      .select("*")
+      .eq("user_email", userEmail);
+
+    setUserData(company_id);
 
     const { data, error } = await supabase
       .from("Employees")
       .select("*")
-      .eq("company_id", company_id)
+      .eq("company_id", userData?.company_id)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -68,23 +71,21 @@ export default function EmployeesPage() {
 
   const addEmployee = async () => {
     try {
-      const newEmployee = {
+      const newData = {
         id: Date.now(),
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        role: data.role,
-        department: data.department,
-        manager: data.manager,
-        access: data.access || "Employee",
-        skills: data.skills || [],
+        name: newEmployee.name,
+        email: newEmployee.email,
+        phone: newEmployee.phone,
+        role: newEmployee.role,
+        department: newEmployee.department,
+        manager: newEmployee.manager,
+        access: newEmployee.access || "Employee",
+        skills: newEmployee.skills || [],
         created_at: new Date().toISOString(),
         company_id: userData?.company_id || null,
       };
 
-      const { data, error } = await supabase
-        .from("Employees")
-        .insert(newEmployee);
+      const { data, error } = await supabase.from("Employees").insert(newData);
 
       if (error) {
         toast.error(`Error adding employee: ${error.message}`);
