@@ -41,18 +41,21 @@ export default function EmployeesPage() {
   }, []);
 
   const fetchEmployees = async () => {
-    console.log("userData", userEmail);
     const { company_id, error: companyError } = await supabase
       .from("HRMS")
       .select("*")
       .eq("user_email", userEmail);
 
-    setUserData(company_id);
+    console.log(companyError);
+
+    setUserData(company_id[0]);
+
+    console.log(company_id);
 
     const { data, error } = await supabase
       .from("Employees")
       .select("*")
-      .eq("company_id", userData?.company_id)
+      .eq("company_id", userData?.id)
       .order("created_at", { ascending: false });
 
     if (error) {
