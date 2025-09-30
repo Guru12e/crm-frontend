@@ -267,7 +267,7 @@ export const navigation = [
         icon: <Calendar />,
       },
       { name: "Employee", href: "/hrms/employee", icon: <UserRoundCog /> },
-      { name: "Payroll", href: "/hrms/payroll", icon: <BanknoteArrowUp /> },
+      { name: "Payroll", href: "/hrms/payroll", icon: <UserRoundCog /> },
     ],
   },
   {
