@@ -45,7 +45,6 @@ export default function HRMSDashboard() {
       }
 
       if (data && data.length > 0) {
-        console.log(data[0].leave);
         const formattedFeatures = [];
         (data[0].leave || []).forEach((feature) => {
           const startDate = new Date(feature.start);

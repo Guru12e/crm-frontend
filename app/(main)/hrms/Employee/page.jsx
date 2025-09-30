@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { redirect } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,28 +40,24 @@ export default function EmployeesPage() {
   }, []);
 
   const fetchEmployees = async () => {
-    const { company_id, error: companyError } = await supabase
+    console.log("userEmail", userEmail);
+    const { data: company_data, error: company_error } = await supabase
       .from("HRMS")
       .select("*")
       .eq("user_email", userEmail);
 
-    console.log(companyError);
-
-    setUserData(company_id[0]);
-
-    console.log(company_id);
+    setUserData(company_data[0]);
 
     const { data, error } = await supabase
       .from("Employees")
       .select("*")
-      .eq("company_id", userData?.id)
+      .eq("company_id", company_data[0]?.id)
       .order("created_at", { ascending: false });
 
     if (error) {
       console.error("Error fetching employees:", error);
     } else {
-      const allEmployees = data.map((row) => row.employees || []).flat();
-      setEmployees(allEmployees);
+      setEmployees(data || []);
     }
   };
 
@@ -85,7 +80,7 @@ export default function EmployeesPage() {
         access: newEmployee.access || "Employee",
         skills: newEmployee.skills || [],
         created_at: new Date().toISOString(),
-        company_id: userData?.company_id || null,
+        company_id: userData?.id || null,
       };
 
       const { data, error } = await supabase.from("Employees").insert(newData);
