@@ -69,7 +69,6 @@ export default function HRMSDashboard() {
           }
         });
 
-        console.log(formattedFeatures);
         setFeatures(formattedFeatures);
       }
     };

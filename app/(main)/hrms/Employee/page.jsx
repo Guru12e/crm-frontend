@@ -29,6 +29,7 @@ export default function EmployeesPage() {
     training: [],
   });
   const [userEmail, setUserEmail] = useState(null);
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -39,40 +40,54 @@ export default function EmployeesPage() {
   }, []);
 
   const fetchEmployees = async () => {
-    const { data, error } = await supabase
-      .from("HRMS")
-      .select("employees")
+    const { company_id, error: companyError } = await supabase
+      .from("profiles")
+      .select("id")
       .eq("user_email", userEmail)
+      .single();
+
+    const { data, error } = await supabase
+      .from("Employees")
+      .select("*")
+      .eq("company_id", company_id)
       .order("created_at", { ascending: false });
 
     if (error) {
       console.error("Error fetching employees:", error);
     } else {
-      // Flatten all employees arrays from each HRMS row
       const allEmployees = data.map((row) => row.employees || []).flat();
       setEmployees(allEmployees);
     }
   };
 
   useEffect(() => {
-    if (userEmail) fetchEmployees();
+    if (userEmail) {
+      fetchEmployees();
+    }
   }, [userEmail]);
 
   const addEmployee = async () => {
     try {
-      const res = await fetch("/api/addEmployee", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...newEmployee,
-          session: { user: { email: userEmail } },
-        }),
-      });
+      const newEmployee = {
+        id: Date.now(),
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        role: data.role,
+        department: data.department,
+        manager: data.manager,
+        access: data.access || "Employee",
+        skills: data.skills || [],
+        created_at: new Date().toISOString(),
+        company_id: userData?.company_id || null,
+      };
 
-      const data = await res.json();
+      const { data, error } = await supabase
+        .from("Employees")
+        .insert(newEmployee);
 
-      if (!res.ok) {
-        toast.error(`Error adding employee: ${data.error}`);
+      if (error) {
+        toast.error(`Error adding employee: ${error.message}`);
       } else {
         toast.success("Employee added successfully!");
         setNewEmployee({
@@ -95,7 +110,6 @@ export default function EmployeesPage() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Employees</h1>
         <Dialog>
@@ -170,14 +184,12 @@ export default function EmployeesPage() {
         </Dialog>
       </div>
 
-      {/* Employee List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {employees.map((emp, index) => (
           <div
             key={index}
             className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm p-5 flex flex-col transition-transform hover:shadow-md duration-200"
           >
-            {/* Header */}
             <div className="flex items-center space-x-4 mb-4">
               <div className="w-12 h-12 rounded-full bg-slate-300 dark:bg-slate-700 flex items-center justify-center text-lg font-semibold text-white">
                 {emp.name?.charAt(0) || "E"}
@@ -192,14 +204,12 @@ export default function EmployeesPage() {
               </div>
             </div>
 
-            {/* Manager & Contact */}
             <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1 mb-3">
               <p>Manager: {emp.manager || "-"}</p>
               <p>Email: {emp.email}</p>
               <p>Phone: {emp.phone}</p>
             </div>
 
-            {/* Skills */}
             {emp.skills?.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-3">
                 {emp.skills.map((skill, i) => (
@@ -213,7 +223,6 @@ export default function EmployeesPage() {
               </div>
             )}
 
-            {/* Trainings */}
             {/* <div className="mb-3">
               <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                 Trainings Completed
@@ -235,7 +244,6 @@ export default function EmployeesPage() {
               </p>
             </div> */}
 
-            {/* Actions */}
             <div className="flex justify-end gap-2 mt-auto">
               <Button variant="outline" size="sm" className="text-sm">
                 Edit

@@ -198,9 +198,7 @@ export const CalendarBody = ({ features, children }) => {
       <div
         className={cn(
           "relative flex h-full w-full flex-col gap-1 p-1 text-xs",
-          isLeaveDay
-            ? "bg-red-200 text-red-900"
-            : "bg-white text-muted-foreground"
+          isLeaveDay ? "bg-[#A8E4A0]/30" : "bg-white text-muted-foreground"
         )}
         key={day}
       >
