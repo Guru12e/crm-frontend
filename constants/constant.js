@@ -1,11 +1,14 @@
 import {
   BarChart3,
+  Calendar,
   Cog,
   Database,
   DollarSign,
   FileText,
   Home,
   Megaphone,
+  SquareUser,
+  UserRoundCog,
   Users,
   Wrench,
 } from "lucide-react";
@@ -253,6 +256,20 @@ export const navigation = [
   //   href: "/revenueengine/configureproducts",
   //   icon: <Wrench />,
   // },
+  {
+    name: "HRMS",
+    href: "/hrms",
+    icon: <SquareUser />,
+    subpages: [
+      {
+        name: "Calendar",
+        href: "/hrms/Calendar",
+        icon: <Calendar />,
+      },
+      { name: "Employee", href: "/hrms/Employee", icon: <UserRoundCog /> },
+      { name: "Payroll", href: "/hrms/Payroll", icon: <UserRoundCog /> },
+    ],
+  },
   {
     key: "revenueengine",
     name: "Revenue Engine",
