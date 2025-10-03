@@ -1,9 +1,15 @@
 "use client";
 
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import MarketingSankey from "@/components/campaignPerformance";
+import SalesProductivityDonut from "@/components/salesProductivity";
+
+
+
 import {
   Select,
   SelectContent,
@@ -34,6 +40,15 @@ export default function Analytics() {
   const [activeTab, setActiveTab] = useState("overview");
   const [chartType, setChartType] = useState("chart");
   const [timeRange, setTimeRange] = useState("30d");
+  const salesProductivityData = [
+  { name: "Calls Made", value: 120, description: "Total number of calls made by sales team", itemStyle: { color: "#B2E5E0" } },
+  { name: "Client Meetings Scheduled", value: 45, description: "Upcoming meetings scheduled with clients", itemStyle: { color: "#7FDCD4" } },
+  { name: "Client Meetings Conducted", value: 30, description: "Meetings successfully conducted with clients", itemStyle: { color: "#4CCFC7" } },
+  { name: "Follow ups Done", value: 85, description: "Sales-related tasks marked as completed", itemStyle: { color: "#26BDB5" } },
+  { name: "Deals Closed", value: 25, description: "Number of deals closed successfully", itemStyle: { color: "#14B8A6" } }, 
+];
+
+
 
   const MetricCard = ({
     title,
@@ -54,6 +69,8 @@ export default function Analytics() {
           return val.toLocaleString();
       }
     };
+
+   
 
     return (
       <Card className="backdrop-blur-sm bg-teal-500/70 dark:bg-sky-800/50 border border-slate-200/50 dark:border-white/20">
@@ -445,42 +462,31 @@ export default function Analytics() {
             />
           </div>
 
-          <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+         
             <CardHeader>
-              <CardTitle>Sales Pipeline</CardTitle>
-            </CardHeader>
+              <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
             <CardContent>
-              <PipelineChart />
+            <SalesProductivityDonut data={salesProductivityData} />
             </CardContent>
-          </Card>
+            </Card>
+            </CardHeader>
+            <PipelineChart />
+            
+          
         </TabsContent>
 
         <TabsContent value="marketing" className="space-y-6">
-          <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-            <CardHeader>
-              <CardTitle>Campaign Performance</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <DataTable
-                data={analyticsData.marketing.campaignPerformance}
-                columns={[
-                  { header: "Channel", key: "channel" },
-                  {
-                    header: "Spend",
-                    key: "spend",
-                    format: (v) => `$${v.toLocaleString()}`,
-                  },
-                  { header: "Leads", key: "leads" },
-                  {
-                    header: "Cost per Lead",
-                    key: "cost",
-                    format: (v) => `$${v}`,
-                  },
-                  { header: "ROI", key: "roi", format: (v) => `${v}%` },
-                ]}
-              />
-            </CardContent>
-          </Card>
+  <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+    <CardHeader>
+      <CardTitle>Campaign Performance</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <MarketingSankey />
+    </CardContent>
+  </Card>
+
+
+         
 
           <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
             <CardHeader>

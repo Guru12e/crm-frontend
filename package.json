@@ -30,6 +30,8 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "country-data-list": "^1.5.3",
+    "echarts": "^5.6.0",
+    "echarts-for-react": "^3.0.2",
     "googleapis": "^157.0.0",
     "hamburger-react": "^2.5.2",
     "langchain": "^0.3.30",
