@@ -48,7 +48,7 @@ export function LoginForm({ className, ...props }) {
       autoClose: 2000,
     });
 
-    router.push("/hrms");
+    router.push("/hrms/dashboard");
   };
 
   return (

@@ -343,6 +343,7 @@ export default function Layout({ children }) {
               <div className="max-w-md min-w-0 ml-2 sm:ml-0"></div>
             </div>
             {user &&
+              type === "admin" &&
               (user.refresh_token == null || user.refresh_token == "") && (
                 <div className="flex items-center gap-4">
                   <AlertTriangleIcon
