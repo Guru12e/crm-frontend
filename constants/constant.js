@@ -287,11 +287,17 @@ export const navigation = [
   },
 ];
 
-// export const ROLE_PERMISSIONS = {
-//   CEO: ["home", "prospects", "crm", "pricing", "campaigns"],
-//   CMO: ["home", "prospects", "crm", "campaigns"],
-//   "Sales Manager": ["home", "prospects", "crm"],
-//   "Marketing Manager": ["home", "prospects", "campaigns"],
-//   "Sales Representative": ["home", "prospects", "crm"],
-//   Other: ["home"],
-// };
+export const employeeNavigation = [
+  {
+    name: "HRMS",
+    href: "/hrms",
+    icon: <SquareUser />,
+    subpages: [
+      {
+        name: "Calendar",
+        href: "/hrms/Calendar",
+        icon: <Calendar />,
+      },
+    ],
+  },
+];

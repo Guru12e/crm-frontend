@@ -9,6 +9,8 @@ import {
   HelpCircle,
   Bot,
   AlertTriangleIcon,
+  SquareUser,
+  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -16,7 +18,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import UserButton from "@/components/UserButton";
 import { Label } from "@/components/ui/label";
-import { navigation, ROLE_PERMISSIONS } from "@/constants/constant";
+import { employeeNavigation, navigation } from "@/constants/constant";
 import Hamburger from "hamburger-react";
 
 export default function Layout({ children }) {
@@ -27,19 +29,31 @@ export default function Layout({ children }) {
   const location = usePathname();
   const [alertMessage, setAlertMessage] = useState(false);
   const [user, setUser] = useState(null);
+  const [type, setType] = useState(null);
+  const [navigationItems, setNavigationItems] = useState(navigation);
   const router = useRouter();
 
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      setUser(JSON.parse(user));
+    const type = localStorage.getItem("type");
+    setType(type);
+
+    if (type === "employee") {
+      const employee = localStorage.getItem("employee");
+      setNavigationItems(employeeNavigation);
+      if (employee) {
+        setUser(JSON.parse(employee));
+      } else {
+        router.push("/");
+      }
     } else {
-      router.push("/");
+      const user = localStorage.getItem("user");
+      if (user) {
+        setUser(JSON.parse(user));
+      } else {
+        router.push("/");
+      }
     }
   }, []);
-
-  // const allowedPages = ROLE_PERMISSIONS[user?.role] || [];
-  // console.log(allowedPages);
 
   const toggleExpanded = (name) => {
     setExpandedItems((prev) =>
@@ -113,92 +127,88 @@ export default function Layout({ children }) {
           </div>
 
           <nav className="flex-1 space-y-1 px-2 py-4">
-            {navigation
-              // .filter((item) => allowedPages.includes(item.key))
-              .map((item) => {
-                const isActive = item.href === location;
-                item.subpages &&
-                  item.subpages.some((sub) => location === sub.href);
-                const hasSubpages = item.subpages && item.subpages.length > 0;
-                const isExpanded = expandedItems.includes(item.name);
+            {navigationItems.map((item) => {
+              const isActive = item.href === location;
+              item.subpages &&
+                item.subpages.some((sub) => location === sub.href);
+              const hasSubpages = item.subpages && item.subpages.length > 0;
+              const isExpanded = expandedItems.includes(item.name);
 
-                return (
-                  <div key={item.name}>
-                    <div
-                      className={cn(
-                        "flex items-center cursor-pointer rounded-lg px-2 py-2 text-sm font-medium transition-all",
-                        isActive
-                          ? "bg-gradient-to-r from-teal-500 to-sky-500 text-white "
-                          : "text-slate-700 dark:text-slate-300 hover:bg-teal/50 dark:hover:bg-sky-800/50"
-                      )}
-                      onClick={() => handleItemClick(item)}
+              return (
+                <div key={item.name}>
+                  <div
+                    className={cn(
+                      "flex items-center cursor-pointer rounded-lg px-2 py-2 text-sm font-medium transition-all",
+                      isActive
+                        ? "bg-gradient-to-r from-teal-500 to-sky-500 text-white "
+                        : "text-slate-700 dark:text-slate-300 hover:bg-teal/50 dark:hover:bg-sky-800/50"
+                    )}
+                    onClick={() => handleItemClick(item)}
+                  >
+                    <Link
+                      href={item.href}
+                      className={`group flex flex-1 items-center ${
+                        sidebarOpen ? "" : "justify-center pr-1"
+                      }`}
+                      onClick={(e) => {
+                        if (hasSubpages) {
+                          e.preventDefault();
+                        }
+                      }}
                     >
-                      <Link
-                        href={item.href}
-                        className={`group flex flex-1 items-center ${
-                          sidebarOpen ? "" : "justify-center pr-1"
-                        }`}
-                        onClick={(e) => {
-                          if (hasSubpages) {
-                            e.preventDefault();
-                          }
-                        }}
-                      >
-                        <div
-                          className={cn(
-                            "h-5 w-5 flex-shrink-0 ",
-                            isActive ? "text-white" : "text-slate-500"
-                          )}
-                        >
-                          {item.icon}
-                        </div>
-                        {sidebarOpen && (
-                          <span className="ml-3 truncate max-sm:hidden">
-                            {item.name}
-                          </span>
+                      <div
+                        className={cn(
+                          "h-5 w-5 flex-shrink-0 ",
+                          isActive ? "text-white" : "text-slate-500"
                         )}
-                      </Link>
-                      {hasSubpages && sidebarOpen && (
-                        <div className="p-1 max-sm:hidden">
-                          {isExpanded ? (
-                            <ChevronDown className="h-4 w-4" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4" />
-                          )}
-                        </div>
+                      >
+                        {item.icon}
+                      </div>
+                      {sidebarOpen && (
+                        <span className="ml-3 truncate max-sm:hidden">
+                          {item.name}
+                        </span>
                       )}
-                    </div>
-
-                    {hasSubpages && isExpanded && (
-                      <div className="ml-4 mt-1 space-y-1 max-sm:hidden">
-                        {item.subpages.map((subpage) => (
-                          <Link
-                            key={subpage.href}
-                            href={subpage.href}
-                            className={cn(
-                              "block rounded-md px-1 py-2 text-sm transition-all",
-                              location === subpage.href
-                                ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                                : "text-slate-600 dark:text-slate-400 hover:bg-white/30 dark:hover:bg-slate-800/30"
-                            )}
-                          >
-                            <span className="flex items-center gap-2">
-                              {subpage.icon}
-                              <span
-                                className={`ml-2 ${
-                                  sidebarOpen ? "" : "hidden"
-                                }`}
-                              >
-                                {subpage.name}
-                              </span>
-                            </span>
-                          </Link>
-                        ))}
+                    </Link>
+                    {hasSubpages && sidebarOpen && (
+                      <div className="p-1 max-sm:hidden">
+                        {isExpanded ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )}
                       </div>
                     )}
                   </div>
-                );
-              })}
+
+                  {hasSubpages && isExpanded && (
+                    <div className="ml-4 mt-1 space-y-1 max-sm:hidden">
+                      {item.subpages.map((subpage) => (
+                        <Link
+                          key={subpage.href}
+                          href={subpage.href}
+                          className={cn(
+                            "block rounded-md px-1 py-2 text-sm transition-all",
+                            location === subpage.href
+                              ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                              : "text-slate-600 dark:text-slate-400 hover:bg-white/30 dark:hover:bg-slate-800/30"
+                          )}
+                        >
+                          <span className="flex items-center gap-2">
+                            {subpage.icon}
+                            <span
+                              className={`ml-2 ${sidebarOpen ? "" : "hidden"}`}
+                            >
+                              {subpage.name}
+                            </span>
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </nav>
         </div>
       </div>

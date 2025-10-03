@@ -4,8 +4,10 @@ import React from "react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const OnBoarding = () => {
+  const router = useRouter();
   return (
     <div className="relative min-h-screen overflow-hidden from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <div className="absolute inset-0">
@@ -61,7 +63,10 @@ const OnBoarding = () => {
             <Button
               className="w-full h-12 backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 hover:bg-white/70 dark:hover:bg-slate-800/70 border border-white/30 dark:border-slate-700/50 text-slate-900 dark:text-white font-medium transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 group cursor-pointer"
               variant="outline"
-              onClick={() => signIn("google", { callbackUrl: "/on-boarding" })}
+              onClick={() => {
+                localStorage.setItem("type", "admin");
+                signIn("google", { callbackUrl: "/on-boarding" });
+              }}
             >
               <svg
                 className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform"
@@ -85,6 +90,14 @@ const OnBoarding = () => {
                 />
               </svg>
               Continue with Google
+            </Button>
+
+            <Button
+              className="w-full mt-4 h-12 backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 hover:bg-white/70 dark:hover:bg-slate-800/70 border border-white/30 dark:border-slate-700/50 text-slate-900 dark:text-white font-medium transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 group cursor-pointer"
+              variant="outline"
+              onClick={() => router.push("/employee-login")}
+            >
+              Employee Login
             </Button>
 
             <div className="mt-8 flex justify-center space-x-2">
