@@ -14,9 +14,28 @@ import {
 } from "@/components/ui/dialog";
 import { supabase } from "@/utils/supabase/client";
 import { toast } from "react-toastify";
+import { Card } from "@/components/ui/card";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
+  const [editingEmployee, setEditingEmployee] = useState(null); // Employee being edited
+  const [editedEmployee, setEditedEmployee] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    role: "",
+    department: "",
+    manager: "",
+    skills: [],
+    training: [],
+  });
   const [newEmployee, setNewEmployee] = useState({
     name: "",
     email: "",
@@ -67,8 +86,19 @@ export default function EmployeesPage() {
     }
   }, [userEmail]);
 
+  function generatePassword(length = 12) {
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+[]{}|;:,.<>?";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+  }
+
   const addEmployee = async () => {
     try {
+      const generatedPassword = generatePassword(12);
       const newData = {
         id: Date.now(),
         name: newEmployee.name,
@@ -81,6 +111,7 @@ export default function EmployeesPage() {
         skills: newEmployee.skills || [],
         created_at: new Date().toISOString(),
         company_id: userData?.id || null,
+        password: generatedPassword,
       };
 
       const { data, error } = await supabase.from("Employees").insert(newData);
@@ -104,6 +135,41 @@ export default function EmployeesPage() {
     } catch (err) {
       console.error("Error adding employee:", err);
       toast.error("Server error adding employee.");
+    }
+  };
+
+  const saveEditedEmployee = async () => {
+    try {
+      // Fetch the current HRMS row
+      const { data: hrmsRow } = await supabase
+        .from("HRMS")
+        .select("employees")
+        .eq("id", editingEmployee.hrms_id)
+        .single();
+
+      if (!hrmsRow) return toast.error("Error: HRMS row not found");
+
+      // Update the employee in the JSON array
+      const updatedEmployees = hrmsRow.employees.map((emp) =>
+        emp.email === editingEmployee.email ? editedEmployee : emp
+      );
+
+      const { error } = await supabase
+        .from("HRMS")
+        .update({ employees: updatedEmployees })
+        .eq("id", editingEmployee.hrms_id);
+
+      if (error) {
+        console.error("Error updating employee:", error);
+        toast.error("Error updating employee.");
+      } else {
+        toast.success("Employee updated successfully!");
+        setEditingEmployee(null);
+        fetchEmployees();
+      }
+    } catch (err) {
+      console.error("Server error:", err);
+      toast.error("Server error updating employee.");
     }
   };
 
@@ -185,15 +251,10 @@ export default function EmployeesPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {employees.map((emp, index) => (
-          <div
-            key={index}
-            className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm p-5 flex flex-col transition-transform hover:shadow-md duration-200"
-          >
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="w-12 h-12 rounded-full bg-slate-300 dark:bg-slate-700 flex items-center justify-center text-lg font-semibold text-white">
-                {emp.name?.charAt(0) || "E"}
-              </div>
-              <div className="flex flex-col">
+          <Card key={index} className="shadow-sm rounded-xl p-5 flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <div>
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                   {emp.name}
                 </h3>
@@ -201,12 +262,130 @@ export default function EmployeesPage() {
                   {emp.role} | {emp.department}
                 </p>
               </div>
+              {/* Edit Button */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setEditingEmployee(emp);
+                      setEditedEmployee({ ...emp });
+                    }}
+                  >
+                    Edit
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className=" p-6 space-y-6 overflow-y-auto min-h-[80vh] md:min-w-[85vw] min-w-screen">
+                  <SheetHeader>
+                    <SheetTitle>Edit Employee</SheetTitle>
+                  </SheetHeader>
+                  <div className="space-y-3 mt-2 grid grid-cols-3 gap-6">
+                    <Input
+                      placeholder="Full Name"
+                      value={editedEmployee.name}
+                      onChange={(e) =>
+                        setEditedEmployee({
+                          ...editedEmployee,
+                          name: e.target.value,
+                        })
+                      }
+                    />
+                    <Input
+                      placeholder="Email"
+                      value={editedEmployee.email}
+                      onChange={(e) =>
+                        setEditedEmployee({
+                          ...editedEmployee,
+                          email: e.target.value,
+                        })
+                      }
+                    />
+                    <Input
+                      placeholder="Phone"
+                      value={editedEmployee.phone}
+                      onChange={(e) =>
+                        setEditedEmployee({
+                          ...editedEmployee,
+                          phone: e.target.value,
+                        })
+                      }
+                    />
+                    <Input
+                      placeholder="Role"
+                      value={editedEmployee.role}
+                      onChange={(e) =>
+                        setEditedEmployee({
+                          ...editedEmployee,
+                          role: e.target.value,
+                        })
+                      }
+                    />
+                    <Input
+                      placeholder="Department"
+                      value={editedEmployee.department}
+                      onChange={(e) =>
+                        setEditedEmployee({
+                          ...editedEmployee,
+                          department: e.target.value,
+                        })
+                      }
+                    />
+                    <Input
+                      placeholder="Manager"
+                      value={editedEmployee.manager}
+                      onChange={(e) =>
+                        setEditedEmployee({
+                          ...editedEmployee,
+                          manager: e.target.value,
+                        })
+                      }
+                    />
+                    <Textarea
+                      placeholder="Skills (comma separated)"
+                      value={editedEmployee.skills?.join(", ")}
+                      onChange={(e) =>
+                        setEditedEmployee({
+                          ...editedEmployee,
+                          skills: e.target.value
+                            .split(",")
+                            .map((s) => s.trim()),
+                        })
+                      }
+                    />
+                    <Textarea
+                      className="col-span-2"
+                      placeholder="Training (comma separated)"
+                      value={editedEmployee.training?.join(", ")}
+                      onChange={(e) =>
+                        setEditedEmployee({
+                          ...editedEmployee,
+                          training: e.target.value
+                            .split(",")
+                            .map((s) => s.trim()),
+                        })
+                      }
+                    />
+                  </div>
+                  <Button
+                    onClick={saveEditedEmployee}
+                    className="w-full bg-blue-600 text-white"
+                  >
+                    Save Changes
+                  </Button>
+                </SheetContent>
+              </Sheet>
             </div>
 
+            {/* Contact */}
             <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1 mb-3">
               <p>Manager: {emp.manager || "-"}</p>
               <p>Email: {emp.email}</p>
               <p>Phone: {emp.phone}</p>
+              <p>
+                <span className="font-semibold">Password:</span>{" "}
+                <span>{emp.password}</span>
+              </p>
             </div>
 
             {emp.skills?.length > 0 && (
@@ -222,36 +401,13 @@ export default function EmployeesPage() {
               </div>
             )}
 
-            {/* <div className="mb-3">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                Trainings Completed
-              </p>
-              <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2">
-                <div
-                  className="bg-blue-600 dark:bg-blue-400 h-2 rounded-full"
-                  style={{
-                    width: `${
-                      emp.training?.length
-                        ? Math.min((emp.training.length / 10) * 100, 100)
-                        : 0
-                    }%`,
-                  }}
-                ></div>
+            {/* Trainings */}
+            {emp.training?.length > 0 && (
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Trainings: {emp.training.join(", ")}
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-right">
-                {emp.training?.length || 0} / 10
-              </p>
-            </div> */}
-
-            <div className="flex justify-end gap-2 mt-auto">
-              <Button variant="outline" size="sm" className="text-sm">
-                Edit
-              </Button>
-              <Button variant="destructive" size="sm" className="text-sm">
-                Remove
-              </Button>
-            </div>
-          </div>
+            )}
+          </Card>
         ))}
       </div>
     </div>
