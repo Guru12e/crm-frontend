@@ -30,6 +30,15 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ChevronDown } from "lucide-react";
 
 const SkeletonCard = () => (
   <div className="mb-6 border border-slate-200/50 dark:border-white/20 rounded-lg p-4 animate-pulse">
@@ -59,6 +68,8 @@ export default function PricingPage() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [dealsToShow, setDealsToShow] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [configFormData, setConfigFormData] = useState({});
+  const [open, setOpen] = useState([]);
 
   const fetchData = async (email) => {
     if (!email) return;
@@ -232,6 +243,21 @@ export default function PricingPage() {
   const handleGenerateQuote = (dealId) =>
     toast.info("Quote generation feature coming soon!");
 
+  const handleSaveConfiguration = (dealId, productName, optionValues) => {
+    const deal = dealsToShow.find((d) => d.id === dealId);
+    const product = products.find((p) => p.name === productName);
+    const configSummary = optionValues;
+    const config = deal.configurations || [];
+    for (let i = 0; i < deal.products.length; i++) {
+      if (deal.products[i] === productName) {
+        config[i] = configSummary;
+        break;
+      } else {
+        config.push(config[i] || null);
+      }
+    }
+  };
+
   const calculateGrandTotal = (deal) => {
     if (!deal.products || deal.products.length === 0) return 0;
     return deal.products.reduce((total, productName, index) => {
@@ -346,17 +372,121 @@ export default function PricingPage() {
                 <CardHeader>
                   <CardTitle className={"flex justify-between items-center"}>
                     <CardDescription className={"flex flex-col"}>
-                      <span className="text-black  text-2xl">{deal.name}</span>
+                      <span className="text-black dark:text-white text-2xl">
+                        {deal.name}
+                      </span>
                       <span className="font-semibold">
                         {deal.title || "No Title"} - Status: {deal.status}
                       </span>
                     </CardDescription>
-                    <Button
-                      variant="outline"
-                      onClick={() => handleGenerateQuote(deal.id)}
-                    >
-                      Generate Quote
-                    </Button>
+                    <div className="flex gap-2 flex-wrap">
+                      <Button
+                        variant="outline"
+                        onClick={() => handleGenerateQuote(deal.id)}
+                      >
+                        Generate Quote
+                      </Button>
+                      <Sheet>
+                        <SheetTrigger asChild>
+                          <Button
+                            className={`bg-transparent hover:bg-gray-500 cursor-pointer text-gray-700 hover:text-white border border-gray-700 hover:border-transparent dark:border-gray-200 dark:text-gray-100`}
+                          >
+                            Configure Product
+                          </Button>
+                        </SheetTrigger>
+                        <SheetContent className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6 md:min-w-[85vw] min-w-screen">
+                          <SheetHeader>
+                            <SheetTitle className="mb-4 text-lg font-bold">
+                              Configure Products for {deal.name}
+                            </SheetTitle>
+                          </SheetHeader>
+                          {!deal.products || deal.products.length === 0 ? (
+                            <p>This deal has no products assigned.</p>
+                          ) : (
+                            deal.products.map((productName, index) => {
+                              const product = products.find(
+                                (p) => p.name === productName
+                              );
+                              const price = {};
+                              for (const product1 in deal.products) {
+                                const product_check = products.find(
+                                  (p) => p.name === product1
+                                );
+                                price[product1] = product_check.price;
+                              }
+
+                              return (
+                                <Card
+                                  key={`${deal.id}-config-${index}`}
+                                  onClick={() => {
+                                    if (open.includes(productName)) {
+                                      setOpen(
+                                        open.filter((o) => o !== productName)
+                                      );
+                                    } else {
+                                      setOpen([...open, productName]);
+                                    }
+                                  }}
+                                  className={`${
+                                    open.includes(productName)
+                                      ? "max-h-full"
+                                      : "h-14"
+                                  } p-4 mx-4 flex flex-col justify-start cursor-pointer items-start gap-4 mb-6 bg-white/10 dark:bg-gray-200/10 border-0 backdrop-blur-sm transition-all duration-300 `}
+                                >
+                                  <CardTitle className="mb-2 flex justify-between w-full">
+                                    <div className="flex items-center">
+                                      <ChevronDown
+                                        className={`inline mr-2 ${
+                                          open.includes(productName)
+                                            ? "rotate-180"
+                                            : "rotate-0"
+                                        } transition-transform cursor-pointer`}
+                                      />
+                                      {productName}
+                                    </div>
+                                    <span>
+                                      {product
+                                        ? `Base Price: ${
+                                            price[productName] || "$"
+                                          }${product.price || 0}
+                                          ${product.billing_cycle || ""}`
+                                        : "N/A"}
+                                    </span>
+                                  </CardTitle>
+                                  <CardContent className="p-2 w-full">
+                                    {product.isConfigurable === false ? (
+                                      <p className="text-slate-500">
+                                        This product is not configurable.
+                                      </p>
+                                    ) : !product.configuration ? (
+                                      <p className="text-slate-500">
+                                        No configuration options available for
+                                        this product. To configure, please
+                                        configure the product in the Configure
+                                        Product Section. Or{" "}
+                                        <Link
+                                          href="/revenueengine/configureproducts"
+                                          className="text-blue-500 underline"
+                                        >
+                                          click here
+                                        </Link>
+                                        .
+                                      </p>
+                                    ) : (
+                                      <ConfigureProduct
+                                        userEmail={userEmail}
+                                        product={product}
+                                        config={product.configuration}
+                                      />
+                                    )}
+                                  </CardContent>
+                                </Card>
+                              );
+                            })
+                          )}
+                        </SheetContent>
+                      </Sheet>
+                    </div>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -446,11 +576,11 @@ export default function PricingPage() {
                                     }${finalPrice.toFixed(2)}`
                                   : "N/A"}
                               </TableCell>
-                              <TableCell>
+                              <TableCell className={`flex gap-2`}>
                                 <Button
                                   onClick={() => handleGeneratePrice(deal.id)}
                                   className={
-                                    "bg-transparent hover:bg-blue-100 text-blue-700 hover:text-white border border-blue-700 hover:border-transparent"
+                                    "bg-transparent hover:bg-blue-500/10 text-blue-700 hover:text-white border border-blue-700 hover:border-transparent"
                                   }
                                 >
                                   Suggest Price
