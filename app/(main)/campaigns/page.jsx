@@ -41,7 +41,7 @@ export default function Campaigns() {
   const [searchTerm, setSearchTerm] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
-  const [show, setShow] = useState(-1);
+  // const [show, setShow] = useState(-1);
   const [audienceFilter, setAudienceFilter] = useState("");
   const router = useRouter();
 
@@ -648,12 +648,12 @@ export default function Campaigns() {
                   <Card
                     key={c.id}
                     className="shadow-sm rounded-2xl border transition-all duration-200 hover:shadow-lg bg-white/70 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20 h-full"
-                    onMouseEnter={() => {
-                      setShow(c.id);
-                    }}
-                    onMouseLeave={() => {
-                      setShow(-1);
-                    }}
+                    // onMouseEnter={() => {
+                    //   setShow(c.id);
+                    // }}
+                    // onMouseLeave={() => {
+                    //   setShow(-1);
+                    // }}
                   >
                     <CardContent className="p flex flex-col h-full">
                       <h3 className="font-semibold text-xl text-gray-900 dark:text-white">
@@ -663,33 +663,24 @@ export default function Campaigns() {
                         {c.subject}
                       </p>
 
-                      <p className="text-sm text-slate-900 dark:text-white line-clamp-3 flex-grow leading-relaxed mb-3">
-                        {c.body.length > 50
-                          ? `${c.body.slice(0, 50)}...`
-                          : c.body}
-                      </p>
-
-                      <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 mt-auto pt-3 border-t border-slate-200 dark:border-slate-700">
-                        <span>
+                      <div className="flex justify-between items-center">
+                        <p className="text-sm text-slate-900 dark:text-white line-clamp-3 flex-grow leading-relaxed mb-1">
+                          {c.body.length > 50
+                            ? `${c.body.slice(0, 50)}...`
+                            : c.body}
+                        </p>
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
                           {c.audience?.length > 0
                             ? `${c.audience.length} recipients`
                             : "No recipients"}
                         </span>
-                        <span>
-                          Last edited:{" "}
-                          {new Date(
-                            c.updated_at || c.created_at
-                          ).toLocaleDateString()}
-                        </span>
                       </div>
                     </CardContent>
-                    <CardFooter className="flex gap-2">
-                      <div
-                        className={`flex flex-col w-full md:flex-row gap-3 justify-end items-end ${
-                          show === c.id ? "block" : "hidden"
-                        }`}
-                      >
-                        <div className="flex flex-col w-full md:flex-row gap-2">
+                    <CardFooter className="flex gap-2 border-t mt-auto">
+                      <div className="flex justify-between w-full items-center text-xs border-slate-200 dark:border-slate-700">
+                        <div
+                          className={`flex flex-col w-full md:flex-row gap-3 h-7  mt-auto `}
+                        >
                           <Button
                             onClick={() => router.push(`/campaigns/${c.name}`)}
                             className="text-sm px-3 py-1 rounded-lg border border-slate-300 dark:border-slate-600 
@@ -734,6 +725,14 @@ export default function Campaigns() {
                               </DialogFooter>
                             </DialogContent>
                           </Dialog>
+                        </div>
+                        <div>
+                          <div className="text-xs min-w-[120px] flex text-slate-500 dark:text-slate-400">
+                            <span className="inline">Created at: </span>
+                            <span>
+                              {new Date(c.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </CardFooter>

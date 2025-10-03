@@ -1,11 +1,14 @@
 import {
   BarChart3,
+  Calendar,
   Cog,
   Database,
   DollarSign,
   FileText,
   Home,
   Megaphone,
+  SquareUser,
+  UserRoundCog,
   Users,
   Wrench,
 } from "lucide-react";
@@ -254,6 +257,20 @@ export const navigation = [
   //   icon: <Wrench />,
   // },
   {
+    name: "HRMS",
+    href: "/hrms",
+    icon: <SquareUser />,
+    subpages: [
+      {
+        name: "Calendar",
+        href: "/hrms/Calendar",
+        icon: <Calendar />,
+      },
+      { name: "Employee", href: "/hrms/Employee", icon: <UserRoundCog /> },
+      { name: "Payroll", href: "/hrms/Payroll", icon: <UserRoundCog /> },
+    ],
+  },
+  {
     key: "revenueengine",
     name: "Revenue Engine",
     href: "/revenueengine/configureproducts",
@@ -270,11 +287,17 @@ export const navigation = [
   },
 ];
 
-// export const ROLE_PERMISSIONS = {
-//   CEO: ["home", "prospects", "crm", "pricing", "campaigns"],
-//   CMO: ["home", "prospects", "crm", "campaigns"],
-//   "Sales Manager": ["home", "prospects", "crm"],
-//   "Marketing Manager": ["home", "prospects", "campaigns"],
-//   "Sales Representative": ["home", "prospects", "crm"],
-//   Other: ["home"],
-// };
+export const employeeNavigation = [
+  {
+    name: "HRMS",
+    href: "/hrms",
+    icon: <SquareUser />,
+    subpages: [
+      {
+        name: "Calendar",
+        href: "/hrms/Calendar",
+        icon: <Calendar />,
+      },
+    ],
+  },
+];
