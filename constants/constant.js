@@ -294,6 +294,11 @@ export const employeeNavigation = [
     icon: <SquareUser />,
     subpages: [
       {
+        name: "Dashboard",
+        href: "/hrms/dashboard",
+        icon: <Home />,
+      },
+      {
         name: "Calendar",
         href: "/hrms/Calendar",
         icon: <Calendar />,
