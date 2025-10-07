@@ -193,12 +193,20 @@ export const CalendarBody = ({ features, children }) => {
   for (let day = 1; day <= daysInMonth; day++) {
     const featuresForDay = featuresByDay[day] || [];
     const isLeaveDay = featuresForDay.length > 0;
+    let isHoliday = false;
+    if (isLeaveDay) {
+      isHoliday = featuresForDay[0]?.holiday ? true : false;
+    }
 
     days.push(
       <div
         className={cn(
           "relative flex h-full w-full flex-col gap-1 p-1 text-xs",
-          isLeaveDay ? "bg-[#A8E4A0]/30" : "bg-white text-muted-foreground"
+          isLeaveDay
+            ? isHoliday
+              ? "bg-green-600/40"
+              : "bg-teal-600/40"
+            : "bg-white text-muted-foreground"
         )}
         key={day}
       >

@@ -1,11 +1,14 @@
 import {
   BarChart3,
+  Bell,
   Calendar,
+  Coffee,
   Cog,
   Database,
   DollarSign,
   FileText,
   Home,
+  ListChecks,
   Megaphone,
   SquareUser,
   UserRoundCog,
@@ -289,20 +292,28 @@ export const navigation = [
 
 export const employeeNavigation = [
   {
-    name: "HRMS",
-    href: "/hrms",
-    icon: <SquareUser />,
-    subpages: [
-      {
-        name: "Dashboard",
-        href: "/hrms/dashboard",
-        icon: <Home />,
-      },
-      {
-        name: "Calendar",
-        href: "/hrms/Calendar",
-        icon: <Calendar />,
-      },
-    ],
+    // name: "HRMS",
+    // href: "/hrms",
+    // icon: <SquareUser />,
+    // subpages: [
+    //   {
+    name: "Dashboard",
+    href: "/hrms/dashboard",
+    icon: <Home />,
+  },
+  {
+    name: "My Tasks",
+    href: "/hrms/tasks",
+    icon: <ListChecks />,
+  },
+  {
+    name: "Notifications",
+    href: "/hrms/notifications",
+    icon: <Bell />,
+  },
+  {
+    name: "Time Off",
+    href: "/hrms/time-off",
+    icon: <Coffee />,
   },
 ];

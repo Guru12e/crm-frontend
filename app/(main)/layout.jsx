@@ -83,7 +83,7 @@ export default function Layout({ children }) {
   return (
     <div
       className={cn(
-        "min-h-screen bg-gradient-to-r from-teal-800/10 to-sky-500/10 dark:from-teal-900 dark:to-blue-800",
+        "min-h-screen bg-gradient-to-r from-teal-800/10 to-sky-500/10 dark:from-teal-900 dark:to-sky-700",
         darkMode && "dark"
       )}
     >
