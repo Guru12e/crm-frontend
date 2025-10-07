@@ -603,7 +603,7 @@ export default function CRM() {
           title="Active Deals"
           total={formatNumber(sum)}
           subtitle={`${dealsData.length} deals • ${
-            dealsData.filter((deal) => deal.status === "Closed - Won").length
+            dealsData.filter((deal) => deal.status === "Closed-won").length
           } won`}
           growth={summaryStats.deals.growth}
           icon={DollarSign}
