@@ -1,6 +1,6 @@
 "use client";
 import { supabase } from "../../../../utils/supabase/client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -29,16 +28,25 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { toast, ToastContainer } from "react-toastify";
 import {
   Sheet,
   SheetContent,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ChevronDown } from "lucide-react";
+import { ProductConfigCard } from "@/components/ProductConfig";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 const SkeletonCard = () => (
   <div className="mb-6 border border-slate-200/50 dark:border-white/20 rounded-lg p-4 animate-pulse">
@@ -59,17 +67,18 @@ const SkeletonCard = () => (
 );
 
 export default function PricingPage() {
+  const triggerRef = useRef({});
   const [dealsData, setDealsData] = useState([]);
   const [userEmail, setUserEmail] = useState("");
   const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(null);
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [dealsToShow, setDealsToShow] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [configFormData, setConfigFormData] = useState({});
-  const [open, setOpen] = useState([]);
+  const [intentScore, setIntentScore] = useState("");
+  const [dealConfig, setDealConfig] = useState([]);
 
   const fetchData = async (email) => {
     if (!email) return;
@@ -97,7 +106,9 @@ export default function PricingPage() {
     const activeDeals = deals.filter((deal) =>
       activeStatuses.includes(deal.status)
     );
+
     setDealsData(activeDeals);
+    setDealsToShow(activeDeals);
 
     const { data: productsData, error: productsError } = await supabase
       .from("Users")
@@ -153,16 +164,19 @@ export default function PricingPage() {
   }, [userEmail]);
 
   useEffect(() => {
-    if (searchTerm.trim() === "") {
+    if (searchTerm === null || searchTerm.trim() === "") {
+      setShowSuggestions(false);
       setSearchSuggestions([]);
       return;
     }
+
     const suggestions = dealsData.filter(
       (deal) =>
         deal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         deal.title?.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setSearchSuggestions(suggestions);
+    setShowSuggestions(true);
   }, [searchTerm, dealsData]);
 
   useEffect(() => {
@@ -172,17 +186,21 @@ export default function PricingPage() {
         deal.products?.includes(selectedProduct)
       );
     }
-    const trimmedSearch = searchTerm.trim().toLowerCase();
-    if (trimmedSearch) {
-      if (!showSuggestions) {
-        result = result.filter(
-          (deal) =>
-            deal.name.toLowerCase().includes(trimmedSearch) ||
-            deal.title?.toLowerCase().includes(trimmedSearch)
-        );
+
+    if (searchTerm) {
+      const trimmedSearch = searchTerm.trim().toLowerCase();
+      if (trimmedSearch) {
+        if (!showSuggestions) {
+          result = result.filter(
+            (deal) =>
+              deal.name.toLowerCase().includes(trimmedSearch) ||
+              deal.title?.toLowerCase().includes(trimmedSearch)
+          );
+        }
       }
+      setDealsToShow(result);
+      setDealConfig(result.map((deal) => deal.configuration || []));
     }
-    setDealsToShow(result);
   }, [searchTerm, showSuggestions, dealsData, selectedProduct]);
 
   const handleChange = (dealId, field, productIndex, value) => {
@@ -200,6 +218,22 @@ export default function PricingPage() {
     setDealsToShow(updatedDeals);
   };
 
+  const handleIntentChange = async (dealId, intentScore, index) => {
+    const { data, error } = await supabase
+      .from("Deals")
+      .update({
+        intent_score: intentScore,
+      })
+      .eq("id", dealId);
+    if (error) {
+      console.error("Error updating intent score:", error);
+      toast.error("Failed to update intent score.");
+    }
+    setIntentScore("");
+    fetchData(userEmail);
+    handleGeneratePrice(dealId, index);
+  };
+
   const handleSave = async (dealId) => {
     const dealToSave = dealsToShow.find((d) => d.id === dealId);
     if (!dealToSave) return;
@@ -212,24 +246,13 @@ export default function PricingPage() {
     else toast.success(`Deal "${dealToSave.name}" saved successfully!`);
   };
 
-  const handleReset = (dealId) => {
-    const originalDeal = dealsData.find((d) => d.id === dealId);
-    if (originalDeal) {
-      const updatedDeals = dealsToShow.map((d) =>
-        d.id === dealId ? originalDeal : d
-      );
-      setDealsToShow(updatedDeals);
-      toast.info("Changes have been reset.");
-    }
-  };
-
   const handleApprove = async (dealId) => {
     const dealToApprove = dealsToShow.find((d) => d.id === dealId);
     if (!dealToApprove) return;
     const grandTotal = calculateGrandTotal(dealToApprove);
     const { error } = await supabase
       .from("Deals")
-      .update({ price: grandTotal.toFixed(2) })
+      .update({ finalPrice: grandTotal.toFixed(2) })
       .eq("id", dealId);
     if (error) toast.error("Failed to approve deal.");
     else
@@ -238,23 +261,79 @@ export default function PricingPage() {
       );
   };
 
-  const handleGeneratePrice = (dealId) =>
-    toast.info("Price generation feature coming soon!");
+  const calculateOriginalPrice = (productName, dealId, dealConfig) => {
+    const product = products.find((p) => p.name === productName);
+    let price = parseFloat(product?.price || 0);
+    const dealIndex = dealsToShow.findIndex((d) => d.id === dealId);
+    const productIndex = dealsToShow[dealIndex]?.products.findIndex(
+      (p) => p === productName
+    );
+    if (!dealConfig[dealIndex] || !dealConfig[dealIndex][productIndex]) {
+      return price;
+    }
+    const config = dealConfig[dealIndex][productIndex];
+    for (const category in config) {
+      price += parseFloat(config[category]?.price || 0);
+    }
+    return price;
+  };
+  const handleGeneratePrice = async (dealId, productIndex) => {
+    const deal = dealsToShow.find((d) => d.id === dealId);
+    const intentScore = deal.intent_score;
+    if (!intentScore) {
+      setIntentScore("");
+      triggerRef.current[dealId]?.click();
+      return;
+    }
+    try {
+      const response = await fetch("http://127.0.0.1:5000/get_discount", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ intent_score: intentScore }),
+      });
+
+      if (!response.ok) throw new Error("Network response was not ok");
+
+      const data = await response.json();
+      const suggestedDiscount = data.suggested_discount;
+
+      await fetch("http://127.0.0.1:5000/update_discount", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          deal_id: dealId,
+          product_index: productIndex,
+          discount_value: suggestedDiscount,
+        }),
+      });
+    } catch (error) {
+      toast.error("Failed to fetch or save suggested price:", error);
+      toast.error("Could not get or save the price suggestion.");
+    }
+    fetchData(userEmail);
+  };
+
   const handleGenerateQuote = (dealId) =>
     toast.info("Quote generation feature coming soon!");
 
-  const handleSaveConfiguration = (dealId, productName, optionValues) => {
-    const deal = dealsToShow.find((d) => d.id === dealId);
-    const product = products.find((p) => p.name === productName);
-    const configSummary = optionValues;
-    const config = deal.configurations || [];
-    for (let i = 0; i < deal.products.length; i++) {
-      if (deal.products[i] === productName) {
-        config[i] = configSummary;
-        break;
-      } else {
-        config.push(config[i] || null);
-      }
+  const handleSaveConfiguration = async (dealId, currentConfig) => {
+    const dealIndex = dealsToShow.findIndex((d) => d.id === dealId);
+    console.log(
+      "Saving configuration for deal:",
+      dealId,
+      currentConfig[dealIndex]
+    );
+    console.log(typeof currentConfig[dealIndex]);
+    const { error } = await supabase
+      .from("Deals")
+      .update({ configuration: currentConfig[dealIndex] })
+      .eq("id", dealId);
+    if (error) {
+      console.error("Error saving configurations:", error);
+      toast.error("Failed to save configurations.");
+    } else {
+      toast.success("Configurations saved successfully.");
+      fetchData(userEmail);
     }
   };
 
@@ -263,7 +342,11 @@ export default function PricingPage() {
     return deal.products.reduce((total, productName, index) => {
       const productDetails = products.find((p) => p.name === productName);
       if (!productDetails) return total;
-      const originalPrice = parseFloat(productDetails.price || 0);
+      const originalPrice = calculateOriginalPrice(
+        productName,
+        deal.id,
+        dealConfig
+      );
       const quantity = parseInt(deal.quantity?.[index] || 1, 10);
       const discountStr = String(deal.user_discount?.[index] || "0");
       const discountValue = parseFloat(discountStr.replace("%", ""));
@@ -280,19 +363,19 @@ export default function PricingPage() {
         Manage your on-going deals and pricing strategies here.
       </p>
 
-      <div className="w-full mt-6 rounded-2xl p-6 flex flex-col md:flex-row gap-4 justify-between backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
-        <div className="relative flex-grow md:max-w-md">
+      <div className="w-full mt-6 relative z-[50] rounded-2xl p-6 flex flex-col md:flex-row gap-4 justify-between backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+        <div className="relative  flex-grow md:max-w-md">
           <Input
             placeholder="Search deals by name or title..."
-            value={searchTerm}
+            value={searchTerm ? searchTerm : ""}
             type="text"
             onChange={(e) => {
               setSearchTerm(e.target.value);
               setShowSuggestions(true);
             }}
           />
-          {searchTerm.trim() !== "" && showSuggestions && (
-            <div className="absolute z-100 top-[110%] p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md shadow-lg flex flex-col items-start w-full">
+          {showSuggestions && (
+            <div className="absolute top-[110%] p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md shadow-lg flex flex-col items-start w-full">
               {searchSuggestions.length > 0 ? (
                 searchSuggestions.map((deal) => (
                   <button
@@ -355,7 +438,7 @@ export default function PricingPage() {
         </div>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 -z-[30]">
         {isLoading ? (
           <>
             <SkeletonCard />
@@ -389,6 +472,11 @@ export default function PricingPage() {
                       <Sheet>
                         <SheetTrigger asChild>
                           <Button
+                            disabled={
+                              deal.finalPrice > 0 &&
+                              deal.finalPrice !== null &&
+                              deal.finalPrice !== undefined
+                            }
                             className={`bg-transparent hover:bg-gray-500 cursor-pointer text-gray-700 hover:text-white border border-gray-700 hover:border-transparent dark:border-gray-200 dark:text-gray-100`}
                           >
                             Configure Product
@@ -403,87 +491,44 @@ export default function PricingPage() {
                           {!deal.products || deal.products.length === 0 ? (
                             <p>This deal has no products assigned.</p>
                           ) : (
-                            deal.products.map((productName, index) => {
+                            deal.products.map((productName, productIndex) => {
                               const product = products.find(
                                 (p) => p.name === productName
                               );
                               const price = {};
-                              for (const product1 in deal.products) {
+
+                              for (const product1 of deal.products) {
                                 const product_check = products.find(
                                   (p) => p.name === product1
                                 );
                                 price[product1] = product_check.price;
                               }
-
                               return (
-                                <Card
-                                  key={`${deal.id}-config-${index}`}
-                                  onClick={() => {
-                                    if (open.includes(productName)) {
-                                      setOpen(
-                                        open.filter((o) => o !== productName)
-                                      );
-                                    } else {
-                                      setOpen([...open, productName]);
-                                    }
-                                  }}
-                                  className={`${
-                                    open.includes(productName)
-                                      ? "max-h-full"
-                                      : "h-14"
-                                  } p-4 mx-4 flex flex-col justify-start cursor-pointer items-start gap-4 mb-6 bg-white/10 dark:bg-gray-200/10 border-0 backdrop-blur-sm transition-all duration-300 `}
-                                >
-                                  <CardTitle className="mb-2 flex justify-between w-full">
-                                    <div className="flex items-center">
-                                      <ChevronDown
-                                        className={`inline mr-2 ${
-                                          open.includes(productName)
-                                            ? "rotate-180"
-                                            : "rotate-0"
-                                        } transition-transform cursor-pointer`}
-                                      />
-                                      {productName}
-                                    </div>
-                                    <span>
-                                      {product
-                                        ? `Base Price: ${
-                                            price[productName] || "$"
-                                          }${product.price || 0}
-                                          ${product.billing_cycle || ""}`
-                                        : "N/A"}
-                                    </span>
-                                  </CardTitle>
-                                  <CardContent className="p-2 w-full">
-                                    {product.isConfigurable === false ? (
-                                      <p className="text-slate-500">
-                                        This product is not configurable.
-                                      </p>
-                                    ) : !product.configuration ? (
-                                      <p className="text-slate-500">
-                                        No configuration options available for
-                                        this product. To configure, please
-                                        configure the product in the Configure
-                                        Product Section. Or{" "}
-                                        <Link
-                                          href="/revenueengine/configureproducts"
-                                          className="text-blue-500 underline"
-                                        >
-                                          click here
-                                        </Link>
-                                        .
-                                      </p>
-                                    ) : (
-                                      <ConfigureProduct
-                                        userEmail={userEmail}
-                                        product={product}
-                                        config={product.configuration}
-                                      />
-                                    )}
-                                  </CardContent>
-                                </Card>
+                                <ProductConfigCard
+                                  key={`${deal.id}-${productIndex}`}
+                                  product={product}
+                                  productIndex={productIndex}
+                                  dealIndex={dealsToShow.findIndex(
+                                    (d) => d.id === deal.id
+                                  )}
+                                  index={productIndex}
+                                  dealConfig={dealConfig}
+                                  setDealConfig={setDealConfig}
+                                />
                               );
                             })
                           )}
+                          <SheetFooter className="w-full justify-center items-center">
+                            <Button
+                              type="submit"
+                              className="bg-transparent hover:bg-blue-500/10 text-blue-700 border border-blue-700 w-xl"
+                              onClick={() => {
+                                handleSaveConfiguration(deal.id, dealConfig);
+                              }}
+                            >
+                              Save Configurations
+                            </Button>
+                          </SheetFooter>
                         </SheetContent>
                       </Sheet>
                     </div>
@@ -510,7 +555,11 @@ export default function PricingPage() {
                           const productDetails = products.find(
                             (p) => p.name === productName
                           );
-                          const originalPrice = productDetails?.price || 0;
+                          const originalPrice = calculateOriginalPrice(
+                            productName,
+                            deal.id,
+                            dealConfig
+                          );
                           const quantity = deal.quantity?.[index] || 1;
                           const discountStr = String(
                             deal.user_discount?.[index] || "0"
@@ -529,11 +578,20 @@ export default function PricingPage() {
                                 {productDetails
                                   ? `${
                                       productDetails.currency || "$"
-                                    }${parseFloat(originalPrice).toFixed(2)}`
+                                    }${calculateOriginalPrice(
+                                      productName,
+                                      deal.id,
+                                      dealConfig
+                                    ).toFixed(2)}`
                                   : "N/A"}
                               </TableCell>
                               <TableCell>
                                 <Input
+                                  disabled={
+                                    deal.finalPrice > 0 &&
+                                    deal.finalPrice !== null &&
+                                    deal.finalPrice !== undefined
+                                  }
                                   value={deal.user_discount?.[index] || "0"}
                                   onChange={(e) =>
                                     handleChange(
@@ -548,6 +606,11 @@ export default function PricingPage() {
                               </TableCell>
                               <TableCell>
                                 <Input
+                                  disabled={
+                                    deal.finalPrice > 0 &&
+                                    deal.finalPrice !== null &&
+                                    deal.finalPrice !== undefined
+                                  }
                                   value={deal.discount?.[index] || "0%"}
                                   readOnly
                                   className="w-24 bg-slate-100 dark:bg-slate-700"
@@ -556,6 +619,11 @@ export default function PricingPage() {
                               <TableCell>
                                 <Input
                                   value={deal.quantity?.[index] || 1}
+                                  disabled={
+                                    deal.finalPrice > 0 &&
+                                    deal.finalPrice !== null &&
+                                    deal.finalPrice !== undefined
+                                  }
                                   type="number"
                                   min="1"
                                   onChange={(e) =>
@@ -577,14 +645,69 @@ export default function PricingPage() {
                                   : "N/A"}
                               </TableCell>
                               <TableCell className={`flex gap-2`}>
-                                <Button
-                                  onClick={() => handleGeneratePrice(deal.id)}
-                                  className={
-                                    "bg-transparent hover:bg-blue-500/10 text-blue-700 hover:text-white border border-blue-700 hover:border-transparent"
-                                  }
-                                >
-                                  Suggest Price
-                                </Button>
+                                <div className="w-full relative">
+                                  <Button
+                                    onClick={() => {
+                                      handleGeneratePrice(deal.id, index);
+                                    }}
+                                    className={
+                                      "bg-transparent hover:bg-blue-500/10 text-blue-700 hover:text-white border border-blue-700 hover:border-transparent"
+                                    }
+                                    disabled={
+                                      deal.finalPrice > 0 &&
+                                      deal.finalPrice !== null &&
+                                      deal.finalPrice !== undefined
+                                    }
+                                  >
+                                    Suggest Price
+                                  </Button>
+                                  <Dialog>
+                                    <DialogTrigger asChild>
+                                      <Button
+                                        ref={(element) => {
+                                          triggerRef.current[deal.id] = element;
+                                        }}
+                                        className="hidden"
+                                      >
+                                        Hidden trigger
+                                      </Button>
+                                    </DialogTrigger>
+
+                                    <DialogContent className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6 md:min-w-[50vw] min-w-screen">
+                                      <DialogTitle>
+                                        Missing Deal Intent Score for{" "}
+                                        {deal.name}
+                                      </DialogTitle>
+                                      <DialogDescription className={`flex`}>
+                                        <Label>
+                                          Enter the Intent score of the deal to
+                                          generate the Discount Suggestion:
+                                        </Label>
+                                        <Input
+                                          value={intentScore || ""}
+                                          placeholder="Enter a value between 1- 100"
+                                          onChange={(e) =>
+                                            setIntentScore(e.target.value)
+                                          }
+                                        />
+                                      </DialogDescription>
+                                      <DialogFooter>
+                                        <Button
+                                          onClick={() => {
+                                            handleIntentChange(
+                                              deal.id,
+                                              intentScore,
+                                              index
+                                            );
+                                          }}
+                                          variant="outline"
+                                        >
+                                          Generate Price
+                                        </Button>
+                                      </DialogFooter>
+                                    </DialogContent>
+                                  </Dialog>
+                                </div>
                               </TableCell>
                             </TableRow>
                           );
@@ -601,22 +724,50 @@ export default function PricingPage() {
                   <div className="flex gap-2 flex-wrap justify-end">
                     <Button
                       variant="outline"
+                      className="cursor-pointer"
+                      disabled={
+                        deal.finalPrice > 0 &&
+                        deal.finalPrice !== null &&
+                        deal.finalPrice !== undefined
+                      }
                       onClick={() => handleSave(deal.id)}
                     >
                       Save Changes
                     </Button>
-                    {/* <Button
-                      variant="destructive"
-                      onClick={() => handleReset(deal.id)}
-                    >
-                      Reset
-                    </Button> */}
-                    <Button
-                      onClick={() => handleApprove(deal.id)}
-                      className="bg-transparent hover:bg-green-100 text-green-700 hover:text-white border border-green-700 hover:border-transparent"
-                    >
-                      Approve & Set Final Price
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          disabled={
+                            deal.finalPrice > 0 &&
+                            deal.finalPrice !== null &&
+                            deal.finalPrice !== undefined
+                          }
+                          className="bg-transparent cursor-pointer hover:bg-green-100 text-green-700 hover:text-green-800 border border-green-700 hover:border-transparent"
+                        >
+                          Approve & Set Final Price
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6 md:min-w-[50vw] min-w-screen">
+                        <div className="p-4">
+                          <h2 className="text-lg font-bold mb-4">
+                            Confirm Approval
+                          </h2>
+                          <p>
+                            Are you sure you want to approve this deal? After
+                            you confirm the details of the deal cannot be
+                            changed anymore.
+                          </p>
+                        </div>
+                        <DialogFooter>
+                          <Button
+                            onClick={() => handleApprove(deal.id)}
+                            className="bg-green-500 text-white hover:bg-green-600"
+                          >
+                            Confirm
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </CardFooter>
               </Card>
