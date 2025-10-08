@@ -16,6 +16,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
 import { supabase } from "@/utils/supabase/client";
+import { Toggle } from "@/components/ui/toggle";
+import { Input } from "@/components/ui/input";
 
 export default function TimeOffPage() {
   const [features, setFeatures] = useState([]);
@@ -24,6 +26,8 @@ export default function TimeOffPage() {
   const [date, setDate] = useState();
   const [employee, setEmployee] = useState(null);
   const [appliedLeaves, setAppliedLeaves] = useState([]);
+  const [isHalfDay, setIsHalfDay] = useState(false);
+  const [duration, setDuration] = useState("");
 
   const [type, setType] = useState(null);
 
@@ -157,11 +161,36 @@ export default function TimeOffPage() {
       email: employee.email,
     };
 
-    const updatedApplyLeave = [...(empData.apply_leave || []), newLeave];
+    const { data: company, error: companyError } = await supabase
+      .from("HRMS")
+      .select("*")
+      .eq("id", company.companyId)
+      .single();
+
+    if (companyError) {
+      console.error("Error fetching company:", companyError);
+      return;
+    }
+
+    const updatedApplyLeave = [...(company.apply_leave || []), newLeave];
+
+    const { error: companyUpdateError } = await supabase
+      .from("HRMS")
+      .update({ apply_leave: updatedApplyLeave })
+      .eq("id", company.id)
+      .single();
+
+    if (companyUpdateError) {
+      console.error("Error updating company leave:", companyUpdateError);
+      toast.error("Error adding leave to company, try again");
+      return;
+    }
+
+    const updatedApply = [...(empData.apply_leave || []), newLeave];
 
     const { error: updateError } = await supabase
       .from("Employees")
-      .update({ apply_leave: updatedApplyLeave })
+      .update({ apply_leave: updatedApply })
       .eq("email", employee.email);
 
     if (updateError) {
@@ -171,50 +200,6 @@ export default function TimeOffPage() {
     }
 
     toast.success("Leave applied successfully");
-    setReason("");
-    setDate(undefined);
-    setOpen(false);
-  };
-
-  // 🔹 Add Company Leave (for admin)
-  const handleAddLeave = async () => {
-    if (!date?.from || !reason) {
-      toast.error("Please fill all fields");
-      return;
-    }
-
-    const newLeave = {
-      id: Math.random().toString(36).substring(2, 9),
-      title: reason,
-      start: date.from,
-      end: date.to || date.from,
-    };
-
-    const { data, error } = await supabase
-      .from("Employees")
-      .select("leave")
-      .eq("email", employee.email)
-      .single();
-
-    if (error) {
-      console.error("Error fetching leaves:", error);
-      return;
-    }
-
-    const updatedLeaves = [...(data.leave || []), newLeave];
-
-    const { error: updateError } = await supabase
-      .from("Employees")
-      .update({ leave: updatedLeaves })
-      .eq("email", employee.email);
-
-    if (updateError) {
-      console.error("Error updating leave:", updateError);
-      toast.error("Error adding leave");
-      return;
-    }
-
-    toast.success("Leave added successfully");
     setReason("");
     setDate(undefined);
     setOpen(false);
@@ -283,6 +268,31 @@ export default function TimeOffPage() {
                   className="rounded-md border p-2"
                 />
               </div>
+              <div className="flex items-center justify-between rounded-lg border bg-muted/40 p-3">
+                <Label className="text-sm font-medium">Leave Type</Label>
+                <Toggle
+                  pressed={isHalfDay}
+                  onPressedChange={setIsHalfDay}
+                  className={`transition-all duration-200 ${
+                    isHalfDay
+                      ? "bg-gradient-to-r from-blue-500 to-teal-400 text-white shadow-md"
+                      : "bg-gray-100 hover:bg-gray-200"
+                  }`}
+                >
+                  {isHalfDay ? "Half Day" : "Full Day"}
+                </Toggle>
+              </div>
+              {isHalfDay && (
+                <div className="grid gap-3">
+                  <Label htmlFor="duration">Duration</Label>
+                  <Input
+                    id="duration"
+                    placeholder="Enter Duration"
+                    value={duration}
+                    onChange={(e) => setDuration(e.target.value)}
+                  />
+                </div>
+              )}
               <div className="grid gap-3">
                 <Label htmlFor="sheet-reason">Reason</Label>
                 <Textarea
