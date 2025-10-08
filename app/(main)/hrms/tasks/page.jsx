@@ -86,11 +86,6 @@ export default function MyTasksPage() {
       console.log(sessionJSON?.email);
     };
 
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) {
-      redirect("/");
-    }
-
     getSession();
   }, []);
 
@@ -120,14 +115,12 @@ export default function MyTasksPage() {
     fetchEmployeeTasks();
   }, [userEmail]);
 
-  // 🔹 Filter and Search
   const filteredTasks = tasks.filter(
     (t) =>
       (filter === "All" || t.status === filter) &&
       t.name?.toLowerCase()?.includes(search.toLowerCase())
   );
 
-  // 🔹 Add a new task
   const handleAddTask = async () => {
     if (!newTask.name.trim()) return;
 
@@ -152,7 +145,6 @@ export default function MyTasksPage() {
     });
   };
 
-  // 🔹 Mark a task completed
   const handleMarkCompleted = async (taskIndex) => {
     const updatedTasks = tasks.map((t, i) =>
       i === taskIndex ? { ...t, status: "Completed" } : t
@@ -168,9 +160,7 @@ export default function MyTasksPage() {
   };
 
   return (
-    // <div className="min-h-screen bg-slate-50 p-6  ">
     <div className="max-w-6xl mx-auto space-y-6 min-h-screen">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">My Tasks</h1>
@@ -247,7 +237,6 @@ export default function MyTasksPage() {
                 </SelectContent>
               </Select>
 
-              {/* Status */}
               <Select
                 value={newTask.status}
                 onValueChange={(value) =>
@@ -286,7 +275,6 @@ export default function MyTasksPage() {
                 </SelectContent>
               </Select>
 
-              {/* Due Date */}
               <Popover open={dueDateOpen} onOpenChange={setDueDateOpen}>
                 <PopoverTrigger asChild>
                   <Button
@@ -309,7 +297,6 @@ export default function MyTasksPage() {
                         ...newTask,
                         dueDate: date?.toISOString(),
                       });
-                      setDueDateOpen(false); // Close popover after selecting a date
                     }}
                   />
                 </PopoverContent>
@@ -325,7 +312,6 @@ export default function MyTasksPage() {
         </Sheet>
       </div>
 
-      {/* Stats Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card
           className={
@@ -374,7 +360,6 @@ export default function MyTasksPage() {
         </Card>
       </div>
 
-      {/* Search + Filters */}
       <Card
         className={
           "backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 bg-white p-4"
@@ -408,7 +393,6 @@ export default function MyTasksPage() {
         </div>
       </Card>
 
-      {/* Task Table */}
       <Card
         className={
           "backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 bg-white"

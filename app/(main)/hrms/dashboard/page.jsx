@@ -41,7 +41,6 @@ import { supabase } from "@/utils/supabase/client";
 import { toast } from "react-toastify";
 
 export default function EmployeeDashboard() {
-  // ---------- STATES ----------
   const [hour, setHour] = useState(0);
   const [minute, setMinute] = useState(0);
   const [isWorking, setIsWorking] = useState(false);
@@ -52,7 +51,6 @@ export default function EmployeeDashboard() {
   const [myTasks, setMyTasks] = useState([]);
   const [chartData, setChartData] = useState([]);
 
-  // ---------- FETCH EMPLOYEE DATA ----------
   useEffect(() => {
     const emp = JSON.parse(localStorage.getItem("employee"));
     if (!emp) return;
@@ -64,7 +62,6 @@ export default function EmployeeDashboard() {
     }
   }, []);
 
-  // ---------- FETCH ATTENDANCE ----------
   const fetchAttendance = async (email) => {
     const { data, error } = await supabase
       .from("Employees")
@@ -94,7 +91,6 @@ export default function EmployeeDashboard() {
     generateWeeklyChart(attendance);
   };
 
-  // ---------- FETCH TASKS ----------
   const fetchTasks = async (email) => {
     const { data, error } = await supabase
       .from("Employees")
@@ -110,7 +106,6 @@ export default function EmployeeDashboard() {
     setMyTasks(data?.tasks || []);
   };
 
-  // ---------- START/STOP WORK ----------
   const HandleStartWork = async () => {
     if (!employee?.email) {
       toast.error("Employee data not found");
@@ -121,14 +116,12 @@ export default function EmployeeDashboard() {
     const currentTime = new Date();
 
     if (!isWorking) {
-      // ✅ START WORK
       setStartTime(currentTime);
       setIsWorking(true);
       localStorage.setItem("isWorking", "true");
       localStorage.setItem("startTime", currentTime.toISOString());
       toast.info("Work started");
     } else {
-      // ✅ STOP WORK
       if (!startTime) return;
 
       const endTime = new Date();
@@ -150,7 +143,6 @@ export default function EmployeeDashboard() {
       setAttendanceDict(updatedAttendance);
       localStorage.setItem("attendanceDict", JSON.stringify(updatedAttendance));
 
-      // ✅ Always update database (both first mark & subsequent stops)
       const { error } = await supabase
         .from("Employees")
         .update({ attendance: updatedAttendance })
@@ -170,7 +162,6 @@ export default function EmployeeDashboard() {
     }
   };
 
-  // ---------- TIMER LOOP ----------
   useEffect(() => {
     let timer;
 
@@ -191,7 +182,6 @@ export default function EmployeeDashboard() {
     return () => clearInterval(timer);
   }, [isWorking]);
 
-  // ---------- LOAD ATTENDANCE ON MOUNT ----------
   useEffect(() => {
     const storedAttendance = JSON.parse(localStorage.getItem("attendanceDict"));
     const storedIsWorking = localStorage.getItem("isWorking") === "true";
@@ -208,7 +198,6 @@ export default function EmployeeDashboard() {
       }
     }
 
-    // ✅ Restore active work session after reload
     if (storedIsWorking && storedStartTime) {
       setIsWorking(true);
       setStartTime(new Date(storedStartTime));
@@ -224,12 +213,10 @@ export default function EmployeeDashboard() {
     if (employee?.email) fetchAttendance(employee.email);
   }, [employee]);
 
-  // ---------- WEEKLY CHART GENERATOR ----------
   const generateWeeklyChart = (attendanceObj) => {
     const today = new Date();
     const weekData = [];
 
-    // Generate past 7 days
     for (let i = 6; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(today.getDate() - i);
@@ -242,18 +229,15 @@ export default function EmployeeDashboard() {
     setChartData(weekData);
   };
 
-  // ---------- CALCULATED STATS ----------
   const totalHours = Object.values(attendanceDict).reduce(
     (sum, h) => sum + h,
     0
   );
   const completedTasks = myTasks.filter((t) => t.status === "Completed").length;
 
-  // ---------- RENDER ----------
   return (
     <div className="min-h-screen">
       <div className="w-full mx-auto grid grid-cols-12 gap-6">
-        {/* SIDEBAR */}
         <aside className="col-span-12 md:col-span-4 lg:col-span-3 backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 bg-white rounded-2xl p-4 shadow-sm">
           <div className="flex items-center gap-4">
             <Avatar>
@@ -291,7 +275,6 @@ export default function EmployeeDashboard() {
           </Card>
         </aside>
 
-        {/* MAIN */}
         <main className="col-span-12 md:col-span-8 lg:col-span-9">
           <div className="flex items-center justify-between mb-6">
             <div className="relative w-full">
@@ -310,7 +293,6 @@ export default function EmployeeDashboard() {
             </div>
           </div>
 
-          {/* CARDS */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <Card
               className={
@@ -391,7 +373,6 @@ export default function EmployeeDashboard() {
             </Card>
           </div>
 
-          {/* WEEKLY PRODUCTIVITY */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
             <Card className="mb-6 lg:col-span-2 backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 bg-white">
               <CardHeader>
@@ -433,7 +414,6 @@ export default function EmployeeDashboard() {
               </CardContent>
             </Card>
 
-            {/* WORK TIMER */}
             <Card className="mb-6 backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 bg-white">
               <CardHeader>
                 <CardTitle>Working Time</CardTitle>
@@ -458,7 +438,6 @@ export default function EmployeeDashboard() {
             </Card>
           </div>
 
-          {/* TASKS TABLE */}
           <Card
             className={
               "backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 bg-white"
@@ -469,30 +448,28 @@ export default function EmployeeDashboard() {
               <CardDescription>Tasks assigned to you</CardDescription>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-[260px]">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Task</TableHead>
-                      <TableHead>Due Date</TableHead>
-                      <TableHead>Status</TableHead>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Task</TableHead>
+                    <TableHead>Due Date</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {myTasks.map((t, i) => (
+                    <TableRow key={i}>
+                      <TableCell className="font-medium">{t.name}</TableCell>
+                      <TableCell>
+                        {t.due_date
+                          ? new Date(t.due_date).toLocaleDateString()
+                          : "-"}
+                      </TableCell>
+                      <TableCell>{t.status}</TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {myTasks.map((t, i) => (
-                      <TableRow key={i}>
-                        <TableCell className="font-medium">{t.name}</TableCell>
-                        <TableCell>
-                          {t.due_date
-                            ? new Date(t.due_date).toLocaleDateString()
-                            : "-"}
-                        </TableCell>
-                        <TableCell>{t.status}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </ScrollArea>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         </main>
