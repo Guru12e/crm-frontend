@@ -81,12 +81,7 @@ export default function Layout({ children }) {
   }, [darkMode]);
 
   return (
-    <div
-      className={cn(
-        "min-h-screen bg-gradient-to-r from-teal-800/10 to-sky-500/10 dark:from-teal-900 dark:to-sky-700",
-        darkMode && "dark"
-      )}
-    >
+    <div className={cn("min-h-screen", darkMode && "dark")}>
       {mobileSidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 sm:hidden"
@@ -101,7 +96,7 @@ export default function Layout({ children }) {
           "hidden sm:block"
         )}
       >
-        <div className="flex h-full flex-col backdrop-blur-xl bg-white/40 dark:bg-sky-900/90 border-r border-teal/30 dark:border-sky-700/50">
+        <div className="flex h-full flex-col backdrop-blur-xl">
           <div
             className={`flex h-16 items-center ${
               sidebarOpen ? "justify-between" : "justify-center"
@@ -139,9 +134,7 @@ export default function Layout({ children }) {
                   <div
                     className={cn(
                       "flex items-center cursor-pointer rounded-lg px-2 py-2 text-sm font-medium transition-all",
-                      isActive
-                        ? "bg-gradient-to-r from-teal-500 to-sky-500 text-white "
-                        : "text-slate-700 dark:text-slate-300 hover:bg-teal/50 dark:hover:bg-sky-800/50"
+                      isActive ? "bg-primary" : "bg-accent"
                     )}
                     onClick={() => handleItemClick(item)}
                   >
@@ -219,7 +212,7 @@ export default function Layout({ children }) {
           mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex h-full flex-col backdrop-blur-xl bg-white dark:bg-sky-900/90 border-r border-white/30 dark:border-slate-700/50">
+        <div className="flex h-full flex-col backdrop-blur-xl bg-white">
           <div className="flex h-16 items-center justify-between px-4">
             <span className="text-xl font-bold bg-gradient-to-r from-sky-700 to-teal-500 dark:from-teal-200 dark:to-sky-300 bg-clip-text text-transparent">
               GTM Engine
@@ -239,81 +232,79 @@ export default function Layout({ children }) {
           </div>
 
           <nav className="flex-1 space-y-1 px-2 py-4">
-            {navigation
-              // .filter((item) => allowedPages.includes(item.key))
-              .map((item) => {
-                const isActive = location === item.href;
-                const hasSubpages = item.subpages && item.subpages.length > 0;
-                const isExpanded = expandedItems.includes(item.name);
-                item.subpages &&
-                  item.subpages.some((sub) => location === sub.href);
+            {navigationItems.map((item) => {
+              const isActive = location === item.href;
+              const hasSubpages = item.subpages && item.subpages.length > 0;
+              const isExpanded = expandedItems.includes(item.name);
+              item.subpages &&
+                item.subpages.some((sub) => location === sub.href);
 
-                return (
-                  <div key={item.name}>
-                    <div
-                      className={cn(
-                        "flex items-center cursor-pointer rounded-lg px-2 py-2 text-sm font-medium transition-all",
-                        isActive
-                          ? "bg-gradient-to-r from-teal-500 to-sky-500 text-white "
-                          : "text-slate-700 dark:text-slate-300 hover:bg-teal/50 dark:hover:bg-sky-800/50"
-                      )}
-                      onClick={() => handleItemClick(item)}
+              return (
+                <div key={item.name}>
+                  <div
+                    className={cn(
+                      "flex items-center cursor-pointer rounded-lg px-2 py-2 text-sm font-medium transition-all",
+                      isActive
+                        ? "bg-gradient-to-r from-teal-500 to-sky-500 text-white "
+                        : "text-slate-700 dark:text-slate-300 hover:bg-teal/50 dark:hover:bg-sky-800/50"
+                    )}
+                    onClick={() => handleItemClick(item)}
+                  >
+                    <Link
+                      href={item.href}
+                      className="group flex flex-1 items-center"
+                      onClick={(e) => {
+                        if (hasSubpages) {
+                          e.preventDefault();
+                        }
+                      }}
                     >
-                      <Link
-                        href={item.href}
-                        className="group flex flex-1 items-center"
-                        onClick={(e) => {
-                          if (hasSubpages) {
-                            e.preventDefault();
-                          }
-                        }}
+                      <div
+                        className={cn(
+                          "h-5 w-5 flex-shrink-0",
+                          isActive ? "text-white" : "text-slate-500"
+                        )}
                       >
-                        <div
-                          className={cn(
-                            "h-5 w-5 flex-shrink-0",
-                            isActive ? "text-white" : "text-slate-500"
-                          )}
-                        >
-                          {item.icon}
-                        </div>
-                        <span className="ml-3 truncate">{item.name}</span>
-                      </Link>
-                      {hasSubpages && (
-                        <div className="p-1">
-                          {isExpanded ? (
-                            <ChevronDown className="h-4 w-4" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4" />
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {hasSubpages && isExpanded && (
-                      <div className="ml-2 mt-1 space-y-1">
-                        {item.subpages.map((subpage) => (
-                          <Link
-                            key={subpage.href}
-                            href={subpage.href}
-                            onClick={() => setMobileSidebarOpen(false)}
-                            className={cn(
-                              "block rounded-md px-1 py-2 text-sm transition-all",
-                              location === subpage.href
-                                ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                                : "text-slate-600 dark:text-slate-400 hover:bg-white/30 dark:hover:bg-slate-800/30"
-                            )}
-                          >
-                            <span className="flex items-center gap-2">
-                              {subpage.icon}
-                              {subpage.name}
-                            </span>
-                          </Link>
-                        ))}
+                        {item.icon}
+                      </div>
+                      <span className="ml-3 truncate">{item.name}</span>
+                    </Link>
+                    {hasSubpages && (
+                      <div className="p-1">
+                        {isExpanded ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )}
                       </div>
                     )}
                   </div>
-                );
-              })}
+
+                  {hasSubpages && isExpanded && (
+                    <div className="ml-2 mt-1 space-y-1">
+                      {item.subpages.map((subpage) => (
+                        <Link
+                          key={subpage.href}
+                          href={subpage.href}
+                          onClick={() => setMobileSidebarOpen(false)}
+                          className={cn(
+                            "block rounded-md px-1 py-2 text-sm transition-all",
+                            location === subpage.href
+                              ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                              : "text-slate-600 dark:text-slate-400 hover:bg-white/30 dark:hover:bg-slate-800/30"
+                          )}
+                        >
+                          <span className="flex items-center gap-2">
+                            {subpage.icon}
+                            {subpage.name}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </nav>
         </div>
       </div>
@@ -325,7 +316,7 @@ export default function Layout({ children }) {
           "max-sm:ml-0"
         )}
       >
-        <div className="sticky top-0 z-40 backdrop-blur-xl bg-white/40 dark:bg-sky-900/90 border-b border-teal/30 dark:border-sky-700/50">
+        <div className="sticky top-0 z-40 backdrop-blur-xl">
           <div className="flex h-16 items-center justify-end px-4 sm:px-6">
             <Button
               variant="ghost"
@@ -370,7 +361,7 @@ export default function Layout({ children }) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="hidden sm:flex items-center space-x-2 hover:bg-white/30 dark:hover:bg-sky-800/50 whitespace-nowrap"
+                className="hidden sm:flex items-center space-x- whitespace-nowrap"
               >
                 <HelpCircle className="h-4 w-4 cursor-pointer" />
                 <span className="hidden md:inline cursor-pointer">

@@ -233,6 +233,7 @@ export default function EmployeeDashboard() {
     (sum, h) => sum + h,
     0
   );
+
   const completedTasks = myTasks.filter((t) => t.status === "Completed").length;
 
   return (
