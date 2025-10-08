@@ -78,7 +78,7 @@ export default function NotificationsPage() {
   };
 
   return (
-    <Card className="shadow-sm backdrop-blur-md border rounded-2xl border-slate-200/50 dark:bg-transparent dark:border-white/20 mb-6 ">
+    <Card className="shadow-sm backdrop-blur-md border rounded-2xl border-slate-200/50 dark:bg-white/10  dark:border-white/20 mb-6 ">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-xl font-semibold flex items-center gap-2">
           <Bell className="w-5 h-5 text-indigo-600" />
@@ -89,7 +89,7 @@ export default function NotificationsPage() {
       <Separator />
 
       <CardContent>
-        <ScrollArea className="h-[70vh] pr-4">
+        <ScrollArea className="h-[70vh] pr-4 ">
           {notifications.length > 0 ? (
             <div className="space-y-4">
               {notifications.map((n) => (
@@ -101,7 +101,7 @@ export default function NotificationsPage() {
                       : "bg-gray-50 border-gray-200"
                   }`}
                 >
-                  <div className="flex justify-between items-start">
+                  <div className="flex justify-between items-start ">
                     <div className="flex items-center gap-3">
                       {getIcon(n.type)}
                       <div>
