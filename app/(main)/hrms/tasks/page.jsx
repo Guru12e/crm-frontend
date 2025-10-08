@@ -378,7 +378,7 @@ export default function MyTasksPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center flex-wrap gap-2">
             {["All", "Open", "In Progress", "Review", "Completed"].map((f) => (
               <Button
                 key={f}
@@ -408,71 +408,69 @@ export default function MyTasksPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[420px]">
-            <Table>
-              <TableHeader>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Task</TableHead>
+                <TableHead>Due Date</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Priority</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredTasks.length === 0 ? (
                 <TableRow>
-                  <TableHead>Task</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Priority</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableCell
+                    colSpan={5}
+                    className="text-center text-muted-foreground py-10"
+                  >
+                    No tasks found.
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredTasks.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={5}
-                      className="text-center text-muted-foreground py-10"
-                    >
-                      No tasks found.
+              ) : (
+                filteredTasks.map((task, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="font-medium">{task.name}</TableCell>
+                    <TableCell>{task.dueDate}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          task.status === "Completed"
+                            ? "bg-green-100 text-green-700"
+                            : task.status === "In Progress"
+                            ? "bg-blue-100 text-blue-700"
+                            : task.status === "Review"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-slate-100 text-slate-700"
+                        }`}
+                      >
+                        {task.status}
+                      </span>
+                    </TableCell>
+                    <TableCell>{task.priority}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button size="sm" variant="outline">
+                          View
+                        </Button>
+                        {task.status !== "Completed" && (
+                          <Button
+                            size="sm"
+                            onClick={() => handleMarkCompleted(index)}
+                            className="flex items-center gap-1 border border-green-600 text-green-600 bg-white hover:bg-green-50 hover:text-green-70"
+                          >
+                            <CheckSquare size={14} />
+                            Done
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
-                ) : (
-                  filteredTasks.map((task, index) => (
-                    <TableRow key={index}>
-                      <TableCell className="font-medium">{task.name}</TableCell>
-                      <TableCell>{task.dueDate}</TableCell>
-                      <TableCell>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            task.status === "Completed"
-                              ? "bg-green-100 text-green-700"
-                              : task.status === "In Progress"
-                              ? "bg-blue-100 text-blue-700"
-                              : task.status === "Review"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-slate-100 text-slate-700"
-                          }`}
-                        >
-                          {task.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>{task.priority}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button size="sm" variant="outline">
-                            View
-                          </Button>
-                          {task.status !== "Completed" && (
-                            <Button
-                              size="sm"
-                              onClick={() => handleMarkCompleted(index)}
-                              className="flex items-center gap-1 border border-green-600 text-green-600 bg-white hover:bg-green-50 hover:text-green-70"
-                            >
-                              <CheckSquare size={14} />
-                              Done
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </ScrollArea>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>
