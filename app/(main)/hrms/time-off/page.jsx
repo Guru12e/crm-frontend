@@ -30,6 +30,7 @@ export default function TimeOffPage() {
   const [isHalfDay, setIsHalfDay] = useState(false);
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [loading, setLoading] = useState(false);
   const [type, setType] = useState(null);
 
   useEffect(() => {
@@ -127,6 +128,7 @@ export default function TimeOffPage() {
       toast.error("Please fill all fields");
       return;
     }
+    setLoading(true);
     const companyId =
       employee?.company_id || JSON.parse(localStorage.getItem("company_id"));
     if (!companyId) {
@@ -214,7 +216,9 @@ export default function TimeOffPage() {
     setStartTime("");
     setEndTime("");
     setOpen(false);
+    setLoading(false);
   };
+  if (loading) return <p className="p-6">Loading...</p>;
 
   return (
     <div className="w-full">

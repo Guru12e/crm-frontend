@@ -13,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
   TableHeader,
@@ -55,22 +54,22 @@ import {
 
 export default function MyTasksPage() {
   const [tasks, setTasks] = useState([]);
-  const [todoList, setTodoList] = useState([]); // ✅ To-do list state
-  const [newTodo, setNewTodo] = useState(""); // ✅ Input for new todo
+  const [todoList, setTodoList] = useState([]);
+  const [newTodo, setNewTodo] = useState("");
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
   const [session, setSession] = useState(null);
   const [userEmail, setUserEmail] = useState("");
+  const [loading, setLoading] = useState(false);
   const [dueDateOpen, setDueDateOpen] = useState(false);
   const [newTask, setNewTask] = useState({
     name: "",
     description: "",
     dueDate: "",
-    status: "Open",
+    status: "In-progress",
     priority: "Medium",
   });
 
-  // Session handling
   useEffect(() => {
     const getSession = () => {
       const sessionJSON = JSON.parse(localStorage.getItem("employee"));
@@ -111,16 +110,15 @@ export default function MyTasksPage() {
     fetchEmployeeData();
   }, [userEmail]);
 
-  // Filtered tasks
   const filteredTasks = tasks.filter(
     (t) =>
       (filter === "All" || t.status === filter) &&
       t.name?.toLowerCase()?.includes(search.toLowerCase())
   );
 
-  // Add new task
   const handleAddTask = async () => {
     if (!newTask.name.trim()) return;
+    setLoading(true);
 
     const updatedTasks = [...tasks, newTask];
     setTasks(updatedTasks);
@@ -136,13 +134,14 @@ export default function MyTasksPage() {
       name: "",
       description: "",
       dueDate: "",
-      status: "Open",
+      status: "In-progress",
       priority: "Medium",
     });
+    setLoading(false);
   };
 
-  // Mark task completed
   const handleMarkCompleted = async (taskIndex) => {
+    console.log("Marking task as completed:", taskIndex);
     const updatedTasks = tasks.map((t, i) =>
       i === taskIndex ? { ...t, status: "Completed" } : t
     );
@@ -156,7 +155,6 @@ export default function MyTasksPage() {
     if (error) console.error("Error updating task status:", error);
   };
 
-  // ✅ Add new to-do item
   const handleAddTodo = async () => {
     if (!newTodo.trim()) return;
 
@@ -172,7 +170,6 @@ export default function MyTasksPage() {
     if (error) console.error("Error adding todo:", error);
   };
 
-  // ✅ Toggle to-do complete/incomplete
   const handleToggleTodo = async (index) => {
     const updatedTodoList = todoList.map((todo, i) =>
       i === index ? { ...todo, completed: !todo.completed } : todo
@@ -199,6 +196,7 @@ export default function MyTasksPage() {
 
     if (error) console.error("Error deleting todo:", error);
   };
+  if (loading) return <p className="p-6">Loading...</p>;
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 min-h-screen">
@@ -299,16 +297,16 @@ export default function MyTasksPage() {
       </div>
 
       {/* --- TASK SUMMARY CARDS --- */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {[
-          {
-            label: "Open Tasks",
-            count: tasks.filter((t) => t.status === "Open").length,
-            icon: <Clock className="text-slate-500" />,
-          },
+          //   {
+          //     label: "Open Tasks",
+          //     count: tasks.filter((t) => t.status === "Open").length,
+          //     icon: <Clock className="text-slate-500" />,
+          //   },
           {
             label: "In Progress",
-            count: tasks.filter((t) => t.status === "In Progress").length,
+            count: tasks.filter((t) => t.status === "In-progress").length,
             icon: <Clock className="text-blue-500" />,
           },
           {
