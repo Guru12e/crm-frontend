@@ -18,6 +18,8 @@ import { toast } from "react-toastify";
 import { supabase } from "@/utils/supabase/client";
 import { Toggle } from "@/components/ui/toggle";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 export default function TimeOffPage() {
   const [features, setFeatures] = useState([]);
@@ -27,19 +29,16 @@ export default function TimeOffPage() {
   const [employee, setEmployee] = useState(null);
   const [appliedLeaves, setAppliedLeaves] = useState([]);
   const [isHalfDay, setIsHalfDay] = useState(false);
-  const [duration, setDuration] = useState("");
-
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [type, setType] = useState(null);
 
-  // 🔹 Get employee details from localStorage
   useEffect(() => {
     const emp = JSON.parse(localStorage.getItem("employee"));
     const userType = localStorage.getItem("type");
     setEmployee(emp);
     setType(userType);
   }, []);
-
-  // 🔹 Fetch employee's leaves and applied leaves
   useEffect(() => {
     const fetchLeaves = async () => {
       if (!employee?.email) return;
@@ -58,8 +57,8 @@ export default function TimeOffPage() {
       const formattedFeatures = [];
 
       data?.leave.forEach((feature) => {
-        const startDate = new Date(feature.start);
-        const endDate = new Date(feature.end);
+        const startDate = new Date(feature.start).toISOString().split("T")[0];
+        const endDate = new Date(feature.end).toISOString().split("T")[0];
         for (
           let d = new Date(startDate);
           d <= endDate;
@@ -68,8 +67,8 @@ export default function TimeOffPage() {
           formattedFeatures.push({
             id: feature.id || Math.random().toString(36).substring(2, 9),
             name: feature.reason || feature.title,
-            startAt: new Date(d),
-            endAt: new Date(d),
+            startAt: new Date(d).toISOString().split("T")[0],
+            endAt: new Date(d).toISOString().split("T")[0],
             holiday: true,
             status: {
               id: 1,
@@ -86,8 +85,8 @@ export default function TimeOffPage() {
       });
 
       data?.apply_leave.forEach((feature) => {
-        const startDate = new Date(feature.start);
-        const endDate = new Date(feature.end);
+        const startDate = new Date(feature.start).toISOString().split("T")[0];
+        const endDate = new Date(feature.end).toISOString().split("T")[0];
         for (
           let d = new Date(startDate);
           d <= endDate;
@@ -96,8 +95,8 @@ export default function TimeOffPage() {
           formattedFeatures.push({
             id: feature.id || Math.random().toString(36).substring(2, 9),
             name: feature.reason || feature.title,
-            startAt: new Date(d),
-            endAt: new Date(d),
+            startAt: new Date(d).toISOString().split("T")[0],
+            endAt: new Date(d).toISOString().split("T")[0],
             holiday: false,
             status: {
               id: 1,
@@ -122,15 +121,19 @@ export default function TimeOffPage() {
     fetchLeaves();
   }, [employee]);
 
-  // 🔹 Apply Leave Function (for employee)
   const handleApplyLeave = async () => {
     if (!date?.from || !reason) {
       toast.error("Please fill all fields");
       return;
     }
+    const companyId =
+      employee?.company_id || JSON.parse(localStorage.getItem("company_id"));
+    if (!companyId) {
+      toast.error("Company ID not found. Please re-login.");
+      return;
+    }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = new Date().toISOString().split("T")[0];
 
     if (date.from < today) {
       toast.error("You can't apply for a past date");
@@ -154,20 +157,23 @@ export default function TimeOffPage() {
       start: date.from,
       end: date.to || date.from,
       status: "Pending",
-      applied_at: new Date().toISOString(),
+      applied_at: new Date().toISOString().split("T")[0],
       department: empData.department || "",
       manager: empData.manager || "",
       employee_id: empData.id,
       email: employee.email,
+      type: isHalfDay ? "Half Day" : "Full Day",
+      start_time: isHalfDay ? startTime : null,
+      end_time: isHalfDay ? endTime : null,
     };
 
     const { data: company, error: companyError } = await supabase
       .from("HRMS")
       .select("*")
-      .eq("id", company.companyId)
+      .eq("id", companyId)
       .single();
 
-    if (companyError) {
+    if (companyError || !company) {
       console.error("Error fetching company:", companyError);
       return;
     }
@@ -177,7 +183,7 @@ export default function TimeOffPage() {
     const { error: companyUpdateError } = await supabase
       .from("HRMS")
       .update({ apply_leave: updatedApplyLeave })
-      .eq("id", company.id)
+      .eq("id", companyId)
       .single();
 
     if (companyUpdateError) {
@@ -202,58 +208,22 @@ export default function TimeOffPage() {
     toast.success("Leave applied successfully");
     setReason("");
     setDate(undefined);
+    setIsHalfDay(false);
+    setStartTime("");
+    setEndTime("");
     setOpen(false);
   };
 
   return (
     <div className="w-full">
       <div className="flex justify-end items-center gap-6">
-        {/* Admin Add Leave */}
-        {type === "admin" && (
-          <Sheet onOpenChange={setOpen} open={open}>
-            <SheetTrigger asChild>
-              <Button>Add Leave</Button>
-            </SheetTrigger>
-            <SheetContent className="w-max px-5">
-              <SheetHeader>
-                <SheetTitle>Add Leave</SheetTitle>
-              </SheetHeader>
-              <div className="grid flex-1 auto-rows-min gap-6 px-4">
-                <div className="grid gap-3">
-                  <Label htmlFor="sheet-date">Date</Label>
-                  <Calendar
-                    id="sheet-date"
-                    mode="range"
-                    selected={date}
-                    onSelect={setDate}
-                    className="rounded-md border p-2"
-                  />
-                </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="sheet-reason">Reason</Label>
-                  <Textarea
-                    id="sheet-reason"
-                    placeholder="Enter Reason"
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                  />
-                </div>
-              </div>
-              <SheetFooter>
-                <Button onClick={handleAddLeave}>Confirm</Button>
-              </SheetFooter>
-            </SheetContent>
-          </Sheet>
-        )}
-
-        {/* Employee Apply Leave */}
         <Sheet onOpenChange={setOpen} open={open}>
           <SheetTrigger asChild>
             <Button className="flex items-center gap-2 bg-gradient-to-r px-3 py-2 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white md:ml-5">
               Apply Time-Off
             </Button>
           </SheetTrigger>
-          <SheetContent className="w-max px-5">
+          <SheetContent className="w-max px-5 overflow-y-scroll">
             <SheetHeader>
               <SheetTitle>Apply Time-Off</SheetTitle>
             </SheetHeader>
@@ -268,29 +238,60 @@ export default function TimeOffPage() {
                   className="rounded-md border p-2"
                 />
               </div>
-              <div className="flex items-center justify-between rounded-lg border bg-muted/40 p-3">
-                <Label className="text-sm font-medium">Leave Type</Label>
-                <Toggle
-                  pressed={isHalfDay}
-                  onPressedChange={setIsHalfDay}
-                  className={`transition-all duration-200 ${
-                    isHalfDay
-                      ? "bg-gradient-to-r from-blue-500 to-teal-400 text-white shadow-md"
-                      : "bg-gray-100 hover:bg-gray-200"
-                  }`}
-                >
-                  {isHalfDay ? "Half Day" : "Full Day"}
-                </Toggle>
+              <div className="flex items-center justify-between rounded-xl border bg-white/70 backdrop-blur-sm p-4 shadow-sm">
+                <div className="space-y-1">
+                  <Label className="text-sm font-medium text-gray-800">
+                    Leave Type
+                  </Label>
+                  <p className="text-xs text-gray-500">
+                    {isHalfDay ? "Half Day Leave" : "Full Day Leave"}
+                  </p>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs text-gray-600">Full</span>
+                  <Switch checked={isHalfDay} onCheckedChange={setIsHalfDay} />
+                  <span className="text-xs text-gray-600">Half</span>
+                </div>
               </div>
+
               {isHalfDay && (
-                <div className="grid gap-3">
-                  <Label htmlFor="duration">Duration</Label>
-                  <Input
-                    id="duration"
-                    placeholder="Enter Duration"
-                    value={duration}
-                    onChange={(e) => setDuration(e.target.value)}
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid gap-3">
+                    <Label
+                      htmlFor="start-time"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Start Time
+                    </Label>
+                    <Input
+                      id="start-time"
+                      type="time"
+                      value={startTime}
+                      onChange={(e) => setStartTime(e.target.value)}
+                      className={cn(
+                        "rounded-md border bg-white shadow-sm focus:ring-2 focus:ring-blue-500"
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid gap-3">
+                    <Label
+                      htmlFor="end-time"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      End Time
+                    </Label>
+                    <Input
+                      id="end-time"
+                      type="time"
+                      value={endTime}
+                      onChange={(e) => setEndTime(e.target.value)}
+                      className={cn(
+                        "rounded-md border bg-white shadow-sm focus:ring-2 focus:ring-blue-500"
+                      )}
+                    />
+                  </div>
                 </div>
               )}
               <div className="grid gap-3">
@@ -304,19 +305,17 @@ export default function TimeOffPage() {
               </div>
             </div>
             <SheetFooter>
-              <Button onClick={handleApplyLeave}>Confirm</Button>
+              <Button onClick={handleApplyLeave}>Request Time-Off</Button>
             </SheetFooter>
           </SheetContent>
         </Sheet>
       </div>
 
       <div className="p-6 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg mt-2">
-        {/* Heading */}
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
           Timeoff Requests
         </h2>
 
-        {/* Leave items */}
         {appliedLeaves.length === 0 ? (
           <p className="text-gray-500 dark:text-gray-400 text-center">
             No leave requests yet.
@@ -328,25 +327,21 @@ export default function TimeOffPage() {
                 key={leave.id}
                 className="bg-gray-50 dark:bg-slate-700 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md transition p-5 flex flex-col justify-between"
               >
-                {/* Reason */}
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-1">
                   {leave.reason}
                 </h3>
 
-                {/* Leave Type */}
                 {leave.type && (
                   <p className="text-sm text-gray-500 dark:text-gray-300 mb-2">
                     Type: {leave.type}
                   </p>
                 )}
 
-                {/* Dates */}
                 <p className="text-sm text-gray-500 dark:text-gray-300 mb-3">
                   {new Date(leave.start).toLocaleDateString()} -{" "}
                   {new Date(leave.end).toLocaleDateString()}
                 </p>
 
-                {/* Status */}
                 <span
                   className={`inline-block px-3 py-1 rounded-full text-sm font-medium w-max ${
                     leave.status === "Approved"
@@ -363,8 +358,6 @@ export default function TimeOffPage() {
           </div>
         )}
       </div>
-
-      {/* Calendar showing leaves */}
       <CalendarComponent feature={features} />
     </div>
   );
