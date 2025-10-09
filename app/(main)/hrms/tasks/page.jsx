@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
@@ -21,21 +22,6 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import {
-  Search,
-  PlusCircle,
-  CheckSquare,
-  Clock,
-  ListChecks,
-} from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -57,10 +43,20 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Textarea } from "@/components/ui/textarea";
+import {
+  Search,
+  PlusCircle,
+  CheckSquare,
+  Clock,
+  ListChecks,
+  ListTodo,
+  Trash2,
+} from "lucide-react";
 
 export default function MyTasksPage() {
   const [tasks, setTasks] = useState([]);
+  const [todoList, setTodoList] = useState([]); // ✅ To-do list state
+  const [newTodo, setNewTodo] = useState(""); // ✅ Input for new todo
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
   const [session, setSession] = useState(null);
@@ -74,6 +70,7 @@ export default function MyTasksPage() {
     priority: "Medium",
   });
 
+  // Session handling
   useEffect(() => {
     const getSession = () => {
       const sessionJSON = JSON.parse(localStorage.getItem("employee"));
@@ -83,44 +80,45 @@ export default function MyTasksPage() {
       } else {
         redirect("/");
       }
-      console.log(sessionJSON?.email);
     };
-
     getSession();
   }, []);
 
+  // Fetch employee data (tasks + todo list)
   useEffect(() => {
-    const fetchEmployeeTasks = async () => {
+    const fetchEmployeeData = async () => {
       if (!userEmail) return;
 
       const { data, error } = await supabase
         .from("Employees")
-        .select("tasks")
+        .select("tasks, todo_list")
         .eq("email", userEmail)
         .single();
 
-      console.log(data, data?.tasks);
       if (error) {
-        console.error("Error fetching tasks:", error);
+        console.error("Error fetching employee data:", error);
         return;
       }
 
-      if (data?.tasks && Array.isArray(data.tasks)) {
-        setTasks(data.tasks);
-      } else {
-        setTasks([]);
-      }
+      if (data?.tasks && Array.isArray(data.tasks)) setTasks(data.tasks);
+      else setTasks([]);
+
+      if (data?.todo_list && Array.isArray(data.todo_list))
+        setTodoList(data.todo_list);
+      else setTodoList([]);
     };
 
-    fetchEmployeeTasks();
+    fetchEmployeeData();
   }, [userEmail]);
 
+  // Filtered tasks
   const filteredTasks = tasks.filter(
     (t) =>
       (filter === "All" || t.status === filter) &&
       t.name?.toLowerCase()?.includes(search.toLowerCase())
   );
 
+  // Add new task
   const handleAddTask = async () => {
     if (!newTask.name.trim()) return;
 
@@ -132,9 +130,7 @@ export default function MyTasksPage() {
       .update({ tasks: updatedTasks })
       .eq("email", userEmail);
 
-    if (error) {
-      console.error("Error adding task:", error);
-    }
+    if (error) console.error("Error adding task:", error);
 
     setNewTask({
       name: "",
@@ -145,6 +141,7 @@ export default function MyTasksPage() {
     });
   };
 
+  // Mark task completed
   const handleMarkCompleted = async (taskIndex) => {
     const updatedTasks = tasks.map((t, i) =>
       i === taskIndex ? { ...t, status: "Completed" } : t
@@ -159,8 +156,53 @@ export default function MyTasksPage() {
     if (error) console.error("Error updating task status:", error);
   };
 
+  // ✅ Add new to-do item
+  const handleAddTodo = async () => {
+    if (!newTodo.trim()) return;
+
+    const updatedTodoList = [...todoList, { text: newTodo, completed: false }];
+    setTodoList(updatedTodoList);
+    setNewTodo("");
+
+    const { error } = await supabase
+      .from("Employees")
+      .update({ todo_list: updatedTodoList })
+      .eq("email", userEmail);
+
+    if (error) console.error("Error adding todo:", error);
+  };
+
+  // ✅ Toggle to-do complete/incomplete
+  const handleToggleTodo = async (index) => {
+    const updatedTodoList = todoList.map((todo, i) =>
+      i === index ? { ...todo, completed: !todo.completed } : todo
+    );
+    setTodoList(updatedTodoList);
+
+    const { error } = await supabase
+      .from("Employees")
+      .update({ todo_list: updatedTodoList })
+      .eq("email", userEmail);
+
+    if (error) console.error("Error updating todo:", error);
+  };
+
+  // ✅ Delete to-do item
+  const handleDeleteTodo = async (index) => {
+    const updatedTodoList = todoList.filter((_, i) => i !== index);
+    setTodoList(updatedTodoList);
+
+    const { error } = await supabase
+      .from("Employees")
+      .update({ todo_list: updatedTodoList })
+      .eq("email", userEmail);
+
+    if (error) console.error("Error deleting todo:", error);
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-6 min-h-screen">
+      {/* --- HEADER --- */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">My Tasks</h1>
@@ -169,6 +211,7 @@ export default function MyTasksPage() {
           </p>
         </div>
 
+        {/* --- Add Task Sheet --- */}
         <Sheet>
           <SheetTrigger asChild>
             <Button className="flex items-center gap-2 bg-gradient-to-r px-3 py-2 rounded-xl from-sky-700 to-teal-500 hover:from-sky-600 hover:to-teal-600 text-white md:ml-5">
@@ -207,71 +250,13 @@ export default function MyTasksPage() {
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select priority">
-                    {newTask.priority && (
-                      <span
-                        className={
-                          newTask.priority === "High"
-                            ? "text-red-500"
-                            : newTask.priority === "Medium"
-                            ? "text-yellow-500"
-                            : newTask.priority === "Low"
-                            ? "text-green-600"
-                            : "text-gray-400"
-                        }
-                      >
-                        {newTask.priority}
-                      </span>
-                    )}
+                    {newTask.priority}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="High" className="text-red-600">
-                    High
-                  </SelectItem>
-                  <SelectItem value="Medium" className="text-yellow-500">
-                    Medium
-                  </SelectItem>
-                  <SelectItem value="Low" className="text-green-600">
-                    Low
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={newTask.status}
-                onValueChange={(value) =>
-                  setNewTask({ ...newTask, status: value })
-                }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select Status">
-                    {newTask.status && (
-                      <span
-                        className={
-                          newTask.status === "Pending"
-                            ? "text-red-500"
-                            : newTask.status === "In Progress"
-                            ? "text-blue-500"
-                            : newTask.status === "Completed"
-                            ? "text-green-600"
-                            : "text-gray-400"
-                        }
-                      >
-                        {newTask.status}
-                      </span>
-                    )}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Pending" className="text-red-500">
-                    Pending
-                  </SelectItem>
-                  <SelectItem value="In Progress" className="text-blue-500">
-                    In Progress
-                  </SelectItem>
-                  <SelectItem value="Completed" className="text-green-600">
-                    Completed
-                  </SelectItem>
+                  <SelectItem value="High">High</SelectItem>
+                  <SelectItem value="Medium">Medium</SelectItem>
+                  <SelectItem value="Low">Low</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -292,15 +277,16 @@ export default function MyTasksPage() {
                     selected={
                       newTask.dueDate ? new Date(newTask.dueDate) : undefined
                     }
-                    onSelect={(date) => {
+                    onSelect={(date) =>
                       setNewTask({
                         ...newTask,
                         dueDate: date?.toISOString(),
-                      });
-                    }}
+                      })
+                    }
                   />
                 </PopoverContent>
               </Popover>
+
               <Button
                 onClick={handleAddTask}
                 className=" bg-green-600 hover:bg-green-700 text-white"
@@ -312,92 +298,42 @@ export default function MyTasksPage() {
         </Sheet>
       </div>
 
+      {/* --- TASK SUMMARY CARDS --- */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card
-          className={
-            "backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 bg-white"
-          }
-        >
-          <CardContent className="flex items-center justify-between p-4">
-            <div>
-              <p className="text-xs text-muted-foreground">Open Tasks</p>
-              <p className="text-2xl font-bold">
-                {tasks.filter((t) => t.status === "Open").length}
-              </p>
-            </div>
-            <Clock className="text-slate-500" />
-          </CardContent>
-        </Card>
-        <Card
-          className={
-            "backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 bg-white"
-          }
-        >
-          <CardContent className="flex items-center justify-between p-4">
-            <div>
-              <p className="text-xs text-muted-foreground">In Progress</p>
-              <p className="text-2xl font-bold">
-                {tasks.filter((t) => t.status === "In Progress").length}
-              </p>
-            </div>
-            <Clock className="text-blue-500" />
-          </CardContent>
-        </Card>
-        <Card
-          className={
-            "backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 bg-white"
-          }
-        >
-          <CardContent className="flex items-center justify-between p-4">
-            <div>
-              <p className="text-xs text-muted-foreground">Completed</p>
-              <p className="text-2xl font-bold">
-                {tasks.filter((t) => t.status === "Completed").length}
-              </p>
-            </div>
-            <CheckSquare className="text-green-500" />
-          </CardContent>
-        </Card>
+        {[
+          {
+            label: "Open Tasks",
+            count: tasks.filter((t) => t.status === "Open").length,
+            icon: <Clock className="text-slate-500" />,
+          },
+          {
+            label: "In Progress",
+            count: tasks.filter((t) => t.status === "In Progress").length,
+            icon: <Clock className="text-blue-500" />,
+          },
+          {
+            label: "Completed",
+            count: tasks.filter((t) => t.status === "Completed").length,
+            icon: <CheckSquare className="text-green-500" />,
+          },
+        ].map((card, i) => (
+          <Card
+            key={i}
+            className="backdrop-blur-sm border border-slate-200/50 dark:border-white/20 bg-white"
+          >
+            <CardContent className="flex items-center justify-between p-4">
+              <div>
+                <p className="text-xs text-muted-foreground">{card.label}</p>
+                <p className="text-2xl font-bold">{card.count}</p>
+              </div>
+              {card.icon}
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      <Card
-        className={
-          "backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 bg-white p-4"
-        }
-      >
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="relative w-full sm:w-1/2">
-            <Input
-              placeholder="Search tasks..."
-              className="pl-10"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <div className="absolute left-3 top-2 text-slate-400">
-              <Search size={16} />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {["All", "Open", "In Progress", "Review", "Completed"].map((f) => (
-              <Button
-                key={f}
-                variant={filter === f ? "default" : "outline"}
-                onClick={() => setFilter(f)}
-                className="text-sm text-black-600 bg-white dark:bg-sky-800/50  hover:bg-green-50 hover:text-green-70"
-              >
-                {f}
-              </Button>
-            ))}
-          </div>
-        </div>
-      </Card>
-
-      <Card
-        className={
-          "backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 bg-white"
-        }
-      >
+      {/* --- TASK LIST TABLE --- */}
+      <Card className="backdrop-blur-sm border border-slate-200/50 dark:border-white/20 bg-white">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ListChecks size={20} />
@@ -408,71 +344,105 @@ export default function MyTasksPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[420px]">
-            <Table>
-              <TableHeader>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Task</TableHead>
+                <TableHead>Due Date</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Priority</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredTasks.length === 0 ? (
                 <TableRow>
-                  <TableHead>Task</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Priority</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableCell
+                    colSpan={5}
+                    className="text-center text-muted-foreground py-10"
+                  >
+                    No tasks found.
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredTasks.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={5}
-                      className="text-center text-muted-foreground py-10"
-                    >
-                      No tasks found.
+              ) : (
+                filteredTasks.map((task, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{task.name}</TableCell>
+                    <TableCell>{task.dueDate}</TableCell>
+                    <TableCell>{task.status}</TableCell>
+                    <TableCell>{task.priority}</TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        size="sm"
+                        onClick={() => handleMarkCompleted(index)}
+                        className="border border-green-600 text-green-600 bg-white hover:bg-green-50"
+                      >
+                        <CheckSquare size={14} />
+                        Done
+                      </Button>
                     </TableCell>
                   </TableRow>
-                ) : (
-                  filteredTasks.map((task, index) => (
-                    <TableRow key={index}>
-                      <TableCell className="font-medium">{task.name}</TableCell>
-                      <TableCell>{task.dueDate}</TableCell>
-                      <TableCell>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            task.status === "Completed"
-                              ? "bg-green-100 text-green-700"
-                              : task.status === "In Progress"
-                              ? "bg-blue-100 text-blue-700"
-                              : task.status === "Review"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-slate-100 text-slate-700"
-                          }`}
-                        >
-                          {task.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>{task.priority}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button size="sm" variant="outline">
-                            View
-                          </Button>
-                          {task.status !== "Completed" && (
-                            <Button
-                              size="sm"
-                              onClick={() => handleMarkCompleted(index)}
-                              className="flex items-center gap-1 border border-green-600 text-green-600 bg-white hover:bg-green-50 hover:text-green-70"
-                            >
-                              <CheckSquare size={14} />
-                              Done
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </ScrollArea>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* --- PERSONAL TO-DO LIST --- */}
+      <Card className="backdrop-blur-sm border border-slate-200/50 dark:border-white/20 bg-white">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ListTodo size={20} />
+            Personal To-Do List
+          </CardTitle>
+          <CardDescription>
+            Manage your own to-do items here (not part of assigned tasks)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-2 mb-4">
+            <Input
+              placeholder="Add a new to-do..."
+              value={newTodo}
+              onChange={(e) => setNewTodo(e.target.value)}
+            />
+            <Button onClick={handleAddTodo} className="bg-blue-600 text-white">
+              Add
+            </Button>
+          </div>
+          {todoList.length === 0 ? (
+            <p className="text-muted-foreground text-sm">No to-dos yet.</p>
+          ) : (
+            <ul className="space-y-2">
+              {todoList.map((todo, index) => (
+                <li
+                  key={index}
+                  className={`flex items-center justify-between p-2 rounded-md border ${
+                    todo.completed ? "bg-green-50" : "bg-slate-50"
+                  }`}
+                >
+                  <div
+                    onClick={() => handleToggleTodo(index)}
+                    className={`flex-1 cursor-pointer ${
+                      todo.completed
+                        ? "line-through text-green-600"
+                        : "text-slate-800"
+                    }`}
+                  >
+                    {todo.text}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteTodo(index)}
+                  >
+                    <Trash2 size={16} className="text-red-500" />
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
         </CardContent>
       </Card>
     </div>
