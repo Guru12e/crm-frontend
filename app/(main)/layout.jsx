@@ -133,15 +133,16 @@ export default function Layout({ children }) {
                 <div key={item.name}>
                   <div
                     className={cn(
-                      "flex items-center cursor-pointer rounded-lg px-2 py-2 text-sm font-medium transition-all",
-                      isActive ? "bg-primary" : "bg-accent"
+                      "flex items-center cursor-pointer rounded-lg p-2 gap-1 text-sm font-medium transition-all",
+                      isActive ? "bg-primary" : "",
+                      !sidebarOpen && "justify-center"
                     )}
                     onClick={() => handleItemClick(item)}
                   >
                     <Link
                       href={item.href}
-                      className={`group flex flex-1 items-center ${
-                        sidebarOpen ? "" : "justify-center pr-1"
+                      className={`group flex flex-1 items-center h-max ${
+                        sidebarOpen ? "" : "justify-center"
                       }`}
                       onClick={(e) => {
                         if (hasSubpages) {
@@ -151,16 +152,21 @@ export default function Layout({ children }) {
                     >
                       <div
                         className={cn(
-                          "h-5 w-5 flex-shrink-0 ",
+                          "h-6 w-6 flex-shrink-0",
                           isActive ? "text-white" : "text-slate-500"
                         )}
                       >
                         {item.icon}
                       </div>
                       {sidebarOpen && (
-                        <span className="ml-3 truncate max-sm:hidden">
+                        <h5
+                          className={cn(
+                            "ml-2 truncate max-sm:hidden",
+                            isActive ? "text-white" : ""
+                          )}
+                        >
                           {item.name}
-                        </span>
+                        </h5>
                       )}
                     </Link>
                     {hasSubpages && sidebarOpen && (
@@ -175,7 +181,7 @@ export default function Layout({ children }) {
                   </div>
 
                   {hasSubpages && isExpanded && (
-                    <div className="ml-4 mt-1 space-y-1 max-sm:hidden">
+                    <div className="ml-4 space-y-1 max-sm:hidden">
                       {item.subpages.map((subpage) => (
                         <Link
                           key={subpage.href}

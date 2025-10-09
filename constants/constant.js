@@ -271,6 +271,7 @@ export const navigation = [
       },
       { name: "Employee", href: "/hrms/Employee", icon: <UserRoundCog /> },
       { name: "Payroll", href: "/hrms/Payroll", icon: <UserRoundCog /> },
+      { name: "Leave", href: "/hrms/Leave", icon: <Coffee /> },
     ],
   },
   {

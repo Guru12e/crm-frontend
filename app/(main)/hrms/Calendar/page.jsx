@@ -49,8 +49,7 @@ export default function HRMSDashboard() {
     } else {
       const rawSession = localStorage.getItem("session");
       const userData = rawSession ? JSON.parse(rawSession) : null;
-      // setUserData(userData.user?.email);
-      setUserData("arsha.tajdeen23@gmail.com");
+      setUserData(userData.user?.email);
     }
   }, []);
 

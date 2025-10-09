@@ -247,10 +247,10 @@ export default function EmployeeDashboard() {
               </div>
             </Avatar>
             <div>
-              <h2 className="text-lg font-semibold">
+              <h2 className="text-lg capitalize font-semibold">
                 {employee?.name || "Employee"}
               </h2>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm capitalize text-muted-foreground">
                 {employee?.role || "Employee Role"}
               </p>
             </div>

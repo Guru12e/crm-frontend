@@ -82,7 +82,6 @@ export default function PayrollPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-8">
       <div className="max-w-6xl mx-auto space-y-10">
-        {/* Header Section */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
@@ -101,7 +100,6 @@ export default function PayrollPage() {
           </Badge>
         </div>
 
-        {/* Employee Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {employees.map((emp) => (
             <Card
@@ -223,7 +221,6 @@ export default function PayrollPage() {
 
                     <Separator />
 
-                    {/* Summary Section */}
                     <div className="space-y-2 text-sm text-gray-700">
                       <p>Gross Salary: ₹{gross.toFixed(2)}</p>
                       <p>PF (12% of salary): ₹{pf.toFixed(2)}</p>

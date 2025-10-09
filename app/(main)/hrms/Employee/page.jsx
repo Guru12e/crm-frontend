@@ -25,7 +25,7 @@ import {
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
-  const [editingEmployee, setEditingEmployee] = useState(null); // Employee being edited
+  const [editingEmployee, setEditingEmployee] = useState(null);
   const [editedEmployee, setEditedEmployee] = useState({
     name: "",
     email: "",
@@ -54,12 +54,10 @@ export default function EmployeesPage() {
     if (!user) redirect("/");
 
     const sessionJSON = JSON.parse(localStorage.getItem("session"));
-    setUserEmail("arsha.tajdeen23@gmail.com");
-    // setUserEmail(sessionJSON.user.email);
+    setUserEmail(sessionJSON.user.email);
   }, []);
 
   const fetchEmployees = async () => {
-    console.log("userEmail", userEmail);
     const { data: company_data, error: company_error } = await supabase
       .from("HRMS")
       .select("*")
@@ -67,10 +65,31 @@ export default function EmployeesPage() {
 
     setUserData(company_data[0]);
 
+    let company_id = null;
+
+    if (company_data.length === 0) {
+      const { data: newCompany, error: newCompanyError } = await supabase
+        .from("HRMS")
+        .insert({ user_email: userEmail })
+        .select()
+        .single();
+
+      if (newCompanyError) {
+        console.error("Error creating company:", newCompanyError);
+        return;
+      }
+
+      company_id = newCompany.id;
+    } else {
+      company_id = company_data[0].id;
+    }
+
+    console.log(company_id);
+
     const { data, error } = await supabase
       .from("Employees")
       .select("*")
-      .eq("company_id", company_data[0]?.id)
+      .eq("company_id", company_id)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -100,7 +119,6 @@ export default function EmployeesPage() {
     try {
       const generatedPassword = generatePassword(12);
       const newData = {
-        id: Date.now(),
         name: newEmployee.name,
         email: newEmployee.email,
         phone: newEmployee.phone,
@@ -114,6 +132,7 @@ export default function EmployeesPage() {
         password: generatedPassword,
       };
 
+      console.log(newData);
       const { data, error } = await supabase.from("Employees").insert(newData);
 
       if (error) {
