@@ -16,25 +16,25 @@ const LeaveApproval = () => {
     setUserEmail(sessionJSON?.user?.email);
   }, []);
 
-  useEffect(() => {
-    const fetchPendingLeaves = async () => {
-      if (userEmail) {
-        const { data, error } = await supabase
-          .from("HRMS")
-          .select("apply_leave")
-          .eq("user_email", userEmail)
-          .single();
+  const fetchPendingLeaves = async () => {
+    if (userEmail) {
+      const { data, error } = await supabase
+        .from("HRMS")
+        .select("apply_leave")
+        .eq("user_email", userEmail)
+        .single();
 
-        if (error) {
-          console.error("Error fetching leave data:", error);
-          return;
-        }
-
-        console.log("leavePending", data);
-        setLeavePending(data.apply_leave || []);
+      if (error) {
+        console.error("Error fetching leave data:", error);
+        return;
       }
-    };
 
+      console.log("leavePending", data);
+      setLeavePending(data.apply_leave || []);
+    }
+  };
+
+  useEffect(() => {
     fetchPendingLeaves();
   }, [userEmail]);
 
@@ -69,7 +69,7 @@ const LeaveApproval = () => {
 
     const updatedLeaves = employeeData.apply_leave.map((l) => {
       if (l.id === leave.id) {
-        return { ...l, status: "approved" };
+        return { ...l, status: "Approved" };
       }
       return l;
     });
@@ -111,6 +111,8 @@ const LeaveApproval = () => {
       console.error("Error creating notification:", notifyError);
       return;
     }
+
+    fetchPendingLeaves();
   };
 
   const HandleRejectLeave = async () => {
@@ -139,7 +141,7 @@ const LeaveApproval = () => {
 
     const updatedLeaves = employeeData.leaves.map((l) => {
       if (l.id === leave.id) {
-        return { ...l, status: "rejected" };
+        return { ...l, status: "Rejected" };
       }
       return l;
     });
@@ -180,6 +182,8 @@ const LeaveApproval = () => {
       console.error("Error creating notification:", notifyError);
       return;
     }
+
+    fetchPendingLeaves();
   };
 
   return (
