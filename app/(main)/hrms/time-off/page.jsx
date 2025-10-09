@@ -16,7 +16,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
 import { supabase } from "@/utils/supabase/client";
-import { Toggle } from "@/components/ui/toggle";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
@@ -56,63 +55,65 @@ export default function TimeOffPage() {
 
       const formattedFeatures = [];
 
-      data?.leave.forEach((feature) => {
-        const startDate = new Date(feature.start).toISOString().split("T")[0];
-        const endDate = new Date(feature.end).toISOString().split("T")[0];
-        for (
-          let d = new Date(startDate);
-          d <= endDate;
-          d.setDate(d.getDate() + 1)
-        ) {
-          formattedFeatures.push({
-            id: feature.id || Math.random().toString(36).substring(2, 9),
-            name: feature.reason || feature.title,
-            startAt: new Date(d).toISOString().split("T")[0],
-            endAt: new Date(d).toISOString().split("T")[0],
-            holiday: true,
-            status: {
-              id: 1,
-              name: feature.status || "Leave",
-              color:
-                feature.status === "Approved"
-                  ? "#A8E4A0"
-                  : feature.status === "Pending"
-                  ? "#F9E79F"
-                  : "#E6B0AA",
-            },
-          });
-        }
-      });
+      if (data?.leave) {
+        data?.leave.forEach((feature) => {
+          const startDate = new Date(feature.start).toISOString().split("T")[0];
+          const endDate = new Date(feature.end).toISOString().split("T")[0];
+          for (
+            let d = new Date(startDate);
+            d <= endDate;
+            d.setDate(d.getDate() + 1)
+          ) {
+            formattedFeatures.push({
+              id: feature.id || Math.random().toString(36).substring(2, 9),
+              name: feature.reason || feature.title,
+              startAt: new Date(d).toISOString().split("T")[0],
+              endAt: new Date(d).toISOString().split("T")[0],
+              holiday: true,
+              status: {
+                id: 1,
+                name: feature.status || "Leave",
+                color:
+                  feature.status === "Approved"
+                    ? "#A8E4A0"
+                    : feature.status === "Pending"
+                    ? "#F9E79F"
+                    : "#E6B0AA",
+              },
+            });
+          }
+        });
+      }
 
-      data?.apply_leave.forEach((feature) => {
-        const startDate = new Date(feature.start).toISOString().split("T")[0];
-        const endDate = new Date(feature.end).toISOString().split("T")[0];
-        for (
-          let d = new Date(startDate);
-          d <= endDate;
-          d.setDate(d.getDate() + 1)
-        ) {
-          formattedFeatures.push({
-            id: feature.id || Math.random().toString(36).substring(2, 9),
-            name: feature.reason || feature.title,
-            startAt: new Date(d).toISOString().split("T")[0],
-            endAt: new Date(d).toISOString().split("T")[0],
-            holiday: false,
-            status: {
-              id: 1,
-              name: feature.status || "Leave",
-              color:
-                feature.status === "Approved"
-                  ? "#A8E4A0"
-                  : feature.status === "Pending"
-                  ? "#F9E79F"
-                  : "#E6B0AA",
-            },
-          });
-        }
-      });
-
-      console.log(formattedFeatures);
+      if (data?.apply_leave) {
+        data?.apply_leave.forEach((feature) => {
+          const startDate = new Date(feature.start).toISOString().split("T")[0];
+          const endDate = new Date(feature.end).toISOString().split("T")[0];
+          for (
+            let d = new Date(startDate);
+            d <= endDate;
+            d.setDate(d.getDate() + 1)
+          ) {
+            formattedFeatures.push({
+              id: feature.id || Math.random().toString(36).substring(2, 9),
+              name: feature.reason || feature.title,
+              startAt: new Date(d).toISOString().split("T")[0],
+              endAt: new Date(d).toISOString().split("T")[0],
+              holiday: false,
+              status: {
+                id: 1,
+                name: feature.status || "Leave",
+                color:
+                  feature.status === "Approved"
+                    ? "#A8E4A0"
+                    : feature.status === "Pending"
+                    ? "#F9E79F"
+                    : "#E6B0AA",
+              },
+            });
+          }
+        });
+      }
 
       setFeatures(formattedFeatures);
       setAppliedLeaves(data?.apply_leave || []);
@@ -162,6 +163,7 @@ export default function TimeOffPage() {
       manager: empData.manager || "",
       employee_id: empData.id,
       email: employee.email,
+      name: employee.name,
       type: isHalfDay ? "Half Day" : "Full Day",
       start_time: isHalfDay ? startTime : null,
       end_time: isHalfDay ? endTime : null,
