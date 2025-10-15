@@ -1,3 +1,4 @@
+import { healthcare } from "googleapis/build/src/apis/healthcare";
 import {
   BarChart3,
   Bell,
@@ -70,16 +71,18 @@ export const analyticsData = {
   },
   customer: {
     satisfaction: 4.7,
-    nps: 67,
+    healthcare: "HealthCare - 40",
     churnRate: 3.2,
-    ltv: 89600,
+    ltv: 260,
     supportTickets: 234,
     resolutionTime: "4.2 hours",
-    segmentation: [
-      { segment: "Enterprise", count: 45, revenue: 1870000 },
-      { segment: "Mid-Market", count: 123, revenue: 892000 },
-      { segment: "SMB", count: 456, revenue: 345000 },
-      { segment: "Startup", count: 234, revenue: 123000 },
+    
+    pipeline: [
+      { stage: "Prospecting", count: 67, value: 1670000 },
+      { stage: "Qualification", count: 45, value: 1125000 },
+      { stage: "Proposal", count: 23, value: 575000 },
+      { stage: "Negotiation", count: 12, value: 300000 },
+      { stage: "Closed Won", count: 89, value: 2278400 },
     ],
   },
 };
