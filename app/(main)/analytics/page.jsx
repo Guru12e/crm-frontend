@@ -1,12 +1,16 @@
 "use client";
 
-
+import { Star } from "lucide-react";
+import { UserMinus } from "lucide-react";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import MarketingSankey from "@/components/campaignPerformance";
 import SalesProductivityDonut from "@/components/salesProductivity";
+import CustomerSegmentCharts from "@/components/CustomerChart";
+import TopIndustriesCard from "@/components/TopIndustryCard";
+
 
 
 
@@ -44,7 +48,7 @@ export default function Analytics() {
   { name: "Calls Made", value: 120, description: "Total number of calls made by sales team", itemStyle: { color: "#B2E5E0" } },
   { name: "Client Meetings Scheduled", value: 45, description: "Upcoming meetings scheduled with clients", itemStyle: { color: "#7FDCD4" } },
   { name: "Client Meetings Conducted", value: 30, description: "Meetings successfully conducted with clients", itemStyle: { color: "#4CCFC7" } },
-  { name: "Follow ups Done", value: 85, description: "Sales-related tasks marked as completed", itemStyle: { color: "#26BDB5" } },
+  { name: "Follow ups Done", value: 85, description: "Sales-related tasks ARKd as completed", itemStyle: { color: "#26BDB5" } },
   { name: "Deals Closed", value: 25, description: "Number of deals closed successfully", itemStyle: { color: "#14B8A6" } }, 
 ];
 
@@ -501,67 +505,55 @@ export default function Analytics() {
         <TabsContent value="customer" className="space-y-4 sm:space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             <MetricCard
-              title="Satisfaction Score"
+              title="Customer Ratings"
               value={analyticsData.customer.satisfaction}
-              icon={CheckCircle}
+              icon={Star}
             />
             <MetricCard
-              title="Net Promoter Score"
-              value={analyticsData.customer.nps}
+              title="Top Customer Industries"
+              value={analyticsData.customer.healthcare}
               icon={TrendingUp}
             />
             <MetricCard
               title="Churn Rate"
               value={analyticsData.customer.churnRate}
-              icon={AlertTriangle}
+              icon={UserMinus}
               format="percentage"
             />
             <MetricCard
-              title="Customer LTV"
+              title="Customers Strength"
               value={analyticsData.customer.ltv}
-              icon={DollarSign}
-              format="currency"
+              icon={Users}
+              format="number"
             />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
               <CardHeader>
-                <CardTitle>Customer Segmentation</CardTitle>
+              
               </CardHeader>
               <CardContent>
-                <CustomerSegmentChart />
+                <CustomerSegmentCharts/>
+               
+               
               </CardContent>
             </Card>
-
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader>
-                <CardTitle>Support Metrics</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center p-3 rounded-lg bg-white/50 dark:bg-slate-700/50">
-                  <span>Support Tickets</span>
-                  <span className="font-bold">
-                    {analyticsData.customer.supportTickets}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center p-3 rounded-lg bg-white/50 dark:bg-slate-700/50">
-                  <span>Avg Resolution Time</span>
-                  <span className="font-bold">
-                    {analyticsData.customer.resolutionTime}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center p-3 rounded-lg bg-white/50 dark:bg-slate-700/50">
-                  <span>Customer Satisfaction</span>
-                  <span className="font-bold">
-                    {analyticsData.customer.satisfaction}/5.0
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+    <CardHeader>
+    
+    </CardHeader>
+    <CardContent>
+      <TopIndustriesCard />
+    </CardContent>
+  </Card>
+</div>
+           
+          
+        
         </TabsContent>
       </Tabs>
     </div>
+    
   );
 }
