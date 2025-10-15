@@ -365,28 +365,7 @@ export default function Analytics() {
               </CardContent>
             </Card>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-             <CardHeader>
-                <CardTitle>User Traffic</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  <UserTraffic />
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-             <CardHeader>
-                <CardTitle>Top Selling Products</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  <TopSelling />
-                </div>
-              </CardContent>
-            </Card>
-            </div>
+          
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
               <CardHeader>
@@ -409,6 +388,28 @@ export default function Analytics() {
               </CardContent>
             </Card>
           </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+             <CardHeader>
+                <CardTitle>User Traffic</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  <UserTraffic />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+             <CardHeader>
+                <CardTitle>Top Selling Products</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  <TopSelling />
+                </div>
+              </CardContent>
+            </Card>
+            </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20 lg:col-span-2">
               <CardHeader>
