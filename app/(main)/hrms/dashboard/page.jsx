@@ -233,7 +233,7 @@ export default function EmployeeDashboard() {
     (sum, h) => sum + h,
     0
   );
-
+  const currentTasks = myTasks.filter((t) => t.status === "In-progress").length;
   const completedTasks = myTasks.filter((t) => t.status === "Completed").length;
 
   return (
@@ -304,7 +304,7 @@ export default function EmployeeDashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground">Tasks due</p>
-                    <p className="text-2xl font-bold">{myTasks.length}</p>
+                    <p className="text-2xl font-bold">{currentTasks}</p>
                   </div>
                   <div className="p-2 rounded-md backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 bg-white">
                     <CalendarDays />
