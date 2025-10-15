@@ -14,12 +14,35 @@ import { Button } from "./ui/button";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function UserButton() {
   const [user, setUser] = useState(null);
+  const [type, setType] = useState(null);
+  const router = useRouter();
+
+  const HandleEmployeeLogout = () => {
+    localStorage.clear();
+    if (type === "admin") {
+      signOut({ callbackUrl: "/" });
+    } else {
+      router.push("/");
+    }
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
+      const type = localStorage.getItem("type");
+      if (type === "employee") {
+        setType("employee");
+        const employeeData = JSON.parse(localStorage.getItem("employee"));
+        setUser(employeeData || null);
+
+        return;
+      } else {
+        setType("admin");
+      }
+
       const res = await fetch("/api/getUserEmail", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -71,24 +94,28 @@ export default function UserButton() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link
-            href="/prospects/our-prospects"
-            className="w-full cursor-pointer"
-          >
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Company Details</span>
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <User className="mr-2 h-4 w-4" />
-          <span>Profile Settings</span>
-        </DropdownMenuItem>
+        {type === "admin" && (
+          <>
+            <DropdownMenuItem asChild>
+              <Link
+                href="/prospects/our-prospects"
+                className="w-full cursor-pointer"
+              >
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Company Details</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile Settings</span>
+            </DropdownMenuItem>
+          </>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <LogOut className="mr-2 h-4 w-4" />
           <button
-            onClick={() => signOut({ callbackUrl: "/" })}
+            onClick={HandleEmployeeLogout}
             className="w-full cursor-pointer"
           >
             <span>Log out</span>

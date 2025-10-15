@@ -49,8 +49,7 @@ export default function HRMSDashboard() {
     } else {
       const rawSession = localStorage.getItem("session");
       const userData = rawSession ? JSON.parse(rawSession) : null;
-      // setUserData(userData.user?.email);
-      setUserData("arsha.tajdeen23@gmail.com");
+      setUserData(userData.user?.email);
     }
   }, []);
 
@@ -119,30 +118,40 @@ export default function HRMSDashboard() {
         .select("*")
         .eq("user_email", userData);
 
+      if (error) {
+        toast.error("Error applying leave");
+        return;
+      }
+
       if (newFeatureData && newFeatureData.length > 0) {
         const existingLeaves = newFeatureData[0].leave || [];
         if (existingLeaves.find((leave) => leave.title === newFeature.title)) {
           toast.error("Leave already exists");
           return;
         }
-        const { data: updatedData, error: updateError } = await supabase
+        const { data, error: updateError } = await supabase
           .from("HRMS")
           .update({
             leave: [...existingLeaves, newFeature],
           })
           .eq("user_email", userData);
 
-        if (updatedData) {
+        if (updateError) {
+          console.error("Error updating leave:", updateError);
+          toast.error("Error applying leave");
           return;
         }
       } else {
-        const { data: insertData, error: insertError } = await supabase
+        const { data, error: insertError } = await supabase
           .from("HRMS")
           .insert({
             user_email: userData,
             leave: [newFeature],
           });
-        if (insertData) {
+
+        if (insertError) {
+          console.error("Error inserting leave:", insertError);
+          toast.error("Error applying leave");
           return;
         }
       }
@@ -154,84 +163,6 @@ export default function HRMSDashboard() {
       toast.success("Leave applied successfully");
     } else {
       toast.error("Please fill all the fields");
-    }
-  };
-
-  const HandleApplyLeave = async () => {
-    if (date?.from && reason) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (date.from < today) {
-        toast.error("You can't apply leave for past date");
-        return;
-      }
-
-      const { data: employee, error: employee_error } = await supabase
-        .from("Employees")
-        .select("*")
-        .eq("email", "jhon@gmail.com");
-
-      if (employee_error) {
-        console.error("Error fetching employee:", employee_error);
-        return;
-      }
-
-      const newFeature = {
-        employee_id: employee[0]?.id,
-        status: "Pending",
-        reason: reason,
-        start: date.from,
-        end: date.to || date.from,
-        applied_at: new Date().toISOString(),
-        department: employee[0]?.department || "",
-        manager: employee[0]?.manager || "",
-        email: "jhon@gmail.com",
-      };
-
-      const { data: company, error: company_error } = await supabase
-        .from("HRMS")
-        .select("*")
-        .eq("id", employee[0]?.company_id)
-        .single();
-      if (company_error) {
-        console.error("Error fetching company:", company_error);
-        return;
-      }
-
-      if (company && company.apply_leave) {
-        const { data: updatedData, error: updateError } = await supabase
-          .from("HRMS")
-          .update({
-            apply_leave: [...company.apply_leave, newFeature],
-          })
-          .eq("id", employee[0]?.company_id);
-        if (updateError) {
-          console.error("Error updating apply_leave:", updateError);
-          return;
-        }
-        setOpen(false);
-        setReason("");
-        setDate(undefined);
-        toast.success("Leave applied successfully");
-      } else if (company) {
-        const { data: updatedData, error: updateError } = await supabase
-          .from("HRMS")
-          .update({
-            apply_leave: [newFeature],
-          })
-          .eq("id", employee[0]?.company_id);
-        if (updateError) {
-          console.error("Error updating apply_leave:", updateError);
-          return;
-        }
-        setOpen(false);
-        setReason("");
-        setDate(undefined);
-        toast.success("Leave applied successfully");
-      }
-    } else {
-      toast.error("Please fill all the fields");
-      return;
     }
   };
 
@@ -275,41 +206,6 @@ export default function HRMSDashboard() {
             </SheetContent>
           </Sheet>
         )}
-        <Sheet onOpenChange={setOpen} open={open}>
-          <SheetTrigger asChild>
-            <Button>Apply Leave</Button>
-          </SheetTrigger>
-          <SheetContent className="w-max px-5">
-            <SheetHeader>
-              <SheetTitle>Apply Leave</SheetTitle>
-            </SheetHeader>
-            <div className="grid flex-1 auto-rows-min gap-6 px-4">
-              <div className="grid gap-3">
-                <Label htmlFor="sheet-date">Date</Label>
-                <Calendar
-                  id="sheet-date"
-                  mode="range"
-                  selected={date}
-                  onSelect={setDate}
-                  className="rounded-md border p-2"
-                />
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="sheet-reason">Reason</Label>
-                <Textarea
-                  id="sheet-reason"
-                  placeholder="Enter Reason"
-                  value={reason}
-                  required
-                  onChange={(e) => setReason(e.target.value)}
-                />
-              </div>
-            </div>
-            <SheetFooter>
-              <Button onClick={HandleApplyLeave}>Confirm</Button>
-            </SheetFooter>
-          </SheetContent>
-        </Sheet>
       </div>
       <CalendarComponent feature={features} />
     </div>
