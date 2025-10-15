@@ -7,6 +7,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import MarketingSankey from "@/components/campaignPerformance";
 import SalesProductivityDonut from "@/components/salesProductivity";
+import SalesOverview from "@/components/charts/SalesOverview";
+import GrowthRate from "@/components/charts/GrowthRate";
+import TopSelling from "@/components/charts/TopSelling";
+import ConversionRate from "@/components/charts/ConversionRate";
+import UserTraffic from "@/components/charts/userTraffic";
+import CustomerSatisfaction from "@/components/charts/CustomerSatisfaction";
+import TrafficBreakdown from "@/components/charts/TrafficBreakdown";
+import TrafficOverview from "@/components/charts/TrafficOverview";
+import TrafficSource from "@/components/charts/TrafficSource";
+import GeographicDistribution from "@/components/charts/TrafficMapChart";
+import TopReferring from "@/components/charts/TopReffering";
+import NewReturningVisitors from "@/components/charts/NewReturningVisitors";
+import TrafficByCampaign from "@/components/charts/TrafficByCampaign";
 
 
 
@@ -336,25 +349,77 @@ export default function Analytics() {
                 <CardTitle>Revenue Trend</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-64 flex items-center justify-center text-slate-500">
-                  <LineChart className="w-16 h-16 mr-4" />
-                  <div>
-                    <div className="font-medium">Revenue Chart</div>
-                    <div className="text-sm">Monthly revenue progression</div>
-                  </div>
+                <div className="h-64 items-center justify-center text-slate-500">
+                  <SalesOverview />
                 </div>
               </CardContent>
             </Card>
-
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+             <CardHeader>
+                <CardTitle>Growth Rate</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  <GrowthRate />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+             <CardHeader>
+                <CardTitle>User Traffic</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  <UserTraffic />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+             <CardHeader>
+                <CardTitle>Top Selling Products</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  <TopSelling />
+                </div>
+              </CardContent>
+            </Card>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+              <CardHeader>
+                <CardTitle>Customer Satisfaction</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64 items-center justify-center text-slate-500">
+                  <CustomerSatisfaction />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+             <CardHeader>
+                <CardTitle>Traffic Breakdown</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  <TrafficBreakdown />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20 lg:col-span-2">
               <CardHeader>
                 <CardTitle>Lead Sources</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4">
                 <LeadSourcesChart />
               </CardContent>
             </Card>
           </div>
+          
         </TabsContent>
 
         <TabsContent value="traffic" className="space-y-4 sm:space-y-6">
@@ -381,7 +446,82 @@ export default function Analytics() {
               icon={Calendar}
             />
           </div>
-
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20 lg:col-span-2">
+              <CardHeader>
+                <CardTitle>Website Traffic Overview</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="w-full h-full">
+                  <TrafficOverview className="w-full h-full"/>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+             <CardHeader>
+                <CardTitle>User Traffic</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  <UserTraffic />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+             <CardHeader>
+                <CardTitle>Top Reffering Websites</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  <TopReferring />
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+             <CardHeader>
+                <CardTitle>New Vs Returning Visitors</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  <NewReturningVisitors />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+             <CardHeader>
+                <CardTitle>Traffic Source</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  <TrafficSource />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+             <CardHeader>
+                <CardTitle>Geographic Distribution</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  < GeographicDistribution/>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+             <CardHeader>
+                <CardTitle>Traffic By Campaign</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  < TrafficByCampaign/>
+                </div>
+              </CardContent>
+            </Card>
+            
+            
+            
+          </div>
           <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
             <CardHeader>
               <CardTitle className="text-lg sm:text-xl">
