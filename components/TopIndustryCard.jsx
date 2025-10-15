@@ -7,27 +7,35 @@ import ReactECharts from "echarts-for-react";
 const TopIndustriesCard = () => {
   // Dummy industry data
   const dummyIndustryData = [
-    ["E-commerce", 12],
-    ["Finance", 8],
-    ["Healthcare", 5],
+    ["E-commerce & Retail", 12],
+    ["Finance & Banking", 8],
+    ["Healthcare Services", 5],
   ];
 
   const dummyCustomers = {
-    "E-commerce": [
-      { name: "Alice", location: "New York", industry: "E-commerce", purchase_history: "Laptop, Phone", intent_score: 85 },
-      { name: "Bob", location: "San Francisco", industry: "E-commerce", purchase_history: "Shoes, Bag", intent_score: 70 },
+    "E-commerce & Retail": [
+      { name: "Alice", location: "New York", industry: "E-commerce & Retail", purchase_history: "Laptop, Phone", intent_score: 85 },
+      { name: "Bob", location: "San Francisco", industry: "E-commerce & Retail", purchase_history: "Shoes, Bag", intent_score: 70 },
     ],
-    Finance: [
-      { name: "Charlie", location: "Chicago", industry: "Finance", purchase_history: "Insurance", intent_score: 90 },
+    "Finance & Banking": [
+      { name: "Charlie", location: "Chicago", industry: "Finance & Banking", purchase_history: "Insurance", intent_score: 90 },
     ],
-    Healthcare: [
-      { name: "David", location: "Boston", industry: "Healthcare", purchase_history: "Vitamins, Medicine", intent_score: 80 },
+    "Healthcare Services": [
+      { name: "David", location: "Boston", industry: "Healthcare Services", purchase_history: "Vitamins, Medicine", intent_score: 80 },
     ],
   };
 
   const [industryData, setIndustryData] = useState([]);
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [industryCustomers, setIndustryCustomers] = useState([]);
+
+  const colors = [
+    "#3BCEC0",
+    "#20B8A6",
+    "#A3E3DC",
+    "#81DDD6",
+    "#4FD1C5",
+  ];
 
   useEffect(() => {
     setIndustryData(dummyIndustryData);
@@ -47,17 +55,38 @@ const TopIndustriesCard = () => {
       trigger: "item",
       formatter: "{b}: {c} customers",
     },
+    grid: {
+      left: "10%", // small gap for Y-axis labels
+      right: "5%",
+      top: "15%",
+      bottom: "10%",
+      containLabel: true,
+    },
     xAxis: { type: "value" },
     yAxis: {
       type: "category",
       data: industryData.map(([industry]) => industry),
+      axisLabel: {
+        interval: 0,
+        fontSize: 12,
+        color: "#334155",
+        formatter: (value) => value, // show full name
+      },
     },
     series: [
       {
         type: "bar",
-        data: industryData.map(([_, count]) => count),
+        data: industryData.map(([_, count], index) => ({
+          value: count,
+          itemStyle: { color: colors[index % colors.length], borderRadius: [5, 5, 5, 5] },
+        })),
         barWidth: "40%",
-        itemStyle: { color: "#4F46E5", borderRadius: [5, 5, 5, 5] },
+        label: {
+          show: true,
+          position: "right",
+          color: "#334155",
+          fontWeight: "bold",
+        },
       },
     ],
   };
@@ -70,14 +99,14 @@ const TopIndustriesCard = () => {
 
   return (
     <>
-      <Card className="w-full">
+      <Card className="backdrop-blur-sm bg-white/500 dark:bg-slate-800/50 border-white/20">
         <CardHeader>
-          <CardTitle>Top 3 Industries</CardTitle>
+        
         </CardHeader>
         <CardContent>
           <ReactECharts
             option={chartOptions}
-            style={{ height: 300 }}
+            style={{ height: 300, width: "90%" }} 
             onEvents={{ click: onChartClick }}
           />
         </CardContent>
