@@ -10,16 +10,18 @@ export default function TopProductsChart() {
 
   // 🧠 Get logged-in user's email from localStorage session
   useEffect(() => {
-    const local = localStorage.getItem("session");
-    const user = JSON.parse(local)?.user;
-    if (user) setUserEmail(user?.email);
+    if (typeof window !== "undefined") {
+      const local = localStorage.getItem("session");
+      const user = JSON.parse(local)?.user;
+      if (user) setUserEmail(user?.email);
+    }
   }, []);
 
-  // 📦 Fetch product data from Supabase once userEmail is available
+  // 📦 Fetch product data (and subscribe for real-time updates)
   useEffect(() => {
-    const fetchData = async () => {
-      if (!userEmail) return;
+    if (!userEmail) return;
 
+    const fetchData = async () => {
       const { data, error } = await supabase
         .from("user")
         .select("name, stock, price, category, user_email")
@@ -30,7 +32,6 @@ export default function TopProductsChart() {
         return;
       }
 
-      // Clean and sort top-selling (lowest stock) products
       const cleaned = (data || [])
         .map((p) => ({
           name: p.name,
@@ -38,16 +39,35 @@ export default function TopProductsChart() {
           category: p.category,
           price: Number(p.price) || 0,
         }))
-        .sort((a, b) => a.stock - b.stock) // sort by stock (lowest first)
-        .slice(0, 5); // limit to top 5
+        .sort((a, b) => a.stock - b.stock)
+        .slice(0, 5);
 
       setProducts(cleaned);
     };
 
+    // initial fetch
     fetchData();
+
+    // 🧩 Subscribe to real-time changes in user table
+    const channel = supabase
+      .channel("realtime-products")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "user" },
+        (payload) => {
+          console.log("Realtime update:", payload);
+          fetchData(); // refetch whenever data changes
+        }
+      )
+      .subscribe();
+
+    // Cleanup on unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [userEmail]);
 
-  // 📊 ECharts option setup
+  // 🧾 ECharts configuration
   const option = {
     title: {
       text: "🏆 Top Selling Products",
@@ -90,8 +110,8 @@ export default function TopProductsChart() {
         itemStyle: {
           borderRadius: 6,
           color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
-            { offset: 0, color: "#0ea5e9" }, // sky-500
-            { offset: 1, color: "#14b8a6" }, // teal-500
+            { offset: 0, color: "#0ea5e9" },
+            { offset: 1, color: "#14b8a6" },
           ]),
         },
       },
@@ -102,6 +122,8 @@ export default function TopProductsChart() {
     <ReactECharts
       option={option}
       style={{ height: "400px", width: "100%" }}
+      notMerge={true}
+      lazyUpdate={true}
     />
   );
 }
