@@ -1,16 +1,26 @@
 "use client";
 
-import { Star } from "lucide-react";
-import { UserMinus } from "lucide-react";
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import MarketingSankey from "@/components/campaignPerformance";
 import SalesProductivityDonut from "@/components/salesProductivity";
-import CustomerSegmentCharts from "@/components/CustomerChart";
-import TopIndustriesCard from "@/components/TopIndustryCard";
 import SalesOverview from "@/components/charts/SalesOverview";
+import GrowthRate from "@/components/charts/GrowthRate";
+import TopSelling from "@/components/charts/TopSelling";
+import UserTraffic from "@/components/charts/userTraffic";
+import CustomerSatisfaction from "@/components/charts/CustomerSatisfaction";
+import TrafficBreakdown from "@/components/charts/TrafficBreakdown";
+import TrafficOverview from "@/components/charts/TrafficOverview";
+import TrafficSource from "@/components/charts/TrafficSource";
+import GeographicDistribution from "@/components/charts/TrafficMapChart";
+import TopReferring from "@/components/charts/TopReffering";
+import NewReturningVisitors from "@/components/charts/NewReturningVisitors";
+import TrafficByCampaign from "@/components/charts/TrafficByCampaign";
+
+
 
 import {
   Select,
@@ -37,54 +47,20 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { analyticsData } from "@/constants/constant";
-import GrowthRateLineChart from "@/components/charts/GrowthRate";
-import TrafficOverview from "@/components/charts/TrafficOverview";
-import TopSelling from "@/components/charts/TopSelling";
-import userTraffic from "@/components/charts/userTraffic";
-import TrafficMapChart from "@/components/charts/TrafficMapChart";
-import TopReffering from "@/components/charts/TopReffering";
-import TrafficBreakdown from "@/components/charts/TrafficBreakdown";
-import TrafficByCampaign from "@/components/charts/TrafficByCampaign";
-import TrafficSource from "@/components/charts/TrafficSource";
-import NewReturningVisitors from "@/components/charts/NewReturningVisitors";
-import CustomerSatisfactionRadar from "@/components/charts/CustomerSatisfaction";
 
 export default function Analytics() {
   const [activeTab, setActiveTab] = useState("overview");
   const [chartType, setChartType] = useState("chart");
   const [timeRange, setTimeRange] = useState("30d");
   const salesProductivityData = [
-    {
-      name: "Calls Made",
-      value: 120,
-      description: "Total number of calls made by sales team",
-      itemStyle: { color: "#B2E5E0" },
-    },
-    {
-      name: "Client Meetings Scheduled",
-      value: 45,
-      description: "Upcoming meetings scheduled with clients",
-      itemStyle: { color: "#7FDCD4" },
-    },
-    {
-      name: "Client Meetings Conducted",
-      value: 30,
-      description: "Meetings successfully conducted with clients",
-      itemStyle: { color: "#4CCFC7" },
-    },
-    {
-      name: "Follow ups Done",
-      value: 85,
-      description: "Sales-related tasks ARKd as completed",
-      itemStyle: { color: "#26BDB5" },
-    },
-    {
-      name: "Deals Closed",
-      value: 25,
-      description: "Number of deals closed successfully",
-      itemStyle: { color: "#14B8A6" },
-    },
-  ];
+  { name: "Calls Made", value: 120, description: "Total number of calls made by sales team", itemStyle: { color: "#B2E5E0" } },
+  { name: "Client Meetings Scheduled", value: 45, description: "Upcoming meetings scheduled with clients", itemStyle: { color: "#7FDCD4" } },
+  { name: "Client Meetings Conducted", value: 30, description: "Meetings successfully conducted with clients", itemStyle: { color: "#4CCFC7" } },
+  { name: "Follow ups Done", value: 85, description: "Sales-related tasks marked as completed", itemStyle: { color: "#26BDB5" } },
+  { name: "Deals Closed", value: 25, description: "Number of deals closed successfully", itemStyle: { color: "#14B8A6" } }, 
+];
+
+
 
   const MetricCard = ({
     title,
@@ -105,6 +81,8 @@ export default function Analytics() {
           return val.toLocaleString();
       }
     };
+
+   
 
     return (
       <Card className="backdrop-blur-sm bg-teal-500/70 dark:bg-sky-800/50 border border-slate-200/50 dark:border-white/20">
@@ -376,57 +354,56 @@ export default function Analytics() {
               </CardContent>
             </Card>
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader>
+             <CardHeader>
                 <CardTitle>Growth Rate</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  <GrowthRateLineChart />
+                  <GrowthRate />
                 </div>
               </CardContent>
             </Card>
           </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+             <CardHeader>
+                <CardTitle>User Traffic</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  <UserTraffic />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+             <CardHeader>
+                <CardTitle>Top Selling Products</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  <TopSelling />
+                </div>
+              </CardContent>
+            </Card>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
               <CardHeader>
                 <CardTitle>Customer Satisfaction</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-64 items-center justify-center text-slate-500">
-                  <CustomerSatisfactionRadar />
+                  <CustomerSatisfaction />
                 </div>
               </CardContent>
             </Card>
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader>
+             <CardHeader>
                 <CardTitle>Traffic Breakdown</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-full w-full flex items-center justify-center text-slate-500">
                   <TrafficBreakdown />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader>
-                <CardTitle>User Traffic</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  <userTraffic />
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader>
-                <CardTitle>Top Selling Products</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  <TopSelling />
                 </div>
               </CardContent>
             </Card>
@@ -441,6 +418,7 @@ export default function Analytics() {
               </CardContent>
             </Card>
           </div>
+          
         </TabsContent>
 
         <TabsContent value="traffic" className="space-y-4 sm:space-y-6">
@@ -474,33 +452,33 @@ export default function Analytics() {
               </CardHeader>
               <CardContent className="p-4">
                 <div className="w-full h-full">
-                  <TrafficOverview className="w-full h-full" />
+                  <TrafficOverview className="w-full h-full"/>
                 </div>
               </CardContent>
             </Card>
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader>
+             <CardHeader>
                 <CardTitle>User Traffic</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  <userTraffic />
+                  <UserTraffic />
                 </div>
               </CardContent>
             </Card>
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader>
+             <CardHeader>
                 <CardTitle>Top Reffering Websites</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  <TopReffering />
+                  <TopReferring />
                 </div>
               </CardContent>
             </Card>
-
+            
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader>
+             <CardHeader>
                 <CardTitle>New Vs Returning Visitors</CardTitle>
               </CardHeader>
               <CardContent>
@@ -510,7 +488,7 @@ export default function Analytics() {
               </CardContent>
             </Card>
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader>
+             <CardHeader>
                 <CardTitle>Traffic Source</CardTitle>
               </CardHeader>
               <CardContent>
@@ -520,25 +498,28 @@ export default function Analytics() {
               </CardContent>
             </Card>
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader>
+             <CardHeader>
                 <CardTitle>Geographic Distribution</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  <TrafficMapChart />
+                  < GeographicDistribution/>
                 </div>
               </CardContent>
             </Card>
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader>
+             <CardHeader>
                 <CardTitle>Traffic By Campaign</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  <TrafficByCampaign />
+                  < TrafficByCampaign/>
                 </div>
               </CardContent>
             </Card>
+            
+            
+            
           </div>
           <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
             <CardHeader>
@@ -620,25 +601,31 @@ export default function Analytics() {
             />
           </div>
 
-          <CardHeader>
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardContent>
-                <SalesProductivityDonut data={salesProductivityData} />
-              </CardContent>
+         
+            <CardHeader>
+              <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+            <CardContent>
+            <SalesProductivityDonut data={salesProductivityData} />
+            </CardContent>
             </Card>
-          </CardHeader>
-          <PipelineChart />
+            </CardHeader>
+            <PipelineChart />
+            
+          
         </TabsContent>
 
         <TabsContent value="marketing" className="space-y-6">
-          <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-            <CardHeader>
-              <CardTitle>Campaign Performance</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <MarketingSankey />
-            </CardContent>
-          </Card>
+  <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+    <CardHeader>
+      <CardTitle>Campaign Performance</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <MarketingSankey />
+    </CardContent>
+  </Card>
+
+
+         
 
           <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
             <CardHeader>
@@ -653,40 +640,62 @@ export default function Analytics() {
         <TabsContent value="customer" className="space-y-4 sm:space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             <MetricCard
-              title="Customer Ratings"
+              title="Satisfaction Score"
               value={analyticsData.customer.satisfaction}
-              icon={Star}
+              icon={CheckCircle}
             />
             <MetricCard
-              title="Top Customer Industries"
-              value={analyticsData.customer.healthcare}
+              title="Net Promoter Score"
+              value={analyticsData.customer.nps}
               icon={TrendingUp}
             />
             <MetricCard
               title="Churn Rate"
               value={analyticsData.customer.churnRate}
-              icon={UserMinus}
+              icon={AlertTriangle}
               format="percentage"
             />
             <MetricCard
-              title="Customers Strength"
+              title="Customer LTV"
               value={analyticsData.customer.ltv}
-              icon={Users}
-              format="number"
+              icon={DollarSign}
+              format="currency"
             />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader></CardHeader>
+              <CardHeader>
+                <CardTitle>Customer Segmentation</CardTitle>
+              </CardHeader>
               <CardContent>
-                <CustomerSegmentCharts />
+                <CustomerSegmentChart />
               </CardContent>
             </Card>
+
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader></CardHeader>
-              <CardContent>
-                <TopIndustriesCard />
+              <CardHeader>
+                <CardTitle>Support Metrics</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between items-center p-3 rounded-lg bg-white/50 dark:bg-slate-700/50">
+                  <span>Support Tickets</span>
+                  <span className="font-bold">
+                    {analyticsData.customer.supportTickets}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-3 rounded-lg bg-white/50 dark:bg-slate-700/50">
+                  <span>Avg Resolution Time</span>
+                  <span className="font-bold">
+                    {analyticsData.customer.resolutionTime}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-3 rounded-lg bg-white/50 dark:bg-slate-700/50">
+                  <span>Customer Satisfaction</span>
+                  <span className="font-bold">
+                    {analyticsData.customer.satisfaction}/5.0
+                  </span>
+                </div>
               </CardContent>
             </Card>
           </div>
