@@ -11,6 +11,25 @@ import SalesProductivityDonut from "@/components/salesProductivity";
 import CustomerSegmentCharts from "@/components/CustomerChart";
 import TopIndustriesCard from "@/components/TopIndustryCard";
 import SalesOverview from "@/components/charts/SalesOverview";
+import { analyticsData } from "@/constants/constant";
+import GrowthRateLineChart from "@/components/charts/GrowthRate";
+import TrafficOverview from "@/components/charts/TrafficOverview";
+import TopSelling from "@/components/charts/TopSelling";
+import userTraffic from "@/components/charts/userTraffic";
+import TrafficMapChart from "@/components/charts/TrafficMapChart";
+import TopReffering from "@/components/charts/TopReffering";
+import TrafficBreakdown from "@/components/charts/TrafficBreakdown";
+import TrafficByCampaign from "@/components/charts/TrafficByCampaign";
+import TrafficSource from "@/components/charts/TrafficSource";
+import NewReturningVisitors from "@/components/charts/NewReturningVisitors";
+import CustomerSatisfactionRadar from "@/components/charts/CustomerSatisfaction";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 import {
   Select,
@@ -36,18 +55,6 @@ import {
   CheckCircle,
   AlertTriangle,
 } from "lucide-react";
-import { analyticsData } from "@/constants/constant";
-import GrowthRateLineChart from "@/components/charts/GrowthRate";
-import TrafficOverview from "@/components/charts/TrafficOverview";
-import TopSelling from "@/components/charts/TopSelling";
-import userTraffic from "@/components/charts/userTraffic";
-import TrafficMapChart from "@/components/charts/TrafficMapChart";
-import TopReffering from "@/components/charts/TopReffering";
-import TrafficBreakdown from "@/components/charts/TrafficBreakdown";
-import TrafficByCampaign from "@/components/charts/TrafficByCampaign";
-import TrafficSource from "@/components/charts/TrafficSource";
-import NewReturningVisitors from "@/components/charts/NewReturningVisitors";
-import CustomerSatisfactionRadar from "@/components/charts/CustomerSatisfaction";
 
 export default function Analytics() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -364,17 +371,7 @@ export default function Analytics() {
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader>
-                <CardTitle>Revenue Trend</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 items-center justify-center text-slate-500">
-                  <SalesOverview />
-                </div>
-              </CardContent>
-            </Card>
+          <div>
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
               <CardHeader>
                 <CardTitle>Growth Rate</CardTitle>
