@@ -41,10 +41,12 @@ export default function TrafficSourceDonutChart() {
       }, {});
 
       // ✅ Convert to chart-friendly format
-      const formattedData = Object.entries(sourceCounts).map(([name, value]) => ({
-        name,
-        value,
-      }));
+      const formattedData = Object.entries(sourceCounts).map(
+        ([name, value]) => ({
+          name,
+          value,
+        })
+      );
 
       setChartData(formattedData);
     };

@@ -1,26 +1,32 @@
 "use client";
 
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import MarketingSankey from "@/components/campaignPerformance";
 import SalesProductivityDonut from "@/components/salesProductivity";
-import SalesOverview from "@/components/charts/SalesOverview";
 import GrowthRate from "@/components/charts/GrowthRate";
-import TopSelling from "@/components/charts/TopSelling";
-import UserTraffic from "@/components/charts/userTraffic";
+// import TopSelling from "@/components/charts/TopSelling";
+// import UserTraffic from "@/components/charts/userTraffic";
 import CustomerSatisfaction from "@/components/charts/CustomerSatisfaction";
 import TrafficBreakdown from "@/components/charts/TrafficBreakdown";
-import TrafficOverview from "@/components/charts/TrafficOverview";
+// import TrafficOverview from "@/components/charts/TrafficOverview";
 import TrafficSource from "@/components/charts/TrafficSource";
-import GeographicDistribution from "@/components/charts/TrafficMapChart";
-import TopReferring from "@/components/charts/TopReffering";
+// import GeographicDistribution from "@/components/charts/TrafficMapChart";
+// import TopReferring from "@/components/charts/TopReffering";
 import NewReturningVisitors from "@/components/charts/NewReturningVisitors";
 import TrafficByCampaign from "@/components/charts/TrafficByCampaign";
-
-
+import { analyticsData } from "@/constants/constant";
+import LeadSourcesChart from "@/components/LeadSourcesChart";
+import TopPerformingChart from "@/components/charts/TopPerformingChart";
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogTrigger,
+// } from "@/components/ui/dialog";
 
 import {
   Select,
@@ -46,21 +52,43 @@ import {
   CheckCircle,
   AlertTriangle,
 } from "lucide-react";
-import { analyticsData } from "@/constants/constant";
 
 export default function Analytics() {
   const [activeTab, setActiveTab] = useState("overview");
   const [chartType, setChartType] = useState("chart");
   const [timeRange, setTimeRange] = useState("30d");
   const salesProductivityData = [
-  { name: "Calls Made", value: 120, description: "Total number of calls made by sales team", itemStyle: { color: "#B2E5E0" } },
-  { name: "Client Meetings Scheduled", value: 45, description: "Upcoming meetings scheduled with clients", itemStyle: { color: "#7FDCD4" } },
-  { name: "Client Meetings Conducted", value: 30, description: "Meetings successfully conducted with clients", itemStyle: { color: "#4CCFC7" } },
-  { name: "Follow ups Done", value: 85, description: "Sales-related tasks marked as completed", itemStyle: { color: "#26BDB5" } },
-  { name: "Deals Closed", value: 25, description: "Number of deals closed successfully", itemStyle: { color: "#14B8A6" } }, 
-];
-
-
+    {
+      name: "Calls Made",
+      value: 120,
+      description: "Total number of calls made by sales team",
+      itemStyle: { color: "#B2E5E0" },
+    },
+    {
+      name: "Client Meetings Scheduled",
+      value: 45,
+      description: "Upcoming meetings scheduled with clients",
+      itemStyle: { color: "#7FDCD4" },
+    },
+    {
+      name: "Client Meetings Conducted",
+      value: 30,
+      description: "Meetings successfully conducted with clients",
+      itemStyle: { color: "#4CCFC7" },
+    },
+    {
+      name: "Follow ups Done",
+      value: 85,
+      description: "Sales-related tasks marked as completed",
+      itemStyle: { color: "#26BDB5" },
+    },
+    {
+      name: "Deals Closed",
+      value: 25,
+      description: "Number of deals closed successfully",
+      itemStyle: { color: "#14B8A6" },
+    },
+  ];
 
   const MetricCard = ({
     title,
@@ -81,8 +109,6 @@ export default function Analytics() {
           return val.toLocaleString();
       }
     };
-
-   
 
     return (
       <Card className="backdrop-blur-sm bg-teal-500/70 dark:bg-sky-800/50 border border-slate-200/50 dark:border-white/20">
@@ -174,32 +200,6 @@ export default function Analytics() {
                 className="bg-gradient-to-r from-teal-500 to-sky-700 h-3 rounded-full transition-all duration-500"
                 style={{ width: `${(stage.value / 2500000) * 100}%` }}
               ></div>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  const LeadSourcesChart = () => (
-    <div className="space-y-4">
-      {analyticsData.marketing.leadSources.map((source, index) => (
-        <div
-          key={index}
-          className="flex items-center justify-between p-3 rounded-lg bg-white/50 dark:bg-slate-700/50"
-        >
-          <div className="flex items-center space-x-3">
-            <div
-              className={`w-4 h-4 rounded-full bg-gradient-to-r from-blue-${
-                (index + 1) * 100
-              } to-purple-${(index + 1) * 100}`}
-            ></div>
-            <span className="font-medium">{source.source}</span>
-          </div>
-          <div className="text-right">
-            <div className="font-bold">{source.count.toLocaleString()}</div>
-            <div className="text-sm text-slate-600 dark:text-slate-400">
-              {source.percentage}%
             </div>
           </div>
         </div>
@@ -342,19 +342,9 @@ export default function Analytics() {
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
               <CardHeader>
-                <CardTitle>Revenue Trend</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 items-center justify-center text-slate-500">
-                  <SalesOverview />
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-             <CardHeader>
                 <CardTitle>Growth Rate</CardTitle>
               </CardHeader>
               <CardContent>
@@ -364,9 +354,9 @@ export default function Analytics() {
               </CardContent>
             </Card>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-             <CardHeader>
+              <CardHeader>
                 <CardTitle>User Traffic</CardTitle>
               </CardHeader>
               <CardContent>
@@ -376,7 +366,7 @@ export default function Analytics() {
               </CardContent>
             </Card>
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-             <CardHeader>
+              <CardHeader>
                 <CardTitle>Top Selling Products</CardTitle>
               </CardHeader>
               <CardContent>
@@ -385,8 +375,8 @@ export default function Analytics() {
                 </div>
               </CardContent>
             </Card>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          </div> */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
               <CardHeader>
                 <CardTitle>Customer Satisfaction</CardTitle>
@@ -398,7 +388,7 @@ export default function Analytics() {
               </CardContent>
             </Card>
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-             <CardHeader>
+              <CardHeader>
                 <CardTitle>Traffic Breakdown</CardTitle>
               </CardHeader>
               <CardContent>
@@ -418,7 +408,6 @@ export default function Analytics() {
               </CardContent>
             </Card>
           </div>
-          
         </TabsContent>
 
         <TabsContent value="traffic" className="space-y-4 sm:space-y-6">
@@ -448,16 +437,16 @@ export default function Analytics() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20 lg:col-span-2">
               <CardHeader>
-                <CardTitle>Website Traffic Overview</CardTitle>
+                <CardTitle>Traffic By Campaign</CardTitle>
               </CardHeader>
-              <CardContent className="p-4">
-                <div className="w-full h-full">
-                  <TrafficOverview className="w-full h-full"/>
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  <TrafficByCampaign />
                 </div>
               </CardContent>
             </Card>
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-             <CardHeader>
+            {/* <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+              <CardHeader>
                 <CardTitle>User Traffic</CardTitle>
               </CardHeader>
               <CardContent>
@@ -467,7 +456,7 @@ export default function Analytics() {
               </CardContent>
             </Card>
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-             <CardHeader>
+              <CardHeader>
                 <CardTitle>Top Reffering Websites</CardTitle>
               </CardHeader>
               <CardContent>
@@ -475,10 +464,10 @@ export default function Analytics() {
                   <TopReferring />
                 </div>
               </CardContent>
-            </Card>
-            
+            </Card> */}
+
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-             <CardHeader>
+              <CardHeader>
                 <CardTitle>New Vs Returning Visitors</CardTitle>
               </CardHeader>
               <CardContent>
@@ -488,7 +477,7 @@ export default function Analytics() {
               </CardContent>
             </Card>
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-             <CardHeader>
+              <CardHeader>
                 <CardTitle>Traffic Source</CardTitle>
               </CardHeader>
               <CardContent>
@@ -497,29 +486,16 @@ export default function Analytics() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-             <CardHeader>
+            {/* <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+              <CardHeader>
                 <CardTitle>Geographic Distribution</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  < GeographicDistribution/>
+                  <GeographicDistribution />
                 </div>
               </CardContent>
-            </Card>
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-             <CardHeader>
-                <CardTitle>Traffic By Campaign</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  < TrafficByCampaign/>
-                </div>
-              </CardContent>
-            </Card>
-            
-            
-            
+            </Card> */}
           </div>
           <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
             <CardHeader>
@@ -528,50 +504,7 @@ export default function Analytics() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {chartType === "table" || chartType === "both" ? (
-                <div className="overflow-x-auto">
-                  <DataTable
-                    data={analyticsData.traffic.topPages}
-                    columns={[
-                      { header: "Page", key: "page" },
-                      {
-                        header: "Views",
-                        key: "views",
-                        format: (v) => v.toLocaleString(),
-                      },
-                      {
-                        header: "Conversion Rate",
-                        key: "conversion",
-                        format: (v) => `${v}%`,
-                      },
-                    ]}
-                  />
-                </div>
-              ) : (
-                <div className="space-y-3 sm:space-y-4">
-                  {analyticsData.traffic.topPages.map((page, index) => (
-                    <div
-                      key={index}
-                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 rounded-lg bg-white/50 dark:bg-slate-700/50"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium break-words">
-                          {page.page}
-                        </div>
-                        <div className="text-sm text-slate-600 dark:text-slate-400">
-                          {page.views.toLocaleString()} views
-                        </div>
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className="self-start sm:self-center"
-                      >
-                        {page.conversion}% conv
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <TopPerformingChart />
             </CardContent>
           </Card>
         </TabsContent>
@@ -601,31 +534,25 @@ export default function Analytics() {
             />
           </div>
 
-         
-            <CardHeader>
-              <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-            <CardContent>
-            <SalesProductivityDonut data={salesProductivityData} />
-            </CardContent>
+          <CardHeader>
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+              <CardContent>
+                <SalesProductivityDonut data={salesProductivityData} />
+              </CardContent>
             </Card>
-            </CardHeader>
-            <PipelineChart />
-            
-          
+          </CardHeader>
+          <PipelineChart />
         </TabsContent>
 
         <TabsContent value="marketing" className="space-y-6">
-  <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-    <CardHeader>
-      <CardTitle>Campaign Performance</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <MarketingSankey />
-    </CardContent>
-  </Card>
-
-
-         
+          <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+            <CardHeader>
+              <CardTitle>Campaign Performance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MarketingSankey />
+            </CardContent>
+          </Card>
 
           <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
             <CardHeader>

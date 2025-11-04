@@ -81,7 +81,7 @@ export default function Layout({ children }) {
   }, [darkMode]);
 
   return (
-    <div className={cn("min-h-screen", darkMode && "dark")}>
+    <div className={cn("min-h-screen bg-[#e1faf7]", darkMode && "dark")}>
       {mobileSidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 sm:hidden"
@@ -96,14 +96,17 @@ export default function Layout({ children }) {
           "hidden sm:block"
         )}
       >
-        <div className="flex h-full flex-col backdrop-blur-xl">
+        <div
+          className="flex h-full flex-col bg-gradient-to-r bg-gradient-to-br  from-[#bce6dd] via-[#a8e0d8] to-[#b2e8f7]
+ backdrop-blur-xl"
+        >
           <div
             className={`flex h-16 items-center ${
               sidebarOpen ? "justify-between" : "justify-center"
             } px-4`}
           >
             {sidebarOpen && (
-              <span className="text-xl font-bold bg-gradient-to-r from-teal-500 to-sky-700 dark:from-teal-200 dark:to-sky-300 bg-clip-text text-transparent">
+              <span className="text-2xl font-bold bg-gradient-to-r from-teal-500 to-sky-700 dark:from-teal-200 dark:to-sky-300 bg-clip-text text-transparent">
                 GTM Engine
               </span>
             )}

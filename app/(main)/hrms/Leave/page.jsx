@@ -29,7 +29,6 @@ const LeaveApproval = () => {
         return;
       }
 
-      console.log("leavePending", data);
       setLeavePending(data.apply_leave || []);
     }
   };
@@ -44,7 +43,7 @@ const LeaveApproval = () => {
   };
 
   const HandleApproveLeave = async (leave) => {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("HRMS")
       .update({
         apply_leave: leavePending.filter((l) => l.id !== leave.id),
@@ -74,21 +73,12 @@ const LeaveApproval = () => {
       return l;
     });
 
-    const { data: updateEmployeeData, error: updateEmployeeError } =
-      await supabase
-        .from("Employees")
-        .update({ apply_leave: updatedLeaves })
-        .eq("id", leave.employee_id);
+    await supabase
+      .from("Employees")
+      .update({ apply_leave: updatedLeaves })
+      .eq("id", leave.employee_id);
 
-    if (updateEmployeeError) {
-      console.error(
-        "Error updating employee leave status:",
-        updateEmployeeError
-      );
-      return;
-    }
-
-    const { data: notifyData, error: notifyError } = await supabase
+    await supabase
       .from("Employees")
       .update({
         notifications: [
@@ -107,16 +97,11 @@ const LeaveApproval = () => {
       })
       .eq("id", leave.employee_id);
 
-    if (notifyError) {
-      console.error("Error creating notification:", notifyError);
-      return;
-    }
-
     fetchPendingLeaves();
   };
 
-  const HandleRejectLeave = async () => {
-    const { data, error } = await supabase
+  const HandleRejectLeave = async (leave) => {
+    const { error } = await supabase
       .from("HRMS")
       .update({
         apply_leave: leavePending.filter((l) => l.id !== leave.id),
@@ -129,7 +114,7 @@ const LeaveApproval = () => {
     }
 
     const { data: employeeData, error: employeeError } = await supabase
-      .from("Employee")
+      .from("Employees")
       .select("*")
       .eq("id", leave.employee_id)
       .single();
@@ -139,27 +124,19 @@ const LeaveApproval = () => {
       return;
     }
 
-    const updatedLeaves = employeeData.leaves.map((l) => {
+    const updatedLeaves = employeeData.apply_leave.map((l) => {
       if (l.id === leave.id) {
         return { ...l, status: "Rejected" };
       }
       return l;
     });
 
-    const { data: updateEmployeeData, error: updateEmployeeError } =
-      await supabase
-        .from("Employees")
-        .update({ leaves: updatedLeaves })
-        .eq("id", leave.employee_id);
-    if (updateEmployeeError) {
-      console.error(
-        "Error updating employee leave status:",
-        updateEmployeeError
-      );
-      return;
-    }
+    await supabase
+      .from("Employees")
+      .update({ apply_leave: updatedLeaves })
+      .eq("id", leave.employee_id);
 
-    const { data: notifyData, error: notifyError } = await supabase
+    await supabase
       .from("Employees")
       .update({
         notifications: [
@@ -178,68 +155,70 @@ const LeaveApproval = () => {
       })
       .eq("id", leave.employee_id);
 
-    if (notifyError) {
-      console.error("Error creating notification:", notifyError);
-      return;
-    }
-
     fetchPendingLeaves();
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#E9FDF9] via-[#C8F4EE] to-[#B2E8F7] p-8">
       <div className="max-w-6xl mx-auto space-y-10">
+        {/* Header */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-              <Coffee className="w-8 h-8 text-blue-600" />
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-[#25C2A0] via-[#2d7b6e] to-[#2c6279] bg-clip-text text-transparent flex items-center gap-2">
+              <Coffee className="w-8 h-8 text-[#2b6781]" />
               Leave Approval
             </h1>
-            <p className="text-gray-500">
+            <p className="text-gray-600 font-medium">
               Manage leave requests and approvals efficiently
             </p>
           </div>
         </div>
-        <div className="bg-white shadow-md rounded-lg p-6">
-          <h2 className="text-2xl font-semibold mb-4">
+
+        {/* Pending Leave Requests */}
+        <div className="bg-white/50 backdrop-blur-xl border border-[#25C2A0]/30 shadow-lg rounded-2xl p-8">
+          <h2 className="text-2xl font-semibold mb-6 text-[#2b6781]">
             Pending Leave Requests
           </h2>
+
           {leavePending.length > 0 ? (
-            <ul className="space-y-4">
+            <ul className="space-y-6">
               {leavePending.map((leave, index) => (
-                <li key={index} className="border p-4 rounded-lg">
-                  <p>
-                    <strong>Employee:</strong> {leave.name}
-                  </p>
-                  <p>
-                    <strong>From:</strong> {formatDate(leave.start)}
-                  </p>
-                  <p>
-                    <strong>To:</strong> {formatDate(leave.end)}
-                  </p>
-                  <p>
-                    <strong>Reason:</strong> {leave.reason}
-                  </p>
-                  <p>
-                    <strong>Half Day:</strong> {leave.half_day ? "Yes" : "No"}
-                  </p>
-                  <p>
-                    <strong>Start:</strong>{" "}
-                    {leave.start_time ? formatDate(leave.start_time) : "N/A"}
-                  </p>
-                  <p>
-                    <strong>End:</strong>{" "}
-                    {leave.end_time ? formatDate(leave.end_time) : "N/A"}
-                  </p>
-                  <div className="mt-2 space-x-2">
+                <li
+                  key={index}
+                  className="border border-[#25C2A0]/20 bg-white/70 rounded-xl p-6 shadow hover:shadow-lg hover:scale-[1.01] transition-all"
+                >
+                  <div className="space-y-2 text-gray-700 font-medium">
+                    <p>
+                      <strong className="text-[#2b6781]">Employee:</strong>{" "}
+                      {leave.name}
+                    </p>
+                    <p>
+                      <strong className="text-[#2b6781]">From:</strong>{" "}
+                      {formatDate(leave.start)}
+                    </p>
+                    <p>
+                      <strong className="text-[#2b6781]">To:</strong>{" "}
+                      {formatDate(leave.end)}
+                    </p>
+                    <p>
+                      <strong className="text-[#2b6781]">Reason:</strong>{" "}
+                      {leave.reason}
+                    </p>
+                    <p>
+                      <strong className="text-[#2b6781]">Half Day:</strong>{" "}
+                      {leave.half_day ? "Yes" : "No"}
+                    </p>
+                  </div>
+
+                  <div className="mt-5 flex gap-3">
                     <button
-                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                      className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-[#25C2A0] to-[#38BDF8] text-white font-semibold shadow hover:scale-[1.03] hover:opacity-90 transition-all"
                       onClick={() => HandleApproveLeave(leave)}
                     >
                       Approve
                     </button>
                     <button
-                      className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                      className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-[#f87171] to-[#ef4444] text-white font-semibold shadow hover:scale-[1.03] hover:opacity-90 transition-all"
                       onClick={() => HandleRejectLeave(leave)}
                     >
                       Reject
@@ -249,7 +228,9 @@ const LeaveApproval = () => {
               ))}
             </ul>
           ) : (
-            <p>No pending leave requests.</p>
+            <p className="text-gray-600 text-center font-medium">
+              No pending leave requests.
+            </p>
           )}
         </div>
       </div>
