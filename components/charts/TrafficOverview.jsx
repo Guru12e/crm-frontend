@@ -33,7 +33,10 @@ export default function TrafficLineChart() {
         .eq("user_email", userEmail);
 
       if (campaignError || leadsError) {
-        console.error("Error fetching chart data:", campaignError || leadsError);
+        console.error(
+          "Error fetching chart data:",
+          campaignError || leadsError
+        );
         return;
       }
 

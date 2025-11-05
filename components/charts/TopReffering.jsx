@@ -28,7 +28,14 @@ export default function TopReferrers() {
       },
       yAxis: {
         type: "category",
-        data: ["Google", "LinkedIn", "Facebook", "Instagram", "YouTube", "Twitter"],
+        data: [
+          "Google",
+          "LinkedIn",
+          "Facebook",
+          "Instagram",
+          "YouTube",
+          "Twitter",
+        ],
         axisLine: { lineStyle: { color: "#94a3b8" } },
         axisLabel: { color: "#475569" },
       },
