@@ -289,7 +289,7 @@ export const navigation = [
         icon: <Cog />,
       },
       { name: "Pricing", href: "/revenueengine/pricing", icon: <DollarSign /> },
-      { name: "Quotes", href: "/revenueengine/quotes", icon: <FileText /> },
+      // { name: "Quotes", href: "/revenueengine/quotes", icon: <FileText /> },
     ],
   },
 ];

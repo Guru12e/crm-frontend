@@ -25,13 +25,34 @@ export async function POST(request) {
         description: data.description,
         user_email: data.session.user.email,
       })
-      .select("*");
+      .select("*")
+      .single();
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
 
-    return NextResponse.json(deal, { status: 200 });
+    // Auto-trigger LeadCreated agent event
+    // try {
+    //   const appBase = process.env.APP_BASE_URL || "http://localhost:3000";
+    //   const created = lead;
+    //   await fetch(`${appBase}/api/agents/events`, {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({
+    //       type: "LeadCreated",
+    //       payload: {
+    //         id: created?.id,
+    //         name: created?.name,
+    //         email: created?.email,
+    //         owner: created?.owner || "auto",
+    //         source: created?.source || "Unknown",
+    //       },
+    //     }),
+    //   });
+    // } catch (_) {}
+
+    return NextResponse.json(lead, { status: 200 });
   } catch (err) {
     console.error(err);
     return NextResponse.json("error", { status: 400 });

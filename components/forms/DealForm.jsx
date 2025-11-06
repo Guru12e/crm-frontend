@@ -298,7 +298,7 @@ const DealForm = ({ fetchDeals, session, products, setDealsData }) => {
             Deal Source
           </Label>
           <Select
-            value={dealFormData.source}
+            value={dealFormData.source || ""}
             onValueChange={(value) => updateDealFormData("source", value)}
             className={errors.source ? "border-red-500" : ""}
           >
@@ -338,7 +338,7 @@ const DealForm = ({ fetchDeals, session, products, setDealsData }) => {
             Deal Status
           </Label>
           <Select
-            value={dealFormData.status}
+            value={dealFormData.status || ""}
             onValueChange={(value) => updateDealFormData("status", value)}
             className={errors.status ? "border-red-500" : ""}
           >
@@ -390,7 +390,7 @@ const DealForm = ({ fetchDeals, session, products, setDealsData }) => {
             Deal Priority
           </Label>
           <Select
-            value={dealFormData.priority}
+            value={dealFormData.priority || ""}
             onValueChange={(value) => updateDealFormData("priority", value)}
             className={errors.priority ? "border-red-500" : ""}
           >
