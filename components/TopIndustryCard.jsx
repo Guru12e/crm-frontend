@@ -74,7 +74,7 @@ const TopIndustriesCard = () => {
       formatter: "{b}: {c} customers",
     },
     grid: {
-      left: "10%",
+      left: "10%", // small gap for Y-axis labels
       right: "5%",
       top: "15%",
       bottom: "10%",
@@ -88,7 +88,7 @@ const TopIndustriesCard = () => {
         interval: 0,
         fontSize: 12,
         color: "#334155",
-        formatter: (value) => value,
+        formatter: (value) => value, // show full name
       },
     },
     series: [
@@ -118,57 +118,19 @@ const TopIndustriesCard = () => {
     fetchIndustryCustomers(industry);
   };
 
-  // Dummy support metrics (replace with real analyticsData if available)
-  const analyticsData = {
-    customer: {
-      supportTickets: 42,
-      resolutionTime: "3h 20m",
-      satisfaction: 4.6,
-    },
-  };
-
   return (
     <>
-      <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-        <CardHeader>
-          <CardTitle>Industry Insights</CardTitle>
-        </CardHeader>
+      <Card className="backdrop-blur-sm bg-white/500 dark:bg-slate-800/50 border-white/20">
+        <CardHeader></CardHeader>
         <CardContent>
-          {/* Top Industries Chart */}
           <ReactECharts
             option={chartOptions}
-            style={{ height: 300, width: "100%" }}
+            style={{ height: 300, width: "90%" }}
             onEvents={{ click: onChartClick }}
           />
-
-          {/* Support Metrics under chart */}
-          <div className="mt-8">
-            <h3 className="font-semibold text-lg mb-3">Support Metrics</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center p-3 rounded-lg bg-white/50 dark:bg-slate-700/50">
-                <span>Support Tickets</span>
-                <span className="font-bold">
-                  {analyticsData.customer.supportTickets}
-                </span>
-              </div>
-              <div className="flex justify-between items-center p-3 rounded-lg bg-white/50 dark:bg-slate-700/50">
-                <span>Avg Resolution Time</span>
-                <span className="font-bold">
-                  {analyticsData.customer.resolutionTime}
-                </span>
-              </div>
-              <div className="flex justify-between items-center p-3 rounded-lg bg-white/50 dark:bg-slate-700/50">
-                <span>Customer Satisfaction</span>
-                <span className="font-bold">
-                  {analyticsData.customer.satisfaction}/5.0
-                </span>
-              </div>
-            </div>
-          </div>
         </CardContent>
       </Card>
 
-      {/* Customer Details */}
       {selectedIndustry && (
         <Card className="mt-4">
           <CardHeader>

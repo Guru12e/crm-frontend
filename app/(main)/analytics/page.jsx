@@ -608,7 +608,7 @@ export default function Analytics() {
                 <TopIndustriesCard />
               </CardContent>
 
-              <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+              <Card className="gap-5 backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
                 <CardHeader>
                   <CardTitle>Support Metrics</CardTitle>
                 </CardHeader>
@@ -635,7 +635,7 @@ export default function Analytics() {
               </Card>
             </Card>
 
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+            {/* <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
               <CardHeader>
                 <CardTitle>Support Metrics</CardTitle>
               </CardHeader>
@@ -659,7 +659,7 @@ export default function Analytics() {
                   </span>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </TabsContent>
       </Tabs>
