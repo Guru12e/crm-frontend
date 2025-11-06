@@ -111,8 +111,26 @@ const LeadForm = ({ session, fetchLeads, fetchDeals, setLeadsData }) => {
 
     if (req.status === 200) {
       toast.success("Lead Added", { autoClose: 3000, position: "top-right" });
-      const updatedLead = await req.json();
-      setLeadsData((prevLeads) => [...prevLeads, updatedLead]);
+      const createdLead = await req.json();
+      const leadObj = Array.isArray(createdLead) ? createdLead[0] : createdLead;
+      setLeadsData((prevLeads) => [...prevLeads, leadObj]);
+      // Client-side trigger too (helps debugging in Network tab)
+      try {
+        await fetch("/api/agents/events", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "LeadCreated",
+            payload: {
+              id: leadObj?.id,
+              name: leadObj?.name,
+              email: leadObj?.email,
+              owner: leadObj?.owner || "auto",
+              source: leadObj?.source || leadsFormData.source || "Unknown",
+            },
+          }),
+        });
+      } catch (e) {}
       setLeadsFormData({
         name: "",
         phone: "",
@@ -248,7 +266,7 @@ const LeadForm = ({ session, fetchLeads, fetchDeals, setLeadsData }) => {
             Industry
           </Label>
           <Select
-            value={leadsFormData.industry}
+            value={leadsFormData.industry || ""}
             onValueChange={(value) => updateLeadsFormData("industry", value)}
             className={errors.industry ? "border-red-500" : ""}
           >
@@ -334,7 +352,7 @@ const LeadForm = ({ session, fetchLeads, fetchDeals, setLeadsData }) => {
             Lead Status
           </Label>
           <Select
-            value={leadsFormData.status}
+            value={leadsFormData.status || ""}
             onValueChange={(value) => updateLeadsFormData("status", value)}
             className={errors.status ? "border-red-500" : ""}
           >
@@ -367,7 +385,7 @@ const LeadForm = ({ session, fetchLeads, fetchDeals, setLeadsData }) => {
             Lead Source
           </Label>
           <Select
-            value={leadsFormData.source}
+            value={leadsFormData.source || ""}
             onValueChange={(value) => updateLeadsFormData("source", value)}
             className={errors.source ? "border-red-500" : ""}
           >

@@ -13,6 +13,7 @@ import CustomerCard from "@/components/cards/CustomerCard";
 import CustomerForm from "@/components/forms/CustomerForm";
 import DealCard from "@/components/cards/DealCard";
 import DealForm from "@/components/forms/DealForm";
+import AgentActivity from "@/components/agents/AgentActivity";
 import {
   Select,
   SelectContent,
@@ -771,6 +772,8 @@ export default function CRM() {
           </div>
         </TabsContent>
       </Tabs>
+
+      <AgentActivity />
     </div>
   );
 }

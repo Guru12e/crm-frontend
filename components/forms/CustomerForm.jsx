@@ -228,7 +228,7 @@ const CustomerForm = ({ session, fetchCustomers, setCustomersData }) => {
             Industry
           </Label>
           <Select
-            value={customerFormData.industry}
+            value={customerFormData.industry || ""}
             onValueChange={(value) => updateCustomerFormData("industry", value)}
             className={errors.industry ? "border-red-500" : ""}
           >
@@ -297,7 +297,7 @@ const CustomerForm = ({ session, fetchCustomers, setCustomersData }) => {
             Customer Status
           </Label>
           <Select
-            value={customerFormData.status}
+            value={customerFormData.status || ""}
             onValueChange={(value) => updateCustomerFormData("status", value)}
             className={errors.status ? "border-red-500" : ""}
           >

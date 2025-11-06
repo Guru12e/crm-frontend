@@ -62,11 +62,12 @@ export default function LeadCard({
   const handleStatusUpdate = async () => {
     const stage_history = lead.stage_history || [];
     const length = stage_history.length;
-    const start_date = stage_history[length - 1]?.end_date || lead.created_at;
+    const start_date_raw = stage_history[length - 1]?.end_date || lead?.created_at || new Date().toISOString();
+    const start_date = new Date(start_date_raw).toISOString().split("T")[0];
     const current_history = {
       old_status: lead.status,
       new_status: newState,
-      start_date: start_date.split("T")[0],
+      start_date: start_date,
       end_date: new Date().toISOString().split("T")[0],
       state_description: description,
     };
@@ -150,17 +151,19 @@ export default function LeadCard({
               </div>
               <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
                 <AvatarFallback className="bg-gradient-to-r from-sky-700 to-teal-500 text-white md:text-xl font-semibold xs:text-md">
-                  {lead.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
+                  {(() => {
+                    const display = (lead?.name || "?").toString();
+                    const parts = display.split(" ").filter(Boolean);
+                    const initials = parts.length ? parts.map((n) => n[0]).join("") : display[0];
+                    return (initials || "?").toUpperCase();
+                  })()}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 w-full">
                 <Sheet>
                   <SheetTrigger asChild key={lead.id}>
                     <Label className="mt-2 ml-2 flex items-center gap-2 hover:text-blue-400 text-md md:text-[16px] min-w-full bg-transparent font-semibold text-slate-900 dark:text-white break-words  hover:bg-transparent">
-                      {lead.name}
+                      {lead?.name || "Unnamed Lead"}
                       <Edit className="h-4 w-4 text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer ml-1" />
                     </Label>
                   </SheetTrigger>
@@ -179,7 +182,7 @@ export default function LeadCard({
                   </SheetContent>
                 </Sheet>
                 <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 break-words">
-                  {lead.contact}
+                  {lead?.contact || ""}
                 </p>
               </div>
             </div>
