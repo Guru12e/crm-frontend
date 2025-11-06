@@ -8,7 +8,7 @@ import MarketingSankey from "@/components/campaignPerformance";
 import SalesProductivityDonut from "@/components/salesProductivity";
 import GrowthRate from "@/components/charts/GrowthRate";
 // import TopSelling from "@/components/charts/TopSelling";
-import UserTraffic from "@/components/charts/userTraffic";
+// import UserTraffic from "@/components/charts/userTraffic";
 import CustomerSatisfaction from "@/components/charts/CustomerSatisfaction";
 import TrafficBreakdown from "@/components/charts/TrafficBreakdown";
 import TrafficOverview from "@/components/charts/TrafficOverview";
@@ -20,6 +20,7 @@ import TrafficByCampaign from "@/components/charts/TrafficByCampaign";
 import { analyticsData } from "@/constants/constant";
 import LeadSourcesChart from "@/components/LeadSourcesChart";
 import TopPerformingChart from "@/components/charts/TopPerformingChart";
+import TopIndustriesCard from "@/components/TopIndustryCard";
 import CustomerSegmentCharts from "@/components/CustomerChart";
 // import {
 //   Dialog,
@@ -355,7 +356,7 @@ export default function Analytics() {
               </CardContent>
             </Card>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
               <CardHeader>
                 <CardTitle>User Traffic</CardTitle>
@@ -366,7 +367,7 @@ export default function Analytics() {
                 </div>
               </CardContent>
             </Card>
-            {/* <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
               <CardHeader>
                 <CardTitle>Top Selling Products</CardTitle>
               </CardHeader>
@@ -376,39 +377,38 @@ export default function Analytics() {
                 </div>
               </CardContent>
             </Card>
-          </div> */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-                <CardHeader>
-                  <CardTitle>Customer Satisfaction</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-64 items-center justify-center text-slate-500">
-                    <CustomerSatisfaction />
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-                <CardHeader>
-                  <CardTitle>Traffic Breakdown</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-full w-full flex items-center justify-center text-slate-500">
-                    <TrafficBreakdown />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20 lg:col-span-2">
-                <CardHeader>
-                  <CardTitle>Lead Sources</CardTitle>
-                </CardHeader>
-                <CardContent className="p-4">
-                  <LeadSourcesChart />
-                </CardContent>
-              </Card>
-            </div>
+          </div>  */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+              <CardHeader>
+                <CardTitle>Customer Satisfaction</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64 items-center justify-center text-slate-500">
+                  <CustomerSatisfaction />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+              <CardHeader>
+                <CardTitle>Traffic Breakdown</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  <TrafficBreakdown />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20 lg:col-span-2">
+              <CardHeader>
+                <CardTitle>Lead Sources</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <LeadSourcesChart />
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
         <TabsContent value="traffic" className="space-y-4 sm:space-y-6">
@@ -446,7 +446,7 @@ export default function Analytics() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+            {/* <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
               <CardHeader>
                 <CardTitle>User Traffic</CardTitle>
               </CardHeader>
@@ -455,7 +455,7 @@ export default function Analytics() {
                   <UserTraffic />
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
               <CardHeader>
                 <CardTitle>Top Reffering Websites</CardTitle>
@@ -602,6 +602,41 @@ export default function Analytics() {
             </Card>
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
               <CardHeader>
+                <CardTitle>TopIndustryCard</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TopIndustriesCard />
+              </CardContent>
+
+              <Card className="gap-5 backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+                <CardHeader>
+                  <CardTitle>Support Metrics</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center p-3 rounded-lg bg-white/50 dark:bg-slate-700/50">
+                    <span>Support Tickets</span>
+                    <span className="font-bold">
+                      {analyticsData.customer.supportTickets}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 rounded-lg bg-white/50 dark:bg-slate-700/50">
+                    <span>Avg Resolution Time</span>
+                    <span className="font-bold">
+                      {analyticsData.customer.resolutionTime}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 rounded-lg bg-white/50 dark:bg-slate-700/50">
+                    <span>Customer Satisfaction</span>
+                    <span className="font-bold">
+                      {analyticsData.customer.satisfaction}/5.0
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            </Card>
+
+            {/* <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+              <CardHeader>
                 <CardTitle>Support Metrics</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -624,7 +659,7 @@ export default function Analytics() {
                   </span>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </TabsContent>
       </Tabs>

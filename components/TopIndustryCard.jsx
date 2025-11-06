@@ -14,14 +14,38 @@ const TopIndustriesCard = () => {
 
   const dummyCustomers = {
     "E-commerce & Retail": [
-      { name: "Alice", location: "New York", industry: "E-commerce & Retail", purchase_history: "Laptop, Phone", intent_score: 85 },
-      { name: "Bob", location: "San Francisco", industry: "E-commerce & Retail", purchase_history: "Shoes, Bag", intent_score: 70 },
+      {
+        name: "Alice",
+        location: "New York",
+        industry: "E-commerce & Retail",
+        purchase_history: "Laptop, Phone",
+        intent_score: 85,
+      },
+      {
+        name: "Bob",
+        location: "San Francisco",
+        industry: "E-commerce & Retail",
+        purchase_history: "Shoes, Bag",
+        intent_score: 70,
+      },
     ],
     "Finance & Banking": [
-      { name: "Charlie", location: "Chicago", industry: "Finance & Banking", purchase_history: "Insurance", intent_score: 90 },
+      {
+        name: "Charlie",
+        location: "Chicago",
+        industry: "Finance & Banking",
+        purchase_history: "Insurance",
+        intent_score: 90,
+      },
     ],
     "Healthcare Services": [
-      { name: "David", location: "Boston", industry: "Healthcare Services", purchase_history: "Vitamins, Medicine", intent_score: 80 },
+      {
+        name: "David",
+        location: "Boston",
+        industry: "Healthcare Services",
+        purchase_history: "Vitamins, Medicine",
+        intent_score: 80,
+      },
     ],
   };
 
@@ -29,13 +53,7 @@ const TopIndustriesCard = () => {
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [industryCustomers, setIndustryCustomers] = useState([]);
 
-  const colors = [
-    "#3BCEC0",
-    "#20B8A6",
-    "#A3E3DC",
-    "#81DDD6",
-    "#4FD1C5",
-  ];
+  const colors = ["#3BCEC0", "#20B8A6", "#A3E3DC", "#81DDD6", "#4FD1C5"];
 
   useEffect(() => {
     setIndustryData(dummyIndustryData);
@@ -78,7 +96,10 @@ const TopIndustriesCard = () => {
         type: "bar",
         data: industryData.map(([_, count], index) => ({
           value: count,
-          itemStyle: { color: colors[index % colors.length], borderRadius: [5, 5, 5, 5] },
+          itemStyle: {
+            color: colors[index % colors.length],
+            borderRadius: [5, 5, 5, 5],
+          },
         })),
         barWidth: "40%",
         label: {
@@ -100,13 +121,11 @@ const TopIndustriesCard = () => {
   return (
     <>
       <Card className="backdrop-blur-sm bg-white/500 dark:bg-slate-800/50 border-white/20">
-        <CardHeader>
-        
-        </CardHeader>
+        <CardHeader></CardHeader>
         <CardContent>
           <ReactECharts
             option={chartOptions}
-            style={{ height: 300, width: "90%" }} 
+            style={{ height: 300, width: "90%" }}
             onEvents={{ click: onChartClick }}
           />
         </CardContent>
@@ -121,17 +140,32 @@ const TopIndustriesCard = () => {
             {industryCustomers.length > 0 ? (
               <div className="grid gap-4">
                 {industryCustomers.map((cust, i) => (
-                  <div key={i} className="p-3 rounded-lg border hover:shadow-md transition">
-                    <p><strong>Name:</strong> {cust.name}</p>
-                    <p><strong>Location:</strong> {cust.location}</p>
-                    <p><strong>Industry:</strong> {cust.industry}</p>
-                    <p><strong>Purchase History:</strong> {cust.purchase_history}</p>
-                    <p><strong>Intent Score:</strong> {cust.intent_score}</p>
+                  <div
+                    key={i}
+                    className="p-3 rounded-lg border hover:shadow-md transition"
+                  >
+                    <p>
+                      <strong>Name:</strong> {cust.name}
+                    </p>
+                    <p>
+                      <strong>Location:</strong> {cust.location}
+                    </p>
+                    <p>
+                      <strong>Industry:</strong> {cust.industry}
+                    </p>
+                    <p>
+                      <strong>Purchase History:</strong> {cust.purchase_history}
+                    </p>
+                    <p>
+                      <strong>Intent Score:</strong> {cust.intent_score}
+                    </p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-muted-foreground">No customer data found for this industry.</p>
+              <p className="text-muted-foreground">
+                No customer data found for this industry.
+              </p>
             )}
           </CardContent>
         </Card>
