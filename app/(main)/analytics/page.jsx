@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import MarketingSankey from "@/components/campaignPerformance";
-import SalesProductivityDonut from "@/components/salesProductivity";
+import MarketingSankey from "@/components/charts/campaignPerformance";
+import SalesProductivityDonut from "@/components/charts/salesProductivity";
 import GrowthRate from "@/components/charts/GrowthRate";
 // import TopSelling from "@/components/charts/TopSelling";
 // import UserTraffic from "@/components/charts/userTraffic";
@@ -20,8 +20,8 @@ import TrafficByCampaign from "@/components/charts/TrafficByCampaign";
 import { analyticsData } from "@/constants/constant";
 import LeadSourcesChart from "@/components/LeadSourcesChart";
 import TopPerformingChart from "@/components/charts/TopPerformingChart";
-import TopIndustriesCard from "@/components/TopIndustryCard";
-import CustomerSegmentCharts from "@/components/CustomerChart";
+import TopIndustriesCard from "@/components/charts/TopIndustryCard";
+import CustomerSegmentCharts from "@/components/charts/CustomerChart";
 // import {
 //   Dialog,
 //   DialogContent,
