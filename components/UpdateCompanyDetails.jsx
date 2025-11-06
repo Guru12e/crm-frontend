@@ -157,7 +157,6 @@ export default function CompanyProfile() {
 
   const addProduct = () => {
     if (!validateNewProduct()) return;
-
     const productToAdd = { ...newProduct, id: Date.now().toString() };
     setProducts([...products, productToAdd]);
     setNewProduct({ name: "", category: "", price: "", description: "" });
@@ -196,11 +195,12 @@ export default function CompanyProfile() {
       .select("*")
       .eq("email", userEmail)
       .single();
+
     const noChanges =
       companyDetails.companyName === companyData.companyName &&
       companyDetails.companyDescription === companyData.companyDescription &&
       companyDetails.companyWebsite === companyData.companyWebsite &&
-      isEqual(companyDetails.products, companyData.products);
+      isEqual(companyDetails.products, products);
 
     if (noChanges) {
       toast.info("No changes detected.", { position: "top-right" });
@@ -226,7 +226,7 @@ export default function CompanyProfile() {
           user_email: userEmail,
           description: {
             ...companyData,
-            products: companyData.products.filter((p) => p.isActive),
+            products: companyData.products.filter((p) => p.isActive || p.isActive === undefined),
           },
         }),
       });
