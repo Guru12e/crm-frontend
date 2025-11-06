@@ -64,6 +64,7 @@ export default function CompanyProfile() {
         const parsed = JSON.parse(cachedData);
         setCompanyData(parsed);
         setProducts(Array.isArray(parsed.products) ? parsed.products : []);
+        console.log(parsed);
       } catch (error) {
         console.error("Failed to parse cached data:", error);
         localStorage.removeItem("companyDataCache");
@@ -95,6 +96,7 @@ export default function CompanyProfile() {
             ? JSON.parse(data.products || "[]")
             : data.products || []
         );
+        
         if (icpData) setIcpData(icpData);
 
         if (icpError) console.error("Error fetching ICP data:", icpError);
@@ -215,6 +217,8 @@ export default function CompanyProfile() {
           console.error("Error deleting ICP data:", error);
         }
       }
+
+  
       const res = await fetch("/api/ICP", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -410,13 +414,13 @@ export default function CompanyProfile() {
             </Button>
           </div>
 
-          {products.filter((product) => product.isActive).length > 0 && (
+          {products.filter((product) => product.isActive || product.isActive === undefined).length > 0 && (
             <div className="space-y-3">
               <h4 className="font-medium text-slate-900 dark:text-white">
                 Your Products & Services
               </h4>
               {products
-                .filter((product) => product.isActive)
+                .filter((product) => product.isActive || product.isActive === undefined)
                 .map((product, idx) => (
                   <div
                     key={product.id}
@@ -484,7 +488,7 @@ export default function CompanyProfile() {
             </div>
           )}
           {products.length > 0 &&
-            products.filter((product) => product.isActive).length === 0 && (
+            products.filter((product) => product.isActive || product.isActive === undefined).length === 0 && (
               <div className="text-center py-6 text-slate-500 dark:text-slate-400">
                 <AlertCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p className="text-sm">
