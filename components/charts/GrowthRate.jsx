@@ -62,7 +62,7 @@ export default function GrowthRateLineChart() {
 
     const option = {
       title: {
-        text: "📈 Weekly Growth Rate (Leads vs Deals)",
+        text: "📈 Growth Rate (Leads vs Deals)",
         left: "center",
         textStyle: { color: "#0f172a", fontWeight: "600" },
       },

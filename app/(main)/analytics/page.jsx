@@ -1,16 +1,33 @@
 "use client";
 
-import { Star } from "lucide-react";
-import { UserMinus } from "lucide-react";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import MarketingSankey from "@/components/campaignPerformance";
 import SalesProductivityDonut from "@/components/salesProductivity";
+import GrowthRate from "@/components/charts/GrowthRate";
+// import TopSelling from "@/components/charts/TopSelling";
+import UserTraffic from "@/components/charts/userTraffic";
+import CustomerSatisfaction from "@/components/charts/CustomerSatisfaction";
+import TrafficBreakdown from "@/components/charts/TrafficBreakdown";
+import TrafficOverview from "@/components/charts/TrafficOverview";
+import TrafficSource from "@/components/charts/TrafficSource";
+import GeographicDistribution from "@/components/charts/TrafficMapChart";
+import TopReferring from "@/components/charts/TopReffering";
+import NewReturningVisitors from "@/components/charts/NewReturningVisitors";
+import TrafficByCampaign from "@/components/charts/TrafficByCampaign";
+import { analyticsData } from "@/constants/constant";
+import LeadSourcesChart from "@/components/LeadSourcesChart";
+import TopPerformingChart from "@/components/charts/TopPerformingChart";
 import CustomerSegmentCharts from "@/components/CustomerChart";
-import TopIndustriesCard from "@/components/TopIndustryCard";
-import SalesOverview from "@/components/charts/SalesOverview";
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogTrigger,
+// } from "@/components/ui/dialog";
 
 import {
   Select,
@@ -36,18 +53,6 @@ import {
   CheckCircle,
   AlertTriangle,
 } from "lucide-react";
-import { analyticsData } from "@/constants/constant";
-import GrowthRateLineChart from "@/components/charts/GrowthRate";
-import TrafficOverview from "@/components/charts/TrafficOverview";
-import TopSelling from "@/components/charts/TopSelling";
-import userTraffic from "@/components/charts/userTraffic";
-import TrafficMapChart from "@/components/charts/TrafficMapChart";
-import TopReffering from "@/components/charts/TopReffering";
-import TrafficBreakdown from "@/components/charts/TrafficBreakdown";
-import TrafficByCampaign from "@/components/charts/TrafficByCampaign";
-import TrafficSource from "@/components/charts/TrafficSource";
-import NewReturningVisitors from "@/components/charts/NewReturningVisitors";
-import CustomerSatisfactionRadar from "@/components/charts/CustomerSatisfaction";
 
 export default function Analytics() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -75,7 +80,7 @@ export default function Analytics() {
     {
       name: "Follow ups Done",
       value: 85,
-      description: "Sales-related tasks ARKd as completed",
+      description: "Sales-related tasks marked as completed",
       itemStyle: { color: "#26BDB5" },
     },
     {
@@ -101,8 +106,8 @@ export default function Analytics() {
           return `$${(val / 1000000).toFixed(1)}M`;
         case "percentage":
           return `${val}%`;
-        default:
-          return val.toLocaleString();
+        // default:
+        //   return val.toLocaleString();
       }
     };
 
@@ -196,32 +201,6 @@ export default function Analytics() {
                 className="bg-gradient-to-r from-teal-500 to-sky-700 h-3 rounded-full transition-all duration-500"
                 style={{ width: `${(stage.value / 2500000) * 100}%` }}
               ></div>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  const LeadSourcesChart = () => (
-    <div className="space-y-4">
-      {analyticsData.marketing.leadSources.map((source, index) => (
-        <div
-          key={index}
-          className="flex items-center justify-between p-3 rounded-lg bg-white/50 dark:bg-slate-700/50"
-        >
-          <div className="flex items-center space-x-3">
-            <div
-              className={`w-4 h-4 rounded-full bg-gradient-to-r from-blue-${
-                (index + 1) * 100
-              } to-purple-${(index + 1) * 100}`}
-            ></div>
-            <span className="font-medium">{source.source}</span>
-          </div>
-          <div className="text-right">
-            <div className="font-bold">{source.count.toLocaleString()}</div>
-            <div className="text-sm text-slate-600 dark:text-slate-400">
-              {source.percentage}%
             </div>
           </div>
         </div>
@@ -364,47 +343,14 @@ export default function Analytics() {
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader>
-                <CardTitle>Revenue Trend</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 items-center justify-center text-slate-500">
-                  <SalesOverview />
-                </div>
-              </CardContent>
-            </Card>
+          <div>
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
               <CardHeader>
                 <CardTitle>Growth Rate</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  <GrowthRateLineChart />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader>
-                <CardTitle>Customer Satisfaction</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 items-center justify-center text-slate-500">
-                  <CustomerSatisfactionRadar />
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader>
-                <CardTitle>Traffic Breakdown</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  <TrafficBreakdown />
+                  <GrowthRate />
                 </div>
               </CardContent>
             </Card>
@@ -416,11 +362,11 @@ export default function Analytics() {
               </CardHeader>
               <CardContent>
                 <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  <userTraffic />
+                  <UserTraffic />
                 </div>
               </CardContent>
             </Card>
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+            {/* <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
               <CardHeader>
                 <CardTitle>Top Selling Products</CardTitle>
               </CardHeader>
@@ -430,19 +376,41 @@ export default function Analytics() {
                 </div>
               </CardContent>
             </Card>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20 lg:col-span-2">
-              <CardHeader>
-                <CardTitle>Lead Sources</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                <LeadSourcesChart />
-              </CardContent>
-            </Card>
+          </div> */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+                <CardHeader>
+                  <CardTitle>Customer Satisfaction</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64 items-center justify-center text-slate-500">
+                    <CustomerSatisfaction />
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
+                <CardHeader>
+                  <CardTitle>Traffic Breakdown</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-full w-full flex items-center justify-center text-slate-500">
+                    <TrafficBreakdown />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20 lg:col-span-2">
+                <CardHeader>
+                  <CardTitle>Lead Sources</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <LeadSourcesChart />
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </TabsContent>
-
         <TabsContent value="traffic" className="space-y-4 sm:space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             <MetricCard
@@ -470,11 +438,11 @@ export default function Analytics() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20 lg:col-span-2">
               <CardHeader>
-                <CardTitle>Website Traffic Overview</CardTitle>
+                <CardTitle>Traffic By Campaign</CardTitle>
               </CardHeader>
-              <CardContent className="p-4">
-                <div className="w-full h-full">
-                  <TrafficOverview className="w-full h-full" />
+              <CardContent>
+                <div className="h-full w-full flex items-center justify-center text-slate-500">
+                  <TrafficByCampaign />
                 </div>
               </CardContent>
             </Card>
@@ -484,7 +452,7 @@ export default function Analytics() {
               </CardHeader>
               <CardContent>
                 <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  <userTraffic />
+                  <UserTraffic />
                 </div>
               </CardContent>
             </Card>
@@ -494,7 +462,7 @@ export default function Analytics() {
               </CardHeader>
               <CardContent>
                 <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  <TopReffering />
+                  <TopReferring />
                 </div>
               </CardContent>
             </Card>
@@ -525,17 +493,7 @@ export default function Analytics() {
               </CardHeader>
               <CardContent>
                 <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  <TrafficMapChart />
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader>
-                <CardTitle>Traffic By Campaign</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-full w-full flex items-center justify-center text-slate-500">
-                  <TrafficByCampaign />
+                  <GeographicDistribution />
                 </div>
               </CardContent>
             </Card>
@@ -547,50 +505,7 @@ export default function Analytics() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {chartType === "table" || chartType === "both" ? (
-                <div className="overflow-x-auto">
-                  <DataTable
-                    data={analyticsData.traffic.topPages}
-                    columns={[
-                      { header: "Page", key: "page" },
-                      {
-                        header: "Views",
-                        key: "views",
-                        format: (v) => v.toLocaleString(),
-                      },
-                      {
-                        header: "Conversion Rate",
-                        key: "conversion",
-                        format: (v) => `${v}%`,
-                      },
-                    ]}
-                  />
-                </div>
-              ) : (
-                <div className="space-y-3 sm:space-y-4">
-                  {analyticsData.traffic.topPages.map((page, index) => (
-                    <div
-                      key={index}
-                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 rounded-lg bg-white/50 dark:bg-slate-700/50"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium break-words">
-                          {page.page}
-                        </div>
-                        <div className="text-sm text-slate-600 dark:text-slate-400">
-                          {page.views.toLocaleString()} views
-                        </div>
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className="self-start sm:self-center"
-                      >
-                        {page.conversion}% conv
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <TopPerformingChart />
             </CardContent>
           </Card>
         </TabsContent>
@@ -653,40 +568,61 @@ export default function Analytics() {
         <TabsContent value="customer" className="space-y-4 sm:space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             <MetricCard
-              title="Customer Ratings"
+              title="Satisfaction Score"
               value={analyticsData.customer.satisfaction}
-              icon={Star}
+              icon={CheckCircle}
             />
             <MetricCard
-              title="Top Customer Industries"
-              value={analyticsData.customer.healthcare}
+              title="Net Promoter Score"
+              value={analyticsData.customer.nps}
               icon={TrendingUp}
             />
             <MetricCard
               title="Churn Rate"
               value={analyticsData.customer.churnRate}
-              icon={UserMinus}
+              icon={AlertTriangle}
               format="percentage"
             />
             <MetricCard
-              title="Customers Strength"
+              title="Customer LTV"
               value={analyticsData.customer.ltv}
-              icon={Users}
-              format="number"
+              icon={DollarSign}
+              format="currency"
             />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader></CardHeader>
+              <CardHeader>
+                <CardTitle>Customer Segmentation</CardTitle>
+              </CardHeader>
               <CardContent>
                 <CustomerSegmentCharts />
               </CardContent>
             </Card>
             <Card className="backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20">
-              <CardHeader></CardHeader>
-              <CardContent>
-                <TopIndustriesCard />
+              <CardHeader>
+                <CardTitle>Support Metrics</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between items-center p-3 rounded-lg bg-white/50 dark:bg-slate-700/50">
+                  <span>Support Tickets</span>
+                  <span className="font-bold">
+                    {analyticsData.customer.supportTickets}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-3 rounded-lg bg-white/50 dark:bg-slate-700/50">
+                  <span>Avg Resolution Time</span>
+                  <span className="font-bold">
+                    {analyticsData.customer.resolutionTime}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-3 rounded-lg bg-white/50 dark:bg-slate-700/50">
+                  <span>Customer Satisfaction</span>
+                  <span className="font-bold">
+                    {analyticsData.customer.satisfaction}/5.0
+                  </span>
+                </div>
               </CardContent>
             </Card>
           </div>

@@ -71,8 +71,6 @@ const MarketingSankey = () => {
         else {
           setCampaignStatus(campaignData.length);
         }
-
-
       }
     };
 
@@ -87,10 +85,10 @@ const MarketingSankey = () => {
       formatter: (params) => {
         if (params.name === "Campaign Performance")
           return "Main metric of your marketing campaign.";
-     
+
         if (params.name === "Avg Lead → Deal")
           return `Qualified Leads: ${qualifiedLeads}`;
-        if (params.name === "Customer") 
+        if (params.name === "Customer")
           return `customers Activity: ${Customeractivity}`;
 
         if (params.name === "Deal Completion %")
@@ -99,7 +97,6 @@ const MarketingSankey = () => {
           return "Number of times the campaign was displayed.";
         if (params.name === "Campaign Status")
           return `Campaigns Sent: ${campaignstatus}`;
-        
       },
     },
     series: [
@@ -109,7 +106,7 @@ const MarketingSankey = () => {
         draggable: false,
         data: [
           { name: "Campaign Performance", itemStyle: { color: "#14B8A6" } },
-          
+
           { name: "Avg Lead → Deal", itemStyle: { color: "#3BCEC0" } },
           { name: "Deal Completion %", itemStyle: { color: "#20B8A6" } },
           { name: "Impressions", itemStyle: { color: "#A3E3DC" } },
@@ -117,7 +114,6 @@ const MarketingSankey = () => {
           { name: "Campaign Status", itemStyle: { color: "#4FD1C5" } },
         ],
         links: [
-          
           {
             source: "Campaign Performance",
             target: "Avg Lead → Deal",
@@ -133,7 +129,11 @@ const MarketingSankey = () => {
             target: "Impressions",
             value: 4000,
           },
-          { source: "Campaign Performance", target: "Customer", value: Customeractivity * 2000},
+          {
+            source: "Campaign Performance",
+            target: "Customer",
+            value: Customeractivity * 2000,
+          },
           {
             source: "Campaign Performance",
             target: "Campaign Status",

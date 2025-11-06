@@ -80,52 +80,62 @@ export default function PayrollPage() {
   const { gross, pf, esi, net } = calcTotals();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-8">
+    <div className="min-h-screen bg-gradient-to-br  from-[#E9FDF9] via-[#C8F4EE] to-[#B2E8F7] p-8">
       <div className="max-w-6xl mx-auto space-y-10">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-2">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-              <Wallet className="w-8 h-8 text-blue-600" />
+            <h1 className="text-3xl md:text-4xl font-bold flex items-start  bg-gradient-to-r from-[#25C2A0] via-[#266d61] to-[#235d76] bg-clip-text text-transparent drop-shadow-[0_2px_2px_rgba(70,200,248,0.25)]">
+              {/* <Wallet className="w-8 h-8 text-transparent bg-gradient-to-r from-[#25C2A0] via-[#2AD4B7] to-[#38BDF8] bg-clip-text" /> */}
               Payroll Dashboard
             </h1>
+
             <p className="text-gray-500">
               Manage salaries, deductions, PF & ESI automatically
             </p>
           </div>
           <Badge
             variant="outline"
-            className="text-blue-600 font-semibold py-2 px-4 rounded-full"
+            className="border-[#25C2A0] text-[#25C2A0] font-semibold py-2 px-4 rounded-b-lg text-sm bg-white backdrop-blur-sm"
           >
             Total Employees: {employees.length}
           </Badge>
         </div>
 
+        {/* Employee Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {employees.map((emp) => (
             <Card
               key={emp.id}
-              className="shadow-lg border border-gray-100 backdrop-blur-md bg-white/70 hover:shadow-xl transition-all"
+              className="shadow-lg border border-[#25C2A0]/20 bg-white/40 backdrop-blur-md hover:shadow-xl hover:scale-[1.02] transition-all"
             >
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span className="text-lg font-semibold">{emp.name}</span>
-                  <Users className="w-5 h-5 text-blue-500" />
+                  <span className="font-semibold text-[#1e7e68]">
+                    {emp.name}
+                  </span>
+                  <Users className="w-5 h-5 text-[#25C2A0]" />
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
-                <p className="text-gray-600">Base Salary: ₹{emp.salary || 0}</p>
-                <p className="text-gray-600">
-                  Last Paid:{" "}
+
+              <CardContent className="space-y-3 pt-2">
+                <p className="text-gray-700">
+                  <span className="font-medium">Base Salary:</span> ₹
+                  {emp.salary || 0}
+                </p>
+                <p className="text-gray-700">
+                  <span className="font-medium">Last Paid:</span>{" "}
                   {emp.last_paid || (
-                    <span className="italic">Not Paid Yet</span>
+                    <span className="italic text-gray-500">Not Paid Yet</span>
                   )}
                 </p>
 
+                {/* Edit Payroll Sheet */}
                 <Sheet>
                   <SheetTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full mt-2 bg-blue-600 text-white hover:bg-blue-700"
+                      className="w-full mt-2 bg-gradient-to-r from-[#25C2A0] to-[#2AD4B7] text-black/70 font-medium hover:opacity-90 cursor-pointer"
                       onClick={() => {
                         setEditing(emp);
                         setPayroll({
@@ -135,21 +145,24 @@ export default function PayrollPage() {
                         });
                       }}
                     >
-                      <Calculator className="w-4 h-4 mr-2" />
+                      <Calculator className="w-4 h-4 mr-2 " />
                       Edit Payroll
                     </Button>
                   </SheetTrigger>
 
-                  <SheetContent className="p-6 space-y-6 max-w-md bg-white/90 backdrop-blur-md">
-                    <SheetHeader>
-                      <SheetTitle>Edit Payroll – {emp.name}</SheetTitle>
+                  <SheetContent className="p-6 space-y-6 max-w-md bg-white/95 backdrop-blur-md border border-[#25C2A0]/30 shadow-lg rounded-lg">
+                    <SheetHeader className="-mx-6 -mt-6 bg-gradient-to-r from-[#A3E3DB] to-[#25C2A0] px-6 py-3 rounded-t-lg shadow-sm">
+                      <SheetTitle className="text-white font-semibold">
+                        Edit Payroll – {emp.name}
+                      </SheetTitle>
                     </SheetHeader>
 
                     <Separator />
 
+                    {/* Salary & Allowances */}
                     <div className="space-y-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-600">
+                        <label className="text-sm font-medium text-gray-700">
                           Base Salary
                         </label>
                         <Input
@@ -221,18 +234,19 @@ export default function PayrollPage() {
 
                     <Separator />
 
-                    <div className="space-y-2 text-sm text-gray-700">
+                    {/* Calculated Summary */}
+                    <div className="space-y-2 text-sm text-gray-700 bg-[#A3E3DB]/20 p-3 rounded-md">
                       <p>Gross Salary: ₹{gross.toFixed(2)}</p>
-                      <p>PF (12% of salary): ₹{pf.toFixed(2)}</p>
-                      <p>ESI (0.75% of gross): ₹{esi.toFixed(2)}</p>
-                      <p className="font-semibold text-gray-800">
+                      <p>PF (12%): ₹{pf.toFixed(2)}</p>
+                      <p>ESI (0.75%): ₹{esi.toFixed(2)}</p>
+                      <p className="font-semibold text-gray-900">
                         Net Pay: ₹{net.toFixed(2)}
                       </p>
                     </div>
 
                     <Button
                       onClick={handleUpdate}
-                      className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold hover:scale-[1.02] transition-transform"
+                      className="w-full bg-gradient-to-r from-[#25C2A0] to-[#2AD4B7] text-white font-semibold hover:opacity-90 hover:scale-[1.02] transition-all"
                     >
                       Save Payroll
                     </Button>

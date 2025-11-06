@@ -209,7 +209,7 @@ export default function CRM() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-left sm:items-center">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+          <h1 className="text-3xl md:text-4xl font-bold flex items-start  bg-gradient-to-r from-[#25C2A0] via-[#2d7d71] to-[#1f576f] bg-clip-text text-transparent drop-shadow-[0_2px_2px_rgba(70,200,248,0.25)]">
             CRM Dashboard
           </h1>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">

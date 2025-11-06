@@ -369,12 +369,12 @@ export default function Campaigns() {
   };
 
   return (
-    <div className="min-h-screen w-full rounded-lg">
+    <div className="min-h-screen w-full rounded-lg from-[#E9FDF9] via-[#C8F4EE] to-[#B2E8F7]">
       <div className="flex flex-row justify-left items-center">
         <Sheet>
           <div className="flex w-full flex-col items-stretch md:flex-row gap-4 justify-between md:items-center relative">
             <div className="flex-1 w-full">
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+              <h1 className="text-3xl md:text-4xl font-bold flex items-start  bg-gradient-to-r from-[#25C2A0] via-[#2d7d71] to-[#1f576f] bg-clip-text text-transparent drop-shadow-[0_2px_2px_rgba(70,200,248,0.25)]">
                 Campaigns
               </h1>
               <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">
@@ -389,7 +389,7 @@ export default function Campaigns() {
           </div>
           <SheetContent
             side="right"
-            className="min-w-[85vw] overflow-y-auto backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6"
+            className="min-w-[85vw] overflow-y-auto backdrop-blur-sm bg-white border border-slate-200/50 dark:border-white/20 mb-6"
           >
             <SheetHeader>
               <SheetTitle>Create Email Campaign</SheetTitle>

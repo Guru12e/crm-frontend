@@ -3,90 +3,109 @@
 import * as echarts from "echarts";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/utils/supabase/client";
+import { startOfWeek, endOfWeek, eachDayOfInterval, format } from "date-fns";
 
 export default function TrafficAreaChart() {
   const chartRef = useRef(null);
+  const [chartData, setChartData] = useState([0, 0, 0, 0, 0, 0, 0]);
   const [userEmail, setUserEmail] = useState("");
-  const [trafficData, setTrafficData] = useState([0, 0, 0, 0, 0, 0, 0]);
 
   useEffect(() => {
+    // Get user session email
     const local = localStorage.getItem("session");
     const user = JSON.parse(local)?.user;
     if (user) setUserEmail(user?.email);
   }, []);
 
   useEffect(() => {
-    const fetchTraffic = async () => {
+    const fetchTrafficData = async () => {
       if (!userEmail) return;
 
-      // Fetch creation timestamps from all relevant tables
-      const [customers, leads, deals] = await Promise.all([
-        supabase.from("Customers").select("created_at").eq("user_email", userEmail),
-        supabase.from("Leads").select("created_at").eq("user_email", userEmail),
-        supabase.from("Deals").select("created_at, status").eq("user_email", userEmail),
-      ]);
+      const now = new Date();
+      const weekStart = startOfWeek(now, { weekStartsOn: 1 }); // Monday
+      const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
 
-      if (customers.error) console.error("Customers fetch error:", customers.error);
-      if (leads.error) console.error("Leads fetch error:", leads.error);
-      if (deals.error) console.error("Deals fetch error:", deals.error);
+      const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
+      const counts = Array(7).fill(0);
 
-      // Combine all timestamps (count only active-type events)
-      const allTimestamps = [
-        ...(customers.data || []).map((c) => c.created_at),
-        ...(leads.data || []).map((l) => l.created_at),
-        ...(deals.data || [])
-          .filter((d) => d.status === "Closed-won") // only successful deals
-          .map((d) => d.created_at),
-      ];
+      // Helper to count records per day
+      const countPerDay = (rows, dateKey = "created_at") => {
+        rows.forEach((row) => {
+          const d = new Date(row[dateKey]);
+          const dayIndex = d.getDay() === 0 ? 6 : d.getDay() - 1; // make Mon=0, Sun=6
+          counts[dayIndex] += 1;
+        });
+      };
 
-      // Initialize traffic count per weekday (0=Sun, 1=Mon, … 6=Sat)
-      const weekdayCounts = [0, 0, 0, 0, 0, 0, 0];
+      // Fetch from multiple tables
+      const { data: users } = await supabase
+        .from("Users")
+        .select("created_at")
+        .gte("created_at", weekStart.toISOString())
+        .lte("created_at", weekEnd.toISOString());
 
-      allTimestamps.forEach((timestamp) => {
-        const day = new Date(timestamp).getDay(); // 0–6
-        weekdayCounts[day] += 1;
-      });
+      const { data: leads } = await supabase
+        .from("Leads")
+        .select("created_at")
+        .eq("user_email", userEmail)
+        .gte("created_at", weekStart.toISOString())
+        .lte("created_at", weekEnd.toISOString());
 
-      // Reorder: Mon–Sun (since JS getDay starts from Sun)
-      const orderedTraffic = [
-        weekdayCounts[1], // Mon
-        weekdayCounts[2], // Tue
-        weekdayCounts[3], // Wed
-        weekdayCounts[4], // Thu
-        weekdayCounts[5], // Fri
-        weekdayCounts[6], // Sat
-        weekdayCounts[0], // Sun
-      ];
+      const { data: deals } = await supabase
+        .from("Deals")
+        .select("created_at")
+        .eq("user_email", userEmail)
+        .gte("created_at", weekStart.toISOString())
+        .lte("created_at", weekEnd.toISOString());
 
-      setTrafficData(orderedTraffic);
+      const { data: campaigns } = await supabase
+        .from("Campaigns")
+        .select("sent_at, created_at")
+        .eq("user_email", userEmail)
+        .gte("created_at", weekStart.toISOString())
+        .lte("created_at", weekEnd.toISOString());
+
+      // Aggregate
+      if (users) countPerDay(users);
+      if (leads) countPerDay(leads);
+      if (deals) countPerDay(deals);
+      if (campaigns) countPerDay(campaigns, "sent_at" || "created_at");
+
+      setChartData(counts);
     };
 
-    fetchTraffic();
+    fetchTrafficData();
+
+    // Optional: Real-time listener (auto-update on inserts)
+    const channels = [
+      supabase
+        .channel("realtime:Users")
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "Users" }, fetchTrafficData)
+        .subscribe(),
+      supabase
+        .channel("realtime:Deals")
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "Deals" }, fetchTrafficData)
+        .subscribe(),
+    ];
+
+    return () => {
+      channels.forEach((ch) => supabase.removeChannel(ch));
+    };
   }, [userEmail]);
 
   useEffect(() => {
     if (!chartRef.current) return;
-
-    const chartDom = chartRef.current;
-    const myChart = echarts.init(chartDom);
+    const myChart = echarts.init(chartRef.current);
 
     const option = {
       title: {
-        text: "👥 User Traffic (Weekly)",
+        text: "👥 Weekly User Traffic",
         left: "center",
-        textStyle: {
-          color: "#0f172a",
-          fontWeight: "600",
-        },
+        textStyle: { color: "#0f172a", fontWeight: "600" },
       },
       tooltip: {
         trigger: "axis",
-        axisPointer: {
-          type: "cross",
-          label: {
-            backgroundColor: "#14b8a6",
-          },
-        },
+        axisPointer: { type: "cross", label: { backgroundColor: "#14b8a6" } },
       },
       xAxis: {
         type: "category",
@@ -104,11 +123,10 @@ export default function TrafficAreaChart() {
       grid: { left: "3%", right: "4%", bottom: "10%", containLabel: true },
       series: [
         {
-          name: "Visitors (Customers + Leads + Deals)",
+          name: "Activity",
           type: "line",
           smooth: true,
           showSymbol: false,
-          lineStyle: { width: 3, color: "#14b8a6" },
           areaStyle: {
             opacity: 0.6,
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
@@ -116,13 +134,13 @@ export default function TrafficAreaChart() {
               { offset: 1, color: "#0ea5e9" },
             ]),
           },
-          data: trafficData,
+          lineStyle: { width: 3, color: "#14b8a6" },
+          data: chartData,
         },
       ],
     };
 
     myChart.setOption(option);
-
     const handleResize = () => myChart.resize();
     window.addEventListener("resize", handleResize);
 
@@ -130,7 +148,7 @@ export default function TrafficAreaChart() {
       window.removeEventListener("resize", handleResize);
       myChart.dispose();
     };
-  }, [trafficData]);
+  }, [chartData]);
 
   return <div ref={chartRef} style={{ width: "100%", height: "400px" }} />;
 }

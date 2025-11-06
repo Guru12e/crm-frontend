@@ -1,12 +1,66 @@
 "use client";
 
 import * as echarts from "echarts";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { supabase } from "@/utils/supabase/client";
 
 export default function TrafficSourcesPie() {
   const chartRef = useRef(null);
+  const [userEmail, setUserEmail] = useState("");
+  const [trafficData, setTrafficData] = useState([]);
 
   useEffect(() => {
+    const local = localStorage.getItem("session");
+    const user = JSON.parse(local)?.user;
+    if (user) {
+      setUserEmail(user?.email);
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchTrafficData = async () => {
+      if (!userEmail) return;
+
+      // Fetch from Leads and Deals
+      const { data: leads, error: leadsError } = await supabase
+        .from("Leads")
+        .select("source")
+        .eq("user_email", userEmail);
+
+      const { data: deals, error: dealsError } = await supabase
+        .from("Deals")
+        .select("source")
+        .eq("user_email", userEmail);
+
+      if (leadsError || dealsError) {
+        console.error("Error fetching traffic data:", leadsError || dealsError);
+        return;
+      }
+
+      // Combine both sources
+      const combined = [...(leads || []), ...(deals || [])];
+
+      // Count occurrences of each traffic source
+      const sourceCount = combined.reduce((acc, item) => {
+        const src = item.source || "Unknown";
+        acc[src] = (acc[src] || 0) + 1;
+        return acc;
+      }, {});
+
+      // Convert to ECharts format
+      const chartData = Object.entries(sourceCount).map(([name, value]) => ({
+        name,
+        value,
+      }));
+
+      setTrafficData(chartData);
+    };
+
+    fetchTrafficData();
+  }, [userEmail]);
+
+  useEffect(() => {
+    if (!chartRef.current || trafficData.length === 0) return;
     const chartDom = chartRef.current;
     const myChart = echarts.init(chartDom);
 
@@ -15,10 +69,7 @@ export default function TrafficSourcesPie() {
         text: "🌐 Traffic Sources",
         subtext: "Visitor Channels",
         left: "center",
-        textStyle: {
-          color: "#0f172a",
-          fontWeight: "600",
-        },
+        textStyle: { color: "#0f172a", fontWeight: "600" },
         subtextStyle: { color: "#64748b", fontSize: 13 },
       },
       tooltip: {
@@ -47,27 +98,21 @@ export default function TrafficSourcesPie() {
             color: "#0f172a",
             fontWeight: "500",
           },
-          labelLine: { show: true },
-          data: [
-            { value: 500, name: "Organic Search" },
-            { value: 300, name: "Paid Ads" },
-            { value: 200, name: "Direct" },
-            { value: 150, name: "Referral" },
-            { value: 100, name: "Social Media" },
-          ],
+          data: trafficData,
           color: [
-            "#14b8a6", // teal-500
-            "#0ea5e9", // sky-500
-            "#38bdf8", // sky-400
-            "#2dd4bf", // teal-400
-            "#7dd3fc", // sky-300
+            "#14b8a6",
+            "#0ea5e9",
+            "#38bdf8",
+            "#2dd4bf",
+            "#7dd3fc",
+            "#818cf8",
+            "#c084fc",
           ],
         },
       ],
     };
 
     myChart.setOption(option);
-
     const handleResize = () => myChart.resize();
     window.addEventListener("resize", handleResize);
 
@@ -75,7 +120,7 @@ export default function TrafficSourcesPie() {
       window.removeEventListener("resize", handleResize);
       myChart.dispose();
     };
-  }, []);
+  }, [trafficData]);
 
   return <div ref={chartRef} style={{ width: "100%", height: "400px" }} />;
 }

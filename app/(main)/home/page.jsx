@@ -225,7 +225,7 @@ export default function Home() {
   const [chartsMode, setChartsMode] = useState("graphic");
 
   const MetricCard = ({ title, value, change, icon: Icon }) => (
-    <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-300 cursor-pointer group">
+    <Card className="backdrop-blur-sm bg-white/40 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 hover:bg-white/20 dark:hover:bg-slate-800/60 transition-all duration-300 cursor-pointer group">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>
@@ -247,7 +247,7 @@ export default function Home() {
               {change}% from last month
             </p> */}
           </div>
-          <Icon className="h-8 w-8 text-blue-500 group-hover:scale-110 transition-transform" />
+          <Icon className="h-8 w-8 text-[#25C2A0] group-hover:text-[#235d76] group-hover:scale-110 transition-transform" />
         </div>
       </CardContent>
     </Card>
@@ -525,14 +525,11 @@ export default function Home() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-[#E9FDF9] via-[#C8F4EE] to-[#B2E8F7] p-8 space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1
-            className={`text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white ${
-              darkMode ? "dark" : ""
-            }`}
-          >
+          <h1 className="text-3xl md:text-4xl font-bold flex items-start  bg-gradient-to-r from-[#25C2A0] via-[#266d61] to-[#235d76] bg-clip-text text-transparent drop-shadow-[0_2px_2px_rgba(70,200,248,0.25)]">
+            {/* <Wallet className="w-8 h-8 text-transparent bg-gradient-to-r from-[#25C2A0] via-[#2AD4B7] to-[#38BDF8] bg-clip-text" /> */}
             Dashboard
           </h1>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">
@@ -555,8 +552,9 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <MetricCard
+          className="bg-white/20"
           title="Onboarding Rate"
           value={onboardingData.rate}
           change={onboardingData.change}
@@ -577,7 +575,7 @@ export default function Home() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+        <Card className="backdrop-blur-sm bg-white/30 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center">
               <PieChart className="w-5 h-5 mr-2" />
@@ -603,7 +601,7 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+        <Card className="backdrop-blur-sm bg-white/30 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center">
               <BarChart3 className="w-5 h-5 mr-2" />
@@ -630,7 +628,7 @@ export default function Home() {
         </Card>
       </div>
 
-      <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+      <Card className="backdrop-blur-sm bg-white/30 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
         <CardHeader>
           <CardTitle className="flex items-center">
             <DollarSign className="w-5 h-5 mr-2" />
@@ -664,7 +662,7 @@ export default function Home() {
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2  gap-4 sm:gap-6">
-        <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+        <Card className="backdrop-blur-sm bg-white/30 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center">
               <Calendar className="w-5 h-5 mr-2" />
@@ -675,7 +673,7 @@ export default function Home() {
             {upcomingMeetings.map((meeting, index) => (
               <div
                 key={index}
-                className="flex items-center space-x-3 p-3 rounded-lg bg-white/50 dark:bg-slate-700/50"
+                className="flex items-center space-x-3 p-3 rounded-lg bg-white/30 dark:bg-slate-700/50"
               >
                 <Phone className="w-4 h-4 text-blue-500" />
                 <div className="flex-1">
@@ -690,7 +688,7 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        <Card className="backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
+        <Card className="backdrop-blur-sm bg-white/30 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center">
               <Trophy className="w-5 h-5 mr-2" />
