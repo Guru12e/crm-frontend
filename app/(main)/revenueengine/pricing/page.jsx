@@ -36,7 +36,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-  SheetDescription
+  SheetDescription,
 } from "@/components/ui/sheet";
 import { ProductConfigCard } from "@/components/ProductConfig";
 import {
@@ -83,9 +83,14 @@ function QuotePreview({ dealId }) {
       <Button onClick={handlePreview}>Preview</Button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="right" className="scale-100 w-[900px] sm:max-w-[1000px]">
+        <SheetContent
+          side="right"
+          className="scale-100 w-[900px] sm:max-w-[1000px]"
+        >
           <SheetHeader>
-            <SheetTitle className="text-2xl font-bold text-center">QUOTATION</SheetTitle>
+            <SheetTitle className="text-2xl font-bold text-center">
+              QUOTATION
+            </SheetTitle>
             <SheetDescription className="text-center text-gray-500 ">
               Preview your quote before sending
             </SheetDescription>
@@ -96,7 +101,7 @@ function QuotePreview({ dealId }) {
               {loading ? "Loading..." : "No data"}
             </p>
           ) : (
-            <div className="mt-6 space-y-6 text-sm w-[750px] mx-auto">
+            <div className="mt-6 space-y-6 text-sm w-[800px] mx-auto">
               {/* Company Info */}
               <div className="flex justify-between">
                 <div>
@@ -199,15 +204,15 @@ function QuotePreview({ dealId }) {
                     {deal.finalPrice
                       ? `$${deal.finalPrice}`
                       : "$" +
-                      deal.products
-                        ?.reduce((sum, _, i) => {
-                          return (
-                            sum +
-                            Number(deal.value?.[i] || 0) *
-                            Number(deal.quantity?.[i] || 1)
-                          );
-                        }, 0)
-                        .toFixed(2)}
+                        deal.products
+                          ?.reduce((sum, _, i) => {
+                            return (
+                              sum +
+                              Number(deal.value?.[i] || 0) *
+                                Number(deal.quantity?.[i] || 1)
+                            );
+                          }, 0)
+                          .toFixed(2)}
                   </span>
                 </div>
 
@@ -217,15 +222,15 @@ function QuotePreview({ dealId }) {
                     {deal.finalPrice
                       ? `$${deal.finalPrice}`
                       : "$" +
-                      deal.products
-                        ?.reduce((sum, _, i) => {
-                          return (
-                            sum +
-                            Number(deal.value?.[i] || 0) *
-                            Number(deal.quantity?.[i] || 1)
-                          );
-                        }, 0)
-                        .toFixed(2)}
+                        deal.products
+                          ?.reduce((sum, _, i) => {
+                            return (
+                              sum +
+                              Number(deal.value?.[i] || 0) *
+                                Number(deal.quantity?.[i] || 1)
+                            );
+                          }, 0)
+                          .toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -620,11 +625,12 @@ export default function PricingPage() {
               setSelectedProduct(null);
             }}
             variant="outline"
-            className={`bg-white/20 dark:bg-slate-800/50 border-gray text-black font-normal ${searchTerm !== "" ||
+            className={`bg-white/20 dark:bg-slate-800/50 border-gray text-black font-normal ${
+              searchTerm !== "" ||
               (selectedProduct !== null && selectedProduct !== "all")
-              ? "opacity-100"
-              : "hidden"
-              }`}
+                ? "opacity-100"
+                : "hidden"
+            }`}
           >
             Clear Filters
           </Button>
@@ -695,7 +701,7 @@ export default function PricingPage() {
                                 const product_check = products.find(
                                   (p) => p.name === product1
                                 );
-                                price[product1] = product_check.price;
+                                price[product1] = product_check?.price ?? 0;
                               }
                               return (
                                 <ProductConfigCard
@@ -770,12 +776,13 @@ export default function PricingPage() {
                               </TableCell>
                               <TableCell>
                                 {productDetails
-                                  ? `${productDetails.currency || "$"
-                                  }${calculateOriginalPrice(
-                                    productName,
-                                    deal.id,
-                                    dealConfig
-                                  ).toFixed(2)}`
+                                  ? `${
+                                      productDetails.currency || "$"
+                                    }${calculateOriginalPrice(
+                                      productName,
+                                      deal.id,
+                                      dealConfig
+                                    ).toFixed(2)}`
                                   : "N/A"}
                               </TableCell>
                               <TableCell>
@@ -832,8 +839,9 @@ export default function PricingPage() {
                               </TableCell>
                               <TableCell>
                                 {productDetails
-                                  ? `${productDetails.currency || "$"
-                                  }${finalPrice.toFixed(2)}`
+                                  ? `${
+                                      productDetails.currency || "$"
+                                    }${finalPrice.toFixed(2)}`
                                   : "N/A"}
                               </TableCell>
                               <TableCell className={`flex gap-2`}>
