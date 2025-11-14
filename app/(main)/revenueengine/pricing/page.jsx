@@ -92,7 +92,9 @@ function QuotePreview({ dealId }) {
           </SheetHeader>
 
           {!deal ? (
-            <p className="text-center mt-10 text-gray-500">{loading ? "Loading..." : "No data"}</p>
+            <p className="text-center mt-10 text-gray-500">
+              {loading ? "Loading..." : "No data"}
+            </p>
           ) : (
             <div className="mt-6 space-y-6 text-sm w-[750px] mx-auto">
               {/* Company Info */}
@@ -109,7 +111,9 @@ function QuotePreview({ dealId }) {
                   <table className="border border-gray-300 text-xs w-[250px] mx-auto">
                     <tbody>
                       <tr>
-                        <td className="border px-2 py-1 font-semibold">QUOTE #</td>
+                        <td className="border px-2 py-1 font-semibold">
+                          QUOTE #
+                        </td>
                         <td className="border px-2 py-1">{deal.id}</td>
                       </tr>
                       <tr>
@@ -119,7 +123,9 @@ function QuotePreview({ dealId }) {
                         </td>
                       </tr>
                       <tr>
-                        <td className="border px-2 py-1 font-semibold">VALID UNTIL</td>
+                        <td className="border px-2 py-1 font-semibold">
+                          VALID UNTIL
+                        </td>
                         <td className="border px-2 py-1">2/15/2025</td>
                       </tr>
                     </tbody>
@@ -129,7 +135,9 @@ function QuotePreview({ dealId }) {
 
               {/* Customer Info */}
               <div>
-                <h3 className="font-semibold bg-gray-100 px-2 py-1 border">CUSTOMER INFO</h3>
+                <h3 className="font-semibold bg-gray-100 px-2 py-1 border">
+                  CUSTOMER INFO
+                </h3>
                 <div className="p-2">
                   <p>{deal.name || "[Customer Name]"}</p>
                   <p>{deal.address || "[Customer Address]"}</p>
@@ -139,13 +147,19 @@ function QuotePreview({ dealId }) {
 
               {/* Description */}
               <div>
-                <h3 className="font-semibold bg-gray-100 px-2 py-1 border">DESCRIPTION OF WORK</h3>
-                <div className="p-2 h-20 border-t">{deal.description || "Provide project details here..."}</div>
+                <h3 className="font-semibold bg-gray-100 px-2 py-1 border">
+                  DESCRIPTION OF WORK
+                </h3>
+                <div className="p-2 h-20 border-t">
+                  {deal.description || "Provide project details here..."}
+                </div>
               </div>
 
               {/* Itemized Cost Table (using deal.products + deal.quantity + deal.value) */}
               <div>
-                <h3 className="font-semibold bg-gray-100 px-2 py-1 border">ITEMIZED COSTS</h3>
+                <h3 className="font-semibold bg-gray-100 px-2 py-1 border">
+                  ITEMIZED COSTS
+                </h3>
 
                 <table className="w-full border text-sm">
                   <thead className="bg-gray-100">
@@ -161,10 +175,17 @@ function QuotePreview({ dealId }) {
                     {deal.products?.map((item, index) => (
                       <tr key={index}>
                         <td className="border px-2 py-1">{item}</td>
-                        <td className="border px-2 py-1 text-center">{deal.quantity?.[index] || 1}</td>
-                        <td className="border px-2 py-1 text-right">{deal.value?.[index] || "0.00"}</td>
+                        <td className="border px-2 py-1 text-center">
+                          {deal.quantity?.[index] || 1}
+                        </td>
                         <td className="border px-2 py-1 text-right">
-                          {(Number(deal.value?.[index]) * Number(deal.quantity?.[index])).toFixed(2)}
+                          {deal.value?.[index] || "0.00"}
+                        </td>
+                        <td className="border px-2 py-1 text-right">
+                          {(
+                            Number(deal.value?.[index]) *
+                            Number(deal.quantity?.[index])
+                          ).toFixed(2)}
                         </td>
                       </tr>
                     ))}
@@ -178,9 +199,15 @@ function QuotePreview({ dealId }) {
                     {deal.finalPrice
                       ? `$${deal.finalPrice}`
                       : "$" +
-                      deal.products?.reduce((sum, _, i) => {
-                        return sum + Number(deal.value?.[i] || 0) * Number(deal.quantity?.[i] || 1);
-                      }, 0).toFixed(2)}
+                      deal.products
+                        ?.reduce((sum, _, i) => {
+                          return (
+                            sum +
+                            Number(deal.value?.[i] || 0) *
+                            Number(deal.quantity?.[i] || 1)
+                          );
+                        }, 0)
+                        .toFixed(2)}
                   </span>
                 </div>
 
@@ -190,15 +217,22 @@ function QuotePreview({ dealId }) {
                     {deal.finalPrice
                       ? `$${deal.finalPrice}`
                       : "$" +
-                      deal.products?.reduce((sum, _, i) => {
-                        return sum + Number(deal.value?.[i] || 0) * Number(deal.quantity?.[i] || 1);
-                      }, 0).toFixed(2)}
+                      deal.products
+                        ?.reduce((sum, _, i) => {
+                          return (
+                            sum +
+                            Number(deal.value?.[i] || 0) *
+                            Number(deal.quantity?.[i] || 1)
+                          );
+                        }, 0)
+                        .toFixed(2)}
                   </span>
                 </div>
               </div>
 
               <p className="text-xs text-gray-500 text-center mt-4">
-                This quotation is an estimate. Payment is due prior to delivery of services.
+                This quotation is an estimate. Payment is due prior to delivery
+                of services.
               </p>
             </div>
           )}
@@ -207,8 +241,6 @@ function QuotePreview({ dealId }) {
     </div>
   );
 }
-
-
 
 const SkeletonCard = () => (
   <div className="mb-6 border border-slate-200/50 dark:border-white/20 rounded-lg p-4 animate-pulse">
