@@ -75,7 +75,7 @@ function QuotePreview() {
             </SheetDescription>
           </SheetHeader>
 
-          <div className="mt-6 space-y-6 text-sm w-[750px] mx-auto">
+          <div className="mt-6 space-y-6 text-sm w-[800px] mx-auto">
             {/* Company Info */}
             <div className="flex justify-between">
               <div>
