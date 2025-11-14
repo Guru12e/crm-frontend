@@ -50,12 +50,33 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 
-function QuotePreview() {
+function QuotePreview({ dealId }) {
   const [open, setOpen] = useState(false);
+  const [deal, setDeal] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handlePreview = () => {
+  const handlePreview = async () => {
     setOpen(true);
+    await fetchDeal();
   };
+
+  async function fetchDeal() {
+    if (!dealId) return;
+    setLoading(true);
+
+    const { data, error } = await supabase
+      .from("Deals")
+      .select("*")
+      .eq("id", dealId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching deal:", error);
+    } else {
+      setDeal(data);
+    }
+    setLoading(false);
+  }
 
   return (
     <div>
@@ -70,116 +91,123 @@ function QuotePreview() {
             </SheetDescription>
           </SheetHeader>
 
-          <div className="mt-6 space-y-6 text-sm w-[750px] mx-auto">
-            {/* Company Info */}
-            <div className="flex justify-between">
-              <div>
-                <p className="font-bold">[Company Name]</p>
-                <p>[Street Address]</p>
-                <p>[City, ST ZIP]</p>
-                <p>Phone: (000) 000-0000</p>
-                <p>Email: company@email.com</p>
+          {!deal ? (
+            <p className="text-center mt-10 text-gray-500">{loading ? "Loading..." : "No data"}</p>
+          ) : (
+            <div className="mt-6 space-y-6 text-sm w-[750px] mx-auto">
+              {/* Company Info */}
+              <div className="flex justify-between">
+                <div>
+                  <p className="font-bold">{deal.title || "[Company Name]"}</p>
+                  <p>{deal.address || "[Street Address]"}</p>
+                  <p>{deal.city || "[City, ST ZIP]"}</p>
+                  <p>Phone: {deal.number || "(000) 000-0000"}</p>
+                  <p>Email: {deal.email || "company@email.com"}</p>
+                </div>
+
+                <div className="text-right text-sm">
+                  <table className="border border-gray-300 text-xs w-[250px] mx-auto">
+                    <tbody>
+                      <tr>
+                        <td className="border px-2 py-1 font-semibold">QUOTE #</td>
+                        <td className="border px-2 py-1">{deal.id}</td>
+                      </tr>
+                      <tr>
+                        <td className="border px-2 py-1 font-semibold">DATE</td>
+                        <td className="border px-2 py-1">
+                          {new Date(deal.created_at).toLocaleDateString()}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="border px-2 py-1 font-semibold">VALID UNTIL</td>
+                        <td className="border px-2 py-1">2/15/2025</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
-              <div className="text-right text-sm">
-                <table className="border border-gray-300 text-xs w-[250px] mx-auto">
+              {/* Customer Info */}
+              <div>
+                <h3 className="font-semibold bg-gray-100 px-2 py-1 border">CUSTOMER INFO</h3>
+                <div className="p-2">
+                  <p>{deal.name || "[Customer Name]"}</p>
+                  <p>{deal.address || "[Customer Address]"}</p>
+                  <p>{deal.user_email || "[Customer Email]"}</p>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <h3 className="font-semibold bg-gray-100 px-2 py-1 border">DESCRIPTION OF WORK</h3>
+                <div className="p-2 h-20 border-t">{deal.description || "Provide project details here..."}</div>
+              </div>
+
+              {/* Itemized Cost Table (using deal.products + deal.quantity + deal.value) */}
+              <div>
+                <h3 className="font-semibold bg-gray-100 px-2 py-1 border">ITEMIZED COSTS</h3>
+
+                <table className="w-full border text-sm">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="border px-2 py-1 text-left">ITEM</th>
+                      <th className="border px-2 py-1">QTY</th>
+                      <th className="border px-2 py-1">UNIT PRICE</th>
+                      <th className="border px-2 py-1">AMOUNT</th>
+                    </tr>
+                  </thead>
+
                   <tbody>
-                    <tr>
-                      <td className="border px-2 py-1 font-semibold">QUOTE #</td>
-                      <td className="border px-2 py-1">2034</td>
-                    </tr>
-                    <tr>
-                      <td className="border px-2 py-1 font-semibold">DATE</td>
-                      <td className="border px-2 py-1">2/1/2025</td>
-                    </tr>
-                    <tr>
-                      <td className="border px-2 py-1 font-semibold">VALID UNTIL</td>
-                      <td className="border px-2 py-1">2/15/2025</td>
-                    </tr>
+                    {deal.products?.map((item, index) => (
+                      <tr key={index}>
+                        <td className="border px-2 py-1">{item}</td>
+                        <td className="border px-2 py-1 text-center">{deal.quantity?.[index] || 1}</td>
+                        <td className="border px-2 py-1 text-right">{deal.value?.[index] || "0.00"}</td>
+                        <td className="border px-2 py-1 text-right">
+                          {(Number(deal.value?.[index]) * Number(deal.quantity?.[index])).toFixed(2)}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
+
+                {/* TOTALS */}
+                <div className="border flex justify-between border-b px-2 py-1">
+                  <span>SUBTOTAL</span>
+                  <span>
+                    {deal.finalPrice
+                      ? `$${deal.finalPrice}`
+                      : "$" +
+                      deal.products?.reduce((sum, _, i) => {
+                        return sum + Number(deal.value?.[i] || 0) * Number(deal.quantity?.[i] || 1);
+                      }, 0).toFixed(2)}
+                  </span>
+                </div>
+
+                <div className="border flex justify-between border-b px-2 py-1 font-semibold bg-gray-100">
+                  <span>TOTAL QUOTE</span>
+                  <span>
+                    {deal.finalPrice
+                      ? `$${deal.finalPrice}`
+                      : "$" +
+                      deal.products?.reduce((sum, _, i) => {
+                        return sum + Number(deal.value?.[i] || 0) * Number(deal.quantity?.[i] || 1);
+                      }, 0).toFixed(2)}
+                  </span>
+                </div>
               </div>
+
+              <p className="text-xs text-gray-500 text-center mt-4">
+                This quotation is an estimate. Payment is due prior to delivery of services.
+              </p>
             </div>
-
-            {/* Customer Info */}
-            <div>
-              <h3 className="font-semibold bg-gray-100 px-2 py-1 border">CUSTOMER INFO</h3>
-              <div className="p-2">
-                <p>[Customer Name]</p>
-                <p>[Customer Address]</p>
-                <p>[Customer Email]</p>
-              </div>
-            </div>
-
-            {/* Description */}
-            <div>
-              <h3 className="font-semibold bg-gray-100 px-2 py-1 border">DESCRIPTION OF WORK</h3>
-              <div className="p-2 h-20 border-t">Provide project details here...</div>
-            </div>
-
-            {/* Itemized Costs */}
-            <div>
-              <h3 className="font-semibold bg-gray-100 px-2 py-1 border">ITEMIZED COSTS</h3>
-              <table className="w-full border text-sm">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="border px-2 py-1 text-left">ITEM</th>
-                    <th className="border px-2 py-1">QTY</th>
-                    <th className="border px-2 py-1">UNIT PRICE</th>
-                    <th className="border px-2 py-1">AMOUNT</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="border px-2 py-1">Service Fee</td>
-                    <td className="border px-2 py-1 text-center">1</td>
-                    <td className="border px-2 py-1 text-right">200.00</td>
-                    <td className="border px-2 py-1 text-right">200.00</td>
-                  </tr>
-                  <tr>
-                    <td className="border px-2 py-1">Labor: 5 hrs @ $75/hr</td>
-                    <td className="border px-2 py-1 text-center">5</td>
-                    <td className="border px-2 py-1 text-right">75.00</td>
-                    <td className="border px-2 py-1 text-right">375.00</td>
-                  </tr>
-                  <tr>
-                    <td className="border px-2 py-1">Parts (tax included)</td>
-                    <td className="border px-2 py-1 text-center">7</td>
-                    <td className="border px-2 py-1 text-right">12.35</td>
-                    <td className="border px-2 py-1 text-right">86.45</td>
-                  </tr>
-                  <tr>
-                    <td className="border px-2 py-1">New client discount</td>
-                    <td className="border px-2 py-1 text-center">-</td>
-                    <td className="border px-2 py-1 text-right">-50.00</td>
-                    <td className="border px-2 py-1 text-right">-50.00</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              {/* Total */}
-
-              <div className="border flex justify-between border-b px-2 py-1">
-                <span>SUBTOTAL</span>
-                <span>$611.45</span>
-              </div>
-              <div className="border flex justify-between border-b px-2 py-1 font-semibold bg-gray-100">
-                <span>TOTAL QUOTE</span>
-                <span>$611.45</span>
-              </div>
-            </div>
-
-
-            {/* Footer */}
-            <p className="text-xs text-gray-500 text-center mt-4">
-              This quotation is an estimate. Payment is due prior to delivery of services.
-            </p>
-          </div>
+          )}
         </SheetContent>
       </Sheet>
     </div>
   );
 }
+
 
 const SkeletonCard = () => (
   <div className="mb-6 border border-slate-200/50 dark:border-white/20 rounded-lg p-4 animate-pulse">
@@ -614,7 +642,7 @@ export default function PricingPage() {
                             Configure Product
                           </Button>
                         </SheetTrigger>
-                        <QuotePreview />
+                        <QuotePreview dealId={deal.id} />
                         <SheetContent className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6 md:min-w-[85vw] min-w-screen">
                           <SheetHeader>
                             <SheetTitle className="mb-4 text-lg font-bold">
