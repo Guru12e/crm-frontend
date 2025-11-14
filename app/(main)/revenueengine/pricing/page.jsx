@@ -36,7 +36,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-  SheetDescription
+  SheetDescription,
 } from "@/components/ui/sheet";
 import { ProductConfigCard } from "@/components/ProductConfig";
 import {
@@ -62,9 +62,14 @@ function QuotePreview() {
       <Button onClick={handlePreview}>Preview</Button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="right" className="scale-100 w-[900px] sm:max-w-[1000px]">
+        <SheetContent
+          side="right"
+          className="scale-100 w-[900px] sm:max-w-[1000px]"
+        >
           <SheetHeader>
-            <SheetTitle className="text-2xl font-bold text-center">QUOTATION</SheetTitle>
+            <SheetTitle className="text-2xl font-bold text-center">
+              QUOTATION
+            </SheetTitle>
             <SheetDescription className="text-center text-gray-500 ">
               Preview your quote before sending
             </SheetDescription>
@@ -85,7 +90,9 @@ function QuotePreview() {
                 <table className="border border-gray-300 text-xs w-[250px] mx-auto">
                   <tbody>
                     <tr>
-                      <td className="border px-2 py-1 font-semibold">QUOTE #</td>
+                      <td className="border px-2 py-1 font-semibold">
+                        QUOTE #
+                      </td>
                       <td className="border px-2 py-1">2034</td>
                     </tr>
                     <tr>
@@ -93,7 +100,9 @@ function QuotePreview() {
                       <td className="border px-2 py-1">2/1/2025</td>
                     </tr>
                     <tr>
-                      <td className="border px-2 py-1 font-semibold">VALID UNTIL</td>
+                      <td className="border px-2 py-1 font-semibold">
+                        VALID UNTIL
+                      </td>
                       <td className="border px-2 py-1">2/15/2025</td>
                     </tr>
                   </tbody>
@@ -103,7 +112,9 @@ function QuotePreview() {
 
             {/* Customer Info */}
             <div>
-              <h3 className="font-semibold bg-gray-100 px-2 py-1 border">CUSTOMER INFO</h3>
+              <h3 className="font-semibold bg-gray-100 px-2 py-1 border">
+                CUSTOMER INFO
+              </h3>
               <div className="p-2">
                 <p>[Customer Name]</p>
                 <p>[Customer Address]</p>
@@ -113,13 +124,19 @@ function QuotePreview() {
 
             {/* Description */}
             <div>
-              <h3 className="font-semibold bg-gray-100 px-2 py-1 border">DESCRIPTION OF WORK</h3>
-              <div className="p-2 h-20 border-t">Provide project details here...</div>
+              <h3 className="font-semibold bg-gray-100 px-2 py-1 border">
+                DESCRIPTION OF WORK
+              </h3>
+              <div className="p-2 h-20 border-t">
+                Provide project details here...
+              </div>
             </div>
 
             {/* Itemized Costs */}
             <div>
-              <h3 className="font-semibold bg-gray-100 px-2 py-1 border">ITEMIZED COSTS</h3>
+              <h3 className="font-semibold bg-gray-100 px-2 py-1 border">
+                ITEMIZED COSTS
+              </h3>
               <table className="w-full border text-sm">
                 <thead className="bg-gray-100">
                   <tr>
@@ -169,10 +186,10 @@ function QuotePreview() {
               </div>
             </div>
 
-
             {/* Footer */}
             <p className="text-xs text-gray-500 text-center mt-4">
-              This quotation is an estimate. Payment is due prior to delivery of services.
+              This quotation is an estimate. Payment is due prior to delivery of
+              services.
             </p>
           </div>
         </SheetContent>
@@ -559,11 +576,12 @@ export default function PricingPage() {
               setSelectedProduct(null);
             }}
             variant="outline"
-            className={`bg-white/20 dark:bg-slate-800/50 border-gray text-black font-normal ${searchTerm !== "" ||
+            className={`bg-white/20 dark:bg-slate-800/50 border-gray text-black font-normal ${
+              searchTerm !== "" ||
               (selectedProduct !== null && selectedProduct !== "all")
-              ? "opacity-100"
-              : "hidden"
-              }`}
+                ? "opacity-100"
+                : "hidden"
+            }`}
           >
             Clear Filters
           </Button>
@@ -634,7 +652,7 @@ export default function PricingPage() {
                                 const product_check = products.find(
                                   (p) => p.name === product1
                                 );
-                                price[product1] = product_check.price;
+                                price[product1] = product_check?.price ?? 0;
                               }
                               return (
                                 <ProductConfigCard
@@ -709,12 +727,13 @@ export default function PricingPage() {
                               </TableCell>
                               <TableCell>
                                 {productDetails
-                                  ? `${productDetails.currency || "$"
-                                  }${calculateOriginalPrice(
-                                    productName,
-                                    deal.id,
-                                    dealConfig
-                                  ).toFixed(2)}`
+                                  ? `${
+                                      productDetails.currency || "$"
+                                    }${calculateOriginalPrice(
+                                      productName,
+                                      deal.id,
+                                      dealConfig
+                                    ).toFixed(2)}`
                                   : "N/A"}
                               </TableCell>
                               <TableCell>
@@ -771,8 +790,9 @@ export default function PricingPage() {
                               </TableCell>
                               <TableCell>
                                 {productDetails
-                                  ? `${productDetails.currency || "$"
-                                  }${finalPrice.toFixed(2)}`
+                                  ? `${
+                                      productDetails.currency || "$"
+                                    }${finalPrice.toFixed(2)}`
                                   : "N/A"}
                               </TableCell>
                               <TableCell className={`flex gap-2`}>
