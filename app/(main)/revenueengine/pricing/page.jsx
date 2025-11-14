@@ -36,7 +36,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-  SheetDescription
+  SheetDescription,
 } from "@/components/ui/sheet";
 import { ProductConfigCard } from "@/components/ProductConfig";
 import {
@@ -83,14 +83,20 @@ function QuotePreview({ dealId }) {
       <Button onClick={handlePreview}>Preview</Button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="right" className="scale-100 w-[900px] sm:max-w-[1000px]">
+        <SheetContent
+          side="right"
+          className="scale-100 w-[900px] sm:max-w-[1000px]"
+        >
           <SheetHeader>
-            <SheetTitle className="text-2xl font-bold text-center">QUOTATION</SheetTitle>
+            <SheetTitle className="text-2xl font-bold text-center">
+              QUOTATION
+            </SheetTitle>
             <SheetDescription className="text-center text-gray-500 ">
               Preview your quote before sending
             </SheetDescription>
           </SheetHeader>
 
+<<<<<<< HEAD
           {!deal ? (
             <p className="text-center mt-10 text-gray-500">{loading ? "Loading..." : "No data"}</p>
           ) : (
@@ -125,6 +131,17 @@ function QuotePreview({ dealId }) {
                     </tbody>
                   </table>
                 </div>
+=======
+          <div className="mt-6 space-y-6 text-sm w-[800px] mx-auto">
+            {/* Company Info */}
+            <div className="flex justify-between">
+              <div>
+                <p className="font-bold">[Company Name]</p>
+                <p>[Street Address]</p>
+                <p>[City, ST ZIP]</p>
+                <p>Phone: (000) 000-0000</p>
+                <p>Email: company@email.com</p>
+>>>>>>> c3bf8337a98e0bfb726c8d3464eba2bc66fad688
               </div>
 
               {/* Customer Info */}
@@ -158,6 +175,7 @@ function QuotePreview({ dealId }) {
                   </thead>
 
                   <tbody>
+<<<<<<< HEAD
                     {deal.products?.map((item, index) => (
                       <tr key={index}>
                         <td className="border px-2 py-1">{item}</td>
@@ -168,6 +186,24 @@ function QuotePreview({ dealId }) {
                         </td>
                       </tr>
                     ))}
+=======
+                    <tr>
+                      <td className="border px-2 py-1 font-semibold">
+                        QUOTE #
+                      </td>
+                      <td className="border px-2 py-1">2034</td>
+                    </tr>
+                    <tr>
+                      <td className="border px-2 py-1 font-semibold">DATE</td>
+                      <td className="border px-2 py-1">2/1/2025</td>
+                    </tr>
+                    <tr>
+                      <td className="border px-2 py-1 font-semibold">
+                        VALID UNTIL
+                      </td>
+                      <td className="border px-2 py-1">2/15/2025</td>
+                    </tr>
+>>>>>>> c3bf8337a98e0bfb726c8d3464eba2bc66fad688
                   </tbody>
                 </table>
 
@@ -201,7 +237,93 @@ function QuotePreview({ dealId }) {
                 This quotation is an estimate. Payment is due prior to delivery of services.
               </p>
             </div>
+<<<<<<< HEAD
           )}
+=======
+
+            {/* Customer Info */}
+            <div>
+              <h3 className="font-semibold bg-gray-100 px-2 py-1 border">
+                CUSTOMER INFO
+              </h3>
+              <div className="p-2">
+                <p>[Customer Name]</p>
+                <p>[Customer Address]</p>
+                <p>[Customer Email]</p>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div>
+              <h3 className="font-semibold bg-gray-100 px-2 py-1 border">
+                DESCRIPTION OF WORK
+              </h3>
+              <div className="p-2 h-20 border-t">
+                Provide project details here...
+              </div>
+            </div>
+
+            {/* Itemized Costs */}
+            <div>
+              <h3 className="font-semibold bg-gray-100 px-2 py-1 border">
+                ITEMIZED COSTS
+              </h3>
+              <table className="w-full border text-sm">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="border px-2 py-1 text-left">ITEM</th>
+                    <th className="border px-2 py-1">QTY</th>
+                    <th className="border px-2 py-1">UNIT PRICE</th>
+                    <th className="border px-2 py-1">AMOUNT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border px-2 py-1">Service Fee</td>
+                    <td className="border px-2 py-1 text-center">1</td>
+                    <td className="border px-2 py-1 text-right">200.00</td>
+                    <td className="border px-2 py-1 text-right">200.00</td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">Labor: 5 hrs @ $75/hr</td>
+                    <td className="border px-2 py-1 text-center">5</td>
+                    <td className="border px-2 py-1 text-right">75.00</td>
+                    <td className="border px-2 py-1 text-right">375.00</td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">Parts (tax included)</td>
+                    <td className="border px-2 py-1 text-center">7</td>
+                    <td className="border px-2 py-1 text-right">12.35</td>
+                    <td className="border px-2 py-1 text-right">86.45</td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">New client discount</td>
+                    <td className="border px-2 py-1 text-center">-</td>
+                    <td className="border px-2 py-1 text-right">-50.00</td>
+                    <td className="border px-2 py-1 text-right">-50.00</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              {/* Total */}
+
+              <div className="border flex justify-between border-b px-2 py-1">
+                <span>SUBTOTAL</span>
+                <span>$611.45</span>
+              </div>
+              <div className="border flex justify-between border-b px-2 py-1 font-semibold bg-gray-100">
+                <span>TOTAL QUOTE</span>
+                <span>$611.45</span>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <p className="text-xs text-gray-500 text-center mt-4">
+              This quotation is an estimate. Payment is due prior to delivery of
+              services.
+            </p>
+          </div>
+>>>>>>> c3bf8337a98e0bfb726c8d3464eba2bc66fad688
         </SheetContent>
       </Sheet>
     </div>
@@ -587,11 +709,12 @@ export default function PricingPage() {
               setSelectedProduct(null);
             }}
             variant="outline"
-            className={`bg-white/20 dark:bg-slate-800/50 border-gray text-black font-normal ${searchTerm !== "" ||
+            className={`bg-white/20 dark:bg-slate-800/50 border-gray text-black font-normal ${
+              searchTerm !== "" ||
               (selectedProduct !== null && selectedProduct !== "all")
-              ? "opacity-100"
-              : "hidden"
-              }`}
+                ? "opacity-100"
+                : "hidden"
+            }`}
           >
             Clear Filters
           </Button>
@@ -662,7 +785,7 @@ export default function PricingPage() {
                                 const product_check = products.find(
                                   (p) => p.name === product1
                                 );
-                                price[product1] = product_check.price;
+                                price[product1] = product_check?.price ?? 0;
                               }
                               return (
                                 <ProductConfigCard
@@ -737,12 +860,13 @@ export default function PricingPage() {
                               </TableCell>
                               <TableCell>
                                 {productDetails
-                                  ? `${productDetails.currency || "$"
-                                  }${calculateOriginalPrice(
-                                    productName,
-                                    deal.id,
-                                    dealConfig
-                                  ).toFixed(2)}`
+                                  ? `${
+                                      productDetails.currency || "$"
+                                    }${calculateOriginalPrice(
+                                      productName,
+                                      deal.id,
+                                      dealConfig
+                                    ).toFixed(2)}`
                                   : "N/A"}
                               </TableCell>
                               <TableCell>
@@ -799,8 +923,9 @@ export default function PricingPage() {
                               </TableCell>
                               <TableCell>
                                 {productDetails
-                                  ? `${productDetails.currency || "$"
-                                  }${finalPrice.toFixed(2)}`
+                                  ? `${
+                                      productDetails.currency || "$"
+                                    }${finalPrice.toFixed(2)}`
                                   : "N/A"}
                               </TableCell>
                               <TableCell className={`flex gap-2`}>
