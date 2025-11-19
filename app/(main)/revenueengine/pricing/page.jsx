@@ -1,4 +1,6 @@
 "use client";
+import TemplateCreator from "@/components/TemplateCreator";
+
 import { supabase } from "../../../../utils/supabase/client";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -619,6 +621,10 @@ export default function PricingPage() {
               </SelectGroup>
             </SelectContent>
           </Select>
+
+          {/* NEW BUTTON HERE */}
+          <TemplateCreator />
+
           <Button
             onClick={() => {
               setSearchTerm("");
@@ -636,7 +642,6 @@ export default function PricingPage() {
           </Button>
         </div>
       </div>
-
       <div className="mt-6 -z-[30]">
         {isLoading ? (
           <>
