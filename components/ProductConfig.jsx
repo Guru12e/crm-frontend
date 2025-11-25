@@ -31,14 +31,16 @@ export function ProductConfigCard({
   const onToggle = () => setIsOpen((prevState) => !prevState);
 
   const totalConfiguredPrice = useMemo(() => {
-    const basePrice = parseFloat(product.price) || 0;
-    const currentProductConfig = dealConfig[dealIndex][productIndex] || {};
+    const basePrice = parseFloat(product?.price) || 0;
+
+    const currentProductConfig = dealConfig?.[dealIndex]?.[productIndex] || {};
+
     const optionsPrice = Object.values(currentProductConfig).reduce(
       (sum, configValue) => sum + (configValue.price || 0),
       0
     );
     return basePrice + optionsPrice;
-  }, [dealConfig, productIndex, product.price, dealIndex]);
+  }, [dealConfig, productIndex, product?.price, dealIndex]);
 
   if (!product) {
     return null;

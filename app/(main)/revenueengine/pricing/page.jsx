@@ -241,6 +241,18 @@ function QuotePreview({ dealId }) {
                 This quotation is an estimate. Payment is due prior to delivery
                 of services.
               </p>
+
+              <Button
+                className="mt-4 w-full bg-transparent hover:bg-green-500/10 text-green-700 border border-green-700 hover:border-transparent dark:border-green-200 dark:text-green-100"
+                onClick={() => setOpen(false)}
+              >
+                {" "}
+                Close Preview
+              </Button>
+
+              <button className=" mt-4 w-full bg-transparent hover:bg-blue-500/10 text-blue-700 border border-blue-700 hover:border-transparent dark:border-blue-200 dark:text-blue-100">
+                Download Quote as PDF
+              </button>
             </div>
           )}
         </SheetContent>
@@ -686,6 +698,7 @@ export default function PricingPage() {
                             Configure Product
                           </Button>
                         </SheetTrigger>
+
                         <QuotePreview dealId={deal.id} />
                         <SheetContent className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6 md:min-w-[85vw] min-w-screen">
                           <SheetHeader>
