@@ -44,10 +44,13 @@ export default function CustomerCard({ customer, onChange }) {
             <div className="flex items-center space-x-3 sm:space-x-4 flex-1 w-full">
               <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
                 <AvatarFallback className="bg-gradient-to-r from-sky-700 to-teal-500 text-white text-sm">
-                  {customer.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
+                  {customer?.name
+                    ? customer.name
+                        .trim()
+                        .split(/\s+/)
+                        .map((n) => n[0])
+                        .join("")
+                    : "?"}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 w-full">
@@ -93,7 +96,12 @@ export default function CustomerCard({ customer, onChange }) {
                   {customer.status}
                 </Badge>
                 <p className="text-[10px] flex flex-col md:text-xs text-slate-500 dark:text-slate-400 mt-1 break-words ">
-                  Created At: <span>{customer.created_at.split("T")[0]}</span>
+                  Created At:{" "}
+                  <span>
+                    {customer?.created_at
+                      ? customer.created_at.split("T")[0]
+                      : "N/A"}
+                  </span>
                 </p>
               </div>
             </div>

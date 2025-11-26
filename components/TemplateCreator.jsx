@@ -32,7 +32,7 @@ export default function TemplateCreator() {
   const [pastTemplates, setPastTemplates] = useState([]);
 
   // ---------------------------
-  // Template Data State (added headerImage/footerImage)
+  // Template Data State (added headerImage/footerImage and quote details)
   // ---------------------------
   const [data, setData] = useState({
     headerTitle: "Your Company Name",
@@ -50,6 +50,11 @@ export default function TemplateCreator() {
     city: "City, ST ZIP",
     phone: "(000) 000-0000",
     email: "company@email.com",
+
+    // Quote details
+    quoteNumber: "70",
+    quoteDate: "6/11/2025",
+    validUntil: "2/15/2025",
 
     customerName: "Customer Name",
     customerAddress: "Customer Address",
@@ -166,11 +171,18 @@ export default function TemplateCreator() {
   };
 
   // ---------------------------
-  // PDF DOWNLOAD + Save Template (Option C: full width, keep aspect ratio)
-  // Behavior chosen:
-  // - If headerImage exists: show header IMAGE only (hide header text)
-  // - If footerImage exists: show footer IMAGE only (hide footer text)
-  // - If no images: render header/footer text as before
+  // Calculate total amount
+  // ---------------------------
+  const calculateTotal = () => {
+    return (data.products || []).reduce((sum, _, i) => {
+      const qty = Number((data.quantity && data.quantity[i]) || 0);
+      const val = Number((data.value && data.value[i]) || 0);
+      return sum + qty * val;
+    }, 0);
+  };
+
+  // ---------------------------
+  // PDF DOWNLOAD + Save Template
   // ---------------------------
   const handlePDFDownload = () => {
     // ensure template is saved
@@ -231,7 +243,7 @@ export default function TemplateCreator() {
     doc.text("QUOTATION", 10, y);
     y += 12;
 
-    // Company info
+    // Company info (left side)
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
     doc.text(String(data.title || ""), 10, y);
@@ -245,17 +257,50 @@ export default function TemplateCreator() {
     doc.text(`Email: ${String(data.email || "")}`, 10, y);
     y += 10;
 
+    // Quote details table (right side)
+    const quoteDetailsX = pageWidth - 70;
+    let quoteY = y - 25;
+
+    // Draw table border
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.2);
+    doc.rect(quoteDetailsX - 5, quoteY - 5, 65, 25);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text("QUOTE #", quoteDetailsX, quoteY);
+    doc.text("DATE", quoteDetailsX, quoteY + 6);
+    doc.text("VALID UNTIL", quoteDetailsX, quoteY + 12);
+
+    doc.setFont("helvetica", "normal");
+    doc.text(String(data.quoteNumber || "70"), quoteDetailsX + 25, quoteY);
+    doc.text(
+      String(data.quoteDate || "6/11/2025"),
+      quoteDetailsX + 25,
+      quoteY + 6
+    );
+    doc.text(
+      String(data.validUntil || "2/15/2025"),
+      quoteDetailsX + 25,
+      quoteY + 12
+    );
+
     // Customer info
-    doc.text(`Customer: ${String(data.customerName || "")}`, 10, y);
+    y += 15;
+    doc.setFont("helvetica", "bold");
+    doc.text("CUSTOMER INFO", 10, y);
     y += 6;
-    doc.text(String(data.customerAddress || ""), 10, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Name: ${String(data.customerName || "")}`, 10, y);
     y += 6;
-    doc.text(String(data.customerEmail || ""), 10, y);
+    doc.text(`Address: ${String(data.customerAddress || "")}`, 10, y);
+    y += 6;
+    doc.text(`Email: ${String(data.customerEmail || "")}`, 10, y);
     y += 12;
 
     // Description
     doc.setFont("helvetica", "bold");
-    doc.text("Description of Work:", 10, y);
+    doc.text("DESCRIPTION OF WORK:", 10, y);
     y += 6;
     doc.setFont("helvetica", "normal");
     const descriptionLines = doc.splitTextToSize(
@@ -267,7 +312,7 @@ export default function TemplateCreator() {
 
     // Itemized Costs
     doc.setFont("helvetica", "bold");
-    doc.text("Itemized Costs:", 10, y);
+    doc.text("ITEMIZED COSTS:", 10, y);
     y += 8;
 
     doc.setFont("helvetica", "normal");
@@ -289,12 +334,7 @@ export default function TemplateCreator() {
     });
 
     // Total
-    const total = (data.products || []).reduce((sum, _, i) => {
-      const qty = Number((data.quantity && data.quantity[i]) || 0);
-      const val = Number((data.value && data.value[i]) || 0);
-      return sum + qty * val;
-    }, 0);
-
+    const total = calculateTotal();
     y += 12;
     doc.setFont("helvetica", "bold");
     doc.text(`TOTAL: $${total.toFixed(2)}`, 10, y);
@@ -461,25 +501,30 @@ export default function TemplateCreator() {
             {!data.headerImage && (
               <>
                 <Input
+                  placeholder="Header Title"
                   value={data.headerTitle}
                   onChange={(e) => update("headerTitle", e.target.value)}
                 />
                 <Input
+                  placeholder="Header Subtitle"
                   value={data.headerSubtitle}
                   onChange={(e) => update("headerSubtitle", e.target.value)}
                   className="mt-2"
                 />
                 <Input
+                  placeholder="Header Address"
                   value={data.headerAddress}
                   onChange={(e) => update("headerAddress", e.target.value)}
                   className="mt-2"
                 />
                 <Input
+                  placeholder="Header Phone"
                   value={data.headerPhone}
                   onChange={(e) => update("headerPhone", e.target.value)}
                   className="mt-2"
                 />
                 <Input
+                  placeholder="Header Email"
                   value={data.headerEmail}
                   onChange={(e) => update("headerEmail", e.target.value)}
                   className="mt-2"
@@ -488,7 +533,7 @@ export default function TemplateCreator() {
             )}
 
             {/* Header Image Upload (always available) */}
-            <div className="mt-3">
+            <div className="mt-3 cursor-pointer">
               <label className="font-semibold block mb-2">
                 Header Image (banner)
               </label>
@@ -522,24 +567,51 @@ export default function TemplateCreator() {
             <h3 className="font-semibold">COMPANY INFO</h3>
             <div className="mt-3 space-y-2">
               <Input
+                placeholder="Company Name"
                 value={data.title}
                 onChange={(e) => update("title", e.target.value)}
               />
               <Input
+                placeholder="Address"
                 value={data.address}
                 onChange={(e) => update("address", e.target.value)}
               />
               <Input
+                placeholder="City, ST ZIP"
                 value={data.city}
                 onChange={(e) => update("city", e.target.value)}
               />
               <Input
+                placeholder="Phone"
                 value={data.phone}
                 onChange={(e) => update("phone", e.target.value)}
               />
               <Input
+                placeholder="Email"
                 value={data.email}
                 onChange={(e) => update("email", e.target.value)}
+              />
+            </div>
+          </section>
+
+          {/** QUOTE DETAILS */}
+          <section className="border p-4 rounded-md bg-green-50">
+            <h3 className="font-semibold">QUOTE DETAILS</h3>
+            <div className="mt-3 space-y-2">
+              <Input
+                placeholder="Quote Number"
+                value={data.quoteNumber}
+                onChange={(e) => update("quoteNumber", e.target.value)}
+              />
+              <Input
+                placeholder="Quote Date"
+                value={data.quoteDate}
+                onChange={(e) => update("quoteDate", e.target.value)}
+              />
+              <Input
+                placeholder="Valid Until"
+                value={data.validUntil}
+                onChange={(e) => update("validUntil", e.target.value)}
               />
             </div>
           </section>
@@ -549,14 +621,17 @@ export default function TemplateCreator() {
             <h3 className="font-semibold">CUSTOMER INFO</h3>
             <div className="mt-3 space-y-2">
               <Input
+                placeholder="Customer Name"
                 value={data.customerName}
                 onChange={(e) => update("customerName", e.target.value)}
               />
               <Input
+                placeholder="Customer Address"
                 value={data.customerAddress}
                 onChange={(e) => update("customerAddress", e.target.value)}
               />
               <Input
+                placeholder="Customer Email"
                 value={data.customerEmail}
                 onChange={(e) => update("customerEmail", e.target.value)}
               />
@@ -567,6 +642,7 @@ export default function TemplateCreator() {
           <section className="border p-4 rounded-md">
             <h3 className="font-semibold">DESCRIPTION OF WORK</h3>
             <Textarea
+              placeholder="Description of work..."
               value={data.description}
               onChange={(e) => update("description", e.target.value)}
               className="h-24 mt-3"
@@ -581,6 +657,7 @@ export default function TemplateCreator() {
               {data.products.map((p, i) => (
                 <div key={i} className="grid grid-cols-4 gap-3">
                   <Input
+                    placeholder="Product Name"
                     value={p}
                     onChange={(e) => {
                       const arr = [...data.products];
@@ -590,6 +667,7 @@ export default function TemplateCreator() {
                   />
                   <Input
                     type="number"
+                    placeholder="Quantity"
                     value={data.quantity[i]}
                     onChange={(e) => {
                       const arr = [...data.quantity];
@@ -599,6 +677,7 @@ export default function TemplateCreator() {
                   />
                   <Input
                     type="number"
+                    placeholder="Price"
                     value={data.value[i]}
                     onChange={(e) => {
                       const arr = [...data.value];
@@ -622,10 +701,12 @@ export default function TemplateCreator() {
             {!data.footerImage && (
               <>
                 <Input
+                  placeholder="Footer Note"
                   value={data.footerNote}
                   onChange={(e) => update("footerNote", e.target.value)}
                 />
                 <Textarea
+                  placeholder="Footer Disclaimer"
                   value={data.footerDisclaimer}
                   onChange={(e) => update("footerDisclaimer", e.target.value)}
                   className="mt-2"
@@ -663,7 +744,6 @@ export default function TemplateCreator() {
             </div>
           </section>
         </div>
-
         {/** FOOTER BUTTONS */}
         <SheetFooter className="mt-10 flex flex-col items-center gap-6">
           <div className="flex justify-center gap-4">
@@ -674,76 +754,157 @@ export default function TemplateCreator() {
 
               <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Template Preview</DialogTitle>
+                  <DialogTitle>Template Preview (Exact PDF Look)</DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-6 p-4 text-sm">
-                  {/* Header Preview */}
+                <div
+                  className="space-y-6 p-4 text-sm bg-white"
+                  style={{ width: "210mm" }}
+                >
+                  {/* Header Preview - FIXED: Remove fixed height */}
                   {data.headerImage ? (
-                    // If headerImage exists, show only the image (behavior B)
                     <img
                       src={data.headerImage}
                       alt="Header Preview"
-                      className="w-full h-24 object-contain border mb-3"
+                      className="w-full object-contain border mb-3" // REMOVED: h-24
                     />
                   ) : (
-                    // No header image: show header text block
-                    <div className="border p-4 rounded">
+                    <div className="border p-4 rounded bg-blue-50">
                       <h2 className="text-xl font-bold">{data.headerTitle}</h2>
-                      <p>{data.headerSubtitle}</p>
+                      <p className="text-lg">{data.headerSubtitle}</p>
                       <p>{data.headerAddress}</p>
-                      <p>{data.headerPhone}</p>
-                      <p>{data.headerEmail}</p>
+                      <p>Phone: {data.headerPhone}</p>
+                      <p>Email: {data.headerEmail}</p>
                     </div>
                   )}
 
-                  <h2 className="text-2xl font-bold text-center">QUOTATION</h2>
+                  {/* QUOTATION Title */}
+                  <h2 className="text-2xl font-bold text-center border-b pb-2">
+                    QUOTATION
+                  </h2>
 
-                  <div className="border p-4">
-                    <h3 className="font-semibold">COMPANY INFO</h3>
-                    <p>{data.title}</p>
-                    <p>{data.address}</p>
-                    <p>{data.city}</p>
-                    <p>{data.phone}</p>
-                    <p>{data.email}</p>
+                  {/* Company Info and Quote Details Side by Side */}
+                  <div className="flex justify-between items-start">
+                    {/* Company Info (Left) */}
+                    <div className="border p-4 rounded flex-1 mr-4">
+                      <h3 className="font-semibold mb-2">COMPANY INFO</h3>
+                      <p className="font-medium">{data.title}</p>
+                      <p>{data.address}</p>
+                      <p>{data.city}</p>
+                      <p>Phone: {data.phone}</p>
+                      <p>Email: {data.email}</p>
+                    </div>
+
+                    {/* Quote Details Table (Right) */}
+                    <div className="border border-gray-300 p-3 rounded text-xs w-64">
+                      <table className="w-full">
+                        <tbody>
+                          <tr>
+                            <td className="font-semibold pr-2 py-1">QUOTE #</td>
+                            <td className="py-1">{data.quoteNumber || "70"}</td>
+                          </tr>
+                          <tr>
+                            <td className="font-semibold pr-2 py-1">DATE</td>
+                            <td className="py-1">
+                              {data.quoteDate || "6/11/2025"}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="font-semibold pr-2 py-1">
+                              VALID UNTIL
+                            </td>
+                            <td className="py-1">
+                              {data.validUntil || "2/15/2025"}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
 
-                  <div className="border p-4">
-                    <h3 className="font-semibold">CUSTOMER INFO</h3>
-                    <p>{data.customerName}</p>
+                  {/* Customer Info */}
+                  <div className="border p-4 rounded">
+                    <h3 className="font-semibold mb-2 bg-gray-100 px-2 py-1">
+                      CUSTOMER INFO
+                    </h3>
+                    <p className="font-medium">{data.customerName}</p>
                     <p>{data.customerAddress}</p>
                     <p>{data.customerEmail}</p>
                   </div>
 
-                  <div className="border p-4">
-                    <h3 className="font-semibold">DESCRIPTION</h3>
-                    <p>{data.description}</p>
-                  </div>
-
-                  <div className="border p-4">
-                    <h3 className="font-semibold">ITEMIZED COSTS</h3>
-                    {data.products.map((p, i) => (
-                      <p key={i}>
-                        {p} — Qty: {data.quantity[i]} — Price: ${data.value[i]}{" "}
-                        — Total: $
-                        {(data.quantity[i] * data.value[i]).toFixed(2)}
-                      </p>
-                    ))}
-                  </div>
-
+                  {/* Description */}
                   <div className="border p-4 rounded">
-                    {/* Footer Preview */}
+                    <h3 className="font-semibold mb-2 bg-gray-100 px-2 py-1">
+                      DESCRIPTION OF WORK
+                    </h3>
+                    <p className="whitespace-pre-wrap">{data.description}</p>
+                  </div>
+
+                  {/* Itemized Costs */}
+                  <div className="border p-4 rounded">
+                    <h3 className="font-semibold mb-2 bg-gray-100 px-2 py-1">
+                      ITEMIZED COSTS
+                    </h3>
+                    <table className="w-full border-collapse border border-gray-300 text-sm">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="border border-gray-300 px-2 py-1 text-left">
+                            ITEM
+                          </th>
+                          <th className="border border-gray-300 px-2 py-1">
+                            QTY
+                          </th>
+                          <th className="border border-gray-300 px-2 py-1">
+                            UNIT PRICE
+                          </th>
+                          <th className="border border-gray-300 px-2 py-1">
+                            AMOUNT
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.products.map((p, i) => (
+                          <tr key={i}>
+                            <td className="border border-gray-300 px-2 py-1">
+                              {p}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-1 text-center">
+                              {data.quantity[i]}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-1 text-right">
+                              ${data.value[i]}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-1 text-right">
+                              ${(data.quantity[i] * data.value[i]).toFixed(2)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+
+                    {/* Total */}
+                    <div className="flex justify-between mt-4 pt-2 border-t border-gray-300 font-bold">
+                      <span>TOTAL QUOTE</span>
+                      <span>${calculateTotal().toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  {/* Footer Preview - FIXED: Remove fixed height */}
+                  <div className="border p-4 rounded bg-yellow-50">
                     {data.footerImage ? (
-                      // If footerImage exists, show only image (behavior B)
                       <img
                         src={data.footerImage}
                         alt="Footer Preview"
-                        className="w-full h-20 object-contain border mb-3"
+                        className="w-full object-contain border" // REMOVED: h-20
                       />
                     ) : (
                       <>
-                        <p className="font-bold">{data.footerNote}</p>
-                        <p className="text-xs">{data.footerDisclaimer}</p>
+                        <p className="font-bold text-center">
+                          {data.footerNote}
+                        </p>
+                        <p className="text-xs text-center mt-2">
+                          {data.footerDisclaimer}
+                        </p>
                       </>
                     )}
                   </div>
