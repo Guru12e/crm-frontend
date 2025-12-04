@@ -79,7 +79,7 @@ export function ProductConfigCard({
           <div className="w-full">
             {Object.entries(product.config).map(([category, options]) => {
               const selectedOptionPrice =
-                dealConfig[dealIndex][productIndex]?.[category]?.price ?? 0;
+                dealConfig?.[dealIndex]?.[productIndex]?.[category]?.price ?? 0;
 
               return (
                 <Table key={category} className="mb-6 table-auto w-full">

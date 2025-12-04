@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-function QuotePreview({ dealId }) {
+function QuotePreview({ dealId, children }) {
   const [open, setOpen] = useState(false);
   const [deal, setDeal] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -264,7 +264,11 @@ function QuotePreview({ dealId }) {
 
   return (
     <div>
-      <Button onClick={handlePreview}>Preview</Button>
+      {children ? (
+        <div onClick={handlePreview}>{children}</div>
+      ) : (
+        <Button onClick={handlePreview}>Preview</Button>
+      )}
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent
@@ -458,7 +462,7 @@ function QuotePreview({ dealId }) {
                 </Button>
 
                 {/* PDF DOWNLOAD BUTTONS */}
-                {/* <Button
+                <Button
                   className="w-full bg-transparent hover:bg-blue-500/10 text-blue-700 border border-blue-700 hover:border-transparent dark:border-blue-200 dark:text-blue-100"
                   onClick={handleDownloadPDF}
                   disabled={generatingPDF}
@@ -466,7 +470,7 @@ function QuotePreview({ dealId }) {
                   {generatingPDF
                     ? "Generating PDF..."
                     : "Download Quote as PDF (Image)"}
-                </Button> */}
+                </Button>
 
                 <Button
                   className="w-full bg-transparent hover:bg-purple-500/10 text-purple-700 border border-purple-700 hover:border-transparent dark:border-purple-200 dark:text-purple-100"
@@ -475,7 +479,7 @@ function QuotePreview({ dealId }) {
                 >
                   {generatingPDF
                     ? "Generating PDF..."
-                    : "Download Quote as PDF"}
+                    : "Download Quote as PDF (Text)"}
                 </Button>
               </div>
             </div>

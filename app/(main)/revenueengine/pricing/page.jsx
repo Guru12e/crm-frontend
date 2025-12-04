@@ -50,6 +50,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import QuotePreview from "@/components/QuotePreview";
+import { DollarSign, Settings, FileText } from "lucide-react";
 
 const SkeletonCard = () => (
   <div className="mb-6 border border-slate-200/50 dark:border-white/20 rounded-lg p-4 animate-pulse">
@@ -360,25 +361,26 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="w-full min-h-[70vh] relative">
-      <h1 className="text-2xl font-bold mb-4">Pricing Page</h1>
-      <p className="text-md">
-        Manage your on-going deals and pricing strategies here.
+    <div className="w-full min-h-[70vh] relative p-4">
+      <h1 className="text-3xl font-bold mb-2">Pricing Manager</h1>
+      <p className="text-slate-500 mb-8">
+        Manage your deals, configure products, and generate quotes.
       </p>
 
-      <div className="w-full mt-6 relative z-[50] rounded-2xl p-6 flex flex-col md:flex-row gap-4 justify-between backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20">
-        <div className="relative  flex-grow md:max-w-md">
+      <div className="w-full mb-8 relative z-[50] rounded-xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+        <div className="relative flex-grow w-full md:max-w-md">
           <Input
-            placeholder="Search deals by name or title..."
+            placeholder="Search deals..."
             value={searchTerm ? searchTerm : ""}
             type="text"
+            className="w-full"
             onChange={(e) => {
               setSearchTerm(e.target.value);
               setShowSuggestions(true);
             }}
           />
           {showSuggestions && (
-            <div className="absolute top-[110%] p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md shadow-lg flex flex-col items-start w-full">
+            <div className="absolute top-[110%] z-50 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md shadow-lg flex flex-col items-start w-full">
               {searchSuggestions.length > 0 ? (
                 searchSuggestions.map((deal) => (
                   <button
@@ -402,7 +404,7 @@ export default function PricingPage() {
           )}
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex gap-2 w-full md:w-auto">
           <Select
             onValueChange={(value) =>
               setSelectedProduct(value === "all" ? null : value)
@@ -424,7 +426,6 @@ export default function PricingPage() {
             </SelectContent>
           </Select>
 
-          {/* NEW BUTTON HERE */}
           <TemplateCreator />
 
           <Button
@@ -433,18 +434,19 @@ export default function PricingPage() {
               setSelectedProduct(null);
             }}
             variant="outline"
-            className={`bg-white/20 dark:bg-slate-800/50 border-gray text-black font-normal ${
+            className={`${
               searchTerm !== "" ||
               (selectedProduct !== null && selectedProduct !== "all")
                 ? "opacity-100"
                 : "hidden"
             }`}
           >
-            Clear Filters
+            Clear
           </Button>
         </div>
       </div>
-      <div className="mt-6 -z-[30]">
+
+      <div className="space-y-6">
         {isLoading ? (
           <>
             <SkeletonCard />
@@ -456,336 +458,391 @@ export default function PricingPage() {
             return (
               <Card
                 key={deal.id}
-                className="mb-6 z-0 overflow-hidden backdrop-blur-sm bg-white/70 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/20"
+                className="overflow-hidden border-slate-200 dark:border-slate-700 shadow-md bg-white dark:bg-slate-800"
               >
-                <CardHeader>
-                  <CardTitle className={"flex justify-between items-center"}>
-                    <CardDescription className={"flex flex-col"}>
-                      <span className="text-black dark:text-white text-2xl">
+                <CardHeader className="border-b border-slate-100 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/50">
+                  <div className="flex justify-between items-start md:items-center flex-col md:flex-row gap-4">
+                    <div>
+                      <CardTitle className="text-xl font-bold text-slate-900 dark:text-white">
                         {deal.name}
-                      </span>
-                      <span className="font-semibold">
-                        {deal.title || "No Title"} - Status: {deal.status}
-                      </span>
-                    </CardDescription>
-                    <div className="flex gap-2 flex-wrap">
-                      <Button
-                        variant="outline"
-                        onClick={() => handleGenerateQuote(deal.id)}
-                      >
-                        Generate Quote
-                      </Button>
-                      <Sheet>
-                        <SheetTrigger asChild>
-                          <Button
-                            disabled={
-                              deal.finalPrice > 0 &&
-                              deal.finalPrice !== null &&
-                              deal.finalPrice !== undefined
-                            }
-                            className={`bg-transparent hover:bg-gray-500 cursor-pointer text-gray-700 hover:text-white border border-gray-700 hover:border-transparent dark:border-gray-200 dark:text-gray-100`}
-                          >
-                            Configure Product
-                          </Button>
-                        </SheetTrigger>
+                      </CardTitle>
+                      <CardDescription className="mt-1">
+                        {deal.title || "No Title"} •{" "}
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                          {deal.status}
+                        </span>
+                      </CardDescription>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm text-slate-500">Grand Total</div>
+                      <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                        {products[0]?.currency || "$"}
+                        {grandTotal.toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
 
-                        <QuotePreview dealId={deal.id} />
-                        <SheetContent className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6 md:min-w-[85vw] min-w-screen">
-                          <SheetHeader>
-                            <SheetTitle className="mb-4 text-lg font-bold">
-                              Configure Products for {deal.name}
-                            </SheetTitle>
-                          </SheetHeader>
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Card 1: Pricing Details */}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <div className="group cursor-pointer rounded-xl border border-slate-200 dark:border-slate-700 p-6 hover:border-blue-500 hover:shadow-lg transition-all duration-200 bg-white dark:bg-slate-800">
+                          <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <DollarSign className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <h3 className="font-semibold text-lg mb-2">
+                            Pricing Details
+                          </h3>
+                          <p className="text-sm text-slate-500">
+                            View and manage pricing, discounts, and quantities
+                            for this deal.
+                          </p>
+                        </div>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+                        <DialogTitle>Pricing Details - {deal.name}</DialogTitle>
+                        <DialogDescription>
+                          Adjust quantities and discounts below.
+                        </DialogDescription>
+                        <div className="mt-4">
                           {!deal.products || deal.products.length === 0 ? (
                             <p>This deal has no products assigned.</p>
                           ) : (
-                            deal.products.map((productName, productIndex) => {
-                              const product = products.find(
-                                (p) => p.name === productName
-                              );
-                              const price = {};
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Product</TableHead>
+                                  <TableHead className="text-right">
+                                    Original Price
+                                  </TableHead>
+                                  <TableHead className="text-center">
+                                    Discount (%)
+                                  </TableHead>
+                                  <TableHead className="text-center">
+                                    Quantity
+                                  </TableHead>
+                                  <TableHead className="text-right">
+                                    Final Price
+                                  </TableHead>
+                                  <TableHead className="text-center">
+                                    Actions
+                                  </TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {deal.products.map((productName, index) => {
+                                  const productDetails = products.find(
+                                    (p) => p.name === productName
+                                  );
+                                  const originalPrice = calculateOriginalPrice(
+                                    productName,
+                                    deal.id,
+                                    dealConfig
+                                  );
+                                  const quantity = deal.quantity?.[index] || 1;
+                                  const discountStr = String(
+                                    deal.user_discount?.[index] || "0"
+                                  );
+                                  const userDiscount =
+                                    parseFloat(discountStr.replace("%", "")) ||
+                                    0;
+                                  const finalPrice =
+                                    originalPrice *
+                                    quantity *
+                                    (1 - userDiscount / 100);
 
-                              for (const product1 of deal.products) {
-                                const product_check = products.find(
-                                  (p) => p.name === product1
-                                );
-                                price[product1] = product_check?.price ?? 0;
-                              }
-                              return (
-                                <ProductConfigCard
-                                  key={`${deal.id}-${productIndex}`}
-                                  product={product}
-                                  productIndex={productIndex}
-                                  dealIndex={dealsToShow.findIndex(
-                                    (d) => d.id === deal.id
-                                  )}
-                                  index={productIndex}
-                                  dealConfig={dealConfig}
-                                  setDealConfig={setDealConfig}
-                                />
-                              );
-                            })
-                          )}
-                          <SheetFooter className="w-full justify-center items-center">
-                            <Button
-                              type="submit"
-                              className="bg-transparent hover:bg-blue-500/10 text-blue-700 border border-blue-700 w-xl"
-                              onClick={() => {
-                                handleSaveConfiguration(deal.id, dealConfig);
-                              }}
-                            >
-                              Save Configurations
-                            </Button>
-                          </SheetFooter>
-                        </SheetContent>
-                      </Sheet>
-                    </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {!deal.products || deal.products.length === 0 ? (
-                    <p>This deal has no products assigned.</p>
-                  ) : (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Product</TableHead>
-                          <TableHead>Original Price</TableHead>
-                          <TableHead>Discount (%)</TableHead>
-                          <TableHead>ML Suggestion</TableHead>
-                          <TableHead>Quantity</TableHead>
-                          <TableHead>Final Price</TableHead>
-                          <TableHead>Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {deal.products.map((productName, index) => {
-                          const productDetails = products.find(
-                            (p) => p.name === productName
-                          );
-                          const originalPrice = calculateOriginalPrice(
-                            productName,
-                            deal.id,
-                            dealConfig
-                          );
-                          const quantity = deal.quantity?.[index] || 1;
-                          const discountStr = String(
-                            deal.user_discount?.[index] || "0"
-                          );
-                          const userDiscount =
-                            parseFloat(discountStr.replace("%", "")) || 0;
-                          const finalPrice =
-                            originalPrice * quantity * (1 - userDiscount / 100);
-
-                          return (
-                            <TableRow key={`${deal.id}-${index}`}>
-                              <TableCell className="font-medium">
-                                {productName}
-                              </TableCell>
-                              <TableCell>
-                                {productDetails
-                                  ? `${
-                                      productDetails.currency || "$"
-                                    }${calculateOriginalPrice(
-                                      productName,
-                                      deal.id,
-                                      dealConfig
-                                    ).toFixed(2)}`
-                                  : "N/A"}
-                              </TableCell>
-                              <TableCell>
-                                <Input
-                                  disabled={
-                                    deal.finalPrice > 0 &&
-                                    deal.finalPrice !== null &&
-                                    deal.finalPrice !== undefined
-                                  }
-                                  value={deal.user_discount?.[index] || "0"}
-                                  onChange={(e) =>
-                                    handleChange(
-                                      deal.id,
-                                      "user_discount",
-                                      index,
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-24"
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <Input
-                                  disabled={
-                                    deal.finalPrice > 0 &&
-                                    deal.finalPrice !== null &&
-                                    deal.finalPrice !== undefined
-                                  }
-                                  value={deal.discount?.[index] || "0%"}
-                                  readOnly
-                                  className="w-24 bg-slate-100 dark:bg-slate-700"
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <Input
-                                  value={deal.quantity?.[index] || 1}
-                                  disabled={
-                                    deal.finalPrice > 0 &&
-                                    deal.finalPrice !== null &&
-                                    deal.finalPrice !== undefined
-                                  }
-                                  type="number"
-                                  min="1"
-                                  onChange={(e) =>
-                                    handleChange(
-                                      deal.id,
-                                      "quantity",
-                                      index,
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-20"
-                                />
-                              </TableCell>
-                              <TableCell>
-                                {productDetails
-                                  ? `${
-                                      productDetails.currency || "$"
-                                    }${finalPrice.toFixed(2)}`
-                                  : "N/A"}
-                              </TableCell>
-                              <TableCell className={`flex gap-2`}>
-                                <div className="w-full relative">
-                                  <Button
-                                    onClick={() => {
-                                      handleGeneratePrice(deal.id, index);
-                                    }}
-                                    className={
-                                      "bg-transparent hover:bg-blue-500/10 text-blue-700 hover:text-white border border-blue-700 hover:border-transparent"
-                                    }
-                                    disabled={
-                                      deal.finalPrice > 0 &&
-                                      deal.finalPrice !== null &&
-                                      deal.finalPrice !== undefined
-                                    }
-                                  >
-                                    Suggest Price
-                                  </Button>
-                                  <Dialog>
-                                    <DialogTrigger asChild>
-                                      <Button
-                                        ref={(element) => {
-                                          triggerRef.current[deal.id] = element;
-                                        }}
-                                        className="hidden"
-                                      >
-                                        Hidden trigger
-                                      </Button>
-                                    </DialogTrigger>
-
-                                    <DialogContent className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6 md:min-w-[50vw] min-w-screen">
-                                      <DialogTitle>
-                                        Missing Deal Intent Score for{" "}
-                                        {deal.name}
-                                      </DialogTitle>
-                                      <DialogDescription className={`flex`}>
-                                        <Label>
-                                          Enter the Intent score of the deal to
-                                          generate the Discount Suggestion:
-                                        </Label>
+                                  return (
+                                    <TableRow key={`${deal.id}-${index}`}>
+                                      <TableCell className="font-medium">
+                                        {productName}
+                                      </TableCell>
+                                      <TableCell className="text-right">
+                                        {productDetails
+                                          ? `${
+                                              productDetails.currency || "$"
+                                            }${originalPrice.toFixed(2)}`
+                                          : "N/A"}
+                                      </TableCell>
+                                      <TableCell className="text-center">
+                                        <div className="flex items-center justify-center gap-2">
+                                          <Input
+                                            disabled={
+                                              deal.finalPrice > 0 &&
+                                              deal.finalPrice !== null &&
+                                              deal.finalPrice !== undefined
+                                            }
+                                            value={
+                                              deal.user_discount?.[index] || "0"
+                                            }
+                                            onChange={(e) =>
+                                              handleChange(
+                                                deal.id,
+                                                "user_discount",
+                                                index,
+                                                e.target.value
+                                              )
+                                            }
+                                            className="w-20 text-center"
+                                          />
+                                          <Input
+                                            disabled
+                                            value={
+                                              deal.discount?.[index] || "0%"
+                                            }
+                                            className="w-20 text-center bg-slate-100 dark:bg-slate-700"
+                                            title="ML Suggestion"
+                                          />
+                                        </div>
+                                      </TableCell>
+                                      <TableCell className="text-center">
                                         <Input
-                                          value={intentScore || ""}
-                                          placeholder="Enter a value between 1- 100"
-                                          onChange={(e) =>
-                                            setIntentScore(e.target.value)
+                                          value={deal.quantity?.[index] || 1}
+                                          disabled={
+                                            deal.finalPrice > 0 &&
+                                            deal.finalPrice !== null &&
+                                            deal.finalPrice !== undefined
                                           }
-                                        />
-                                      </DialogDescription>
-                                      <DialogFooter>
-                                        <Button
-                                          onClick={() => {
-                                            handleIntentChange(
+                                          type="number"
+                                          min="1"
+                                          onChange={(e) =>
+                                            handleChange(
                                               deal.id,
-                                              intentScore,
-                                              index
-                                            );
-                                          }}
-                                          variant="outline"
-                                        >
-                                          Generate Price
-                                        </Button>
-                                      </DialogFooter>
-                                    </DialogContent>
-                                  </Dialog>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  )}
-                </CardContent>
-                <CardFooter className="flex flex-col items-end gap-4 bg-slate-50 dark:bg-slate-900/50 p-4">
-                  <div className="text-lg font-bold">
-                    Grand Total: {products[0]?.currency || "$"}
-                    {grandTotal.toFixed(2)}
-                  </div>
-                  <div className="flex gap-2 flex-wrap justify-end">
-                    <Button
-                      variant="outline"
-                      className="cursor-pointer"
-                      disabled={
-                        deal.finalPrice > 0 &&
-                        deal.finalPrice !== null &&
-                        deal.finalPrice !== undefined
-                      }
-                      onClick={() => handleSave(deal.id)}
-                    >
-                      Save Changes
-                    </Button>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          disabled={
-                            deal.finalPrice > 0 &&
-                            deal.finalPrice !== null &&
-                            deal.finalPrice !== undefined
-                          }
-                          className="bg-transparent cursor-pointer hover:bg-green-100 text-green-700 hover:text-green-800 border border-green-700 hover:border-transparent"
-                        >
-                          Approve & Set Final Price
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6 md:min-w-[50vw] min-w-screen">
-                        <div className="p-4">
-                          <h2 className="text-lg font-bold mb-4">
-                            Confirm Approval
-                          </h2>
-                          <p>
-                            Are you sure you want to approve this deal? After
-                            you confirm the details of the deal cannot be
-                            changed anymore.
-                          </p>
+                                              "quantity",
+                                              index,
+                                              e.target.value
+                                            )
+                                          }
+                                          className="w-20 mx-auto text-center"
+                                        />
+                                      </TableCell>
+                                      <TableCell className="text-right font-bold">
+                                        {productDetails
+                                          ? `${
+                                              productDetails.currency || "$"
+                                            }${finalPrice.toFixed(2)}`
+                                          : "N/A"}
+                                      </TableCell>
+                                      <TableCell className="text-center">
+                                        <div className="flex justify-center gap-2">
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() =>
+                                              handleGeneratePrice(
+                                                deal.id,
+                                                index
+                                              )
+                                            }
+                                            disabled={
+                                              deal.finalPrice > 0 &&
+                                              deal.finalPrice !== null &&
+                                              deal.finalPrice !== undefined
+                                            }
+                                          >
+                                            Suggest
+                                          </Button>
+                                          {/* Hidden Trigger for Intent Score Dialog */}
+                                          <Dialog>
+                                            <DialogTrigger asChild>
+                                              <Button
+                                                ref={(element) => {
+                                                  triggerRef.current[deal.id] =
+                                                    element;
+                                                }}
+                                                className="hidden"
+                                              >
+                                                Hidden
+                                              </Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                              <DialogTitle>
+                                                Missing Intent Score
+                                              </DialogTitle>
+                                              <DialogDescription>
+                                                Enter intent score (1-100) for{" "}
+                                                {deal.name}
+                                              </DialogDescription>
+                                              <Input
+                                                value={intentScore}
+                                                onChange={(e) =>
+                                                  setIntentScore(e.target.value)
+                                                }
+                                                placeholder="Score"
+                                              />
+                                              <DialogFooter>
+                                                <Button
+                                                  onClick={() =>
+                                                    handleIntentChange(
+                                                      deal.id,
+                                                      intentScore,
+                                                      index
+                                                    )
+                                                  }
+                                                >
+                                                  Submit
+                                                </Button>
+                                              </DialogFooter>
+                                            </DialogContent>
+                                          </Dialog>
+                                        </div>
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                })}
+                              </TableBody>
+                            </Table>
+                          )}
                         </div>
                         <DialogFooter>
-                          <Button
-                            onClick={() => handleApprove(deal.id)}
-                            className="bg-green-500 text-white hover:bg-green-600"
-                          >
-                            Confirm
+                          <Button onClick={() => handleSave(deal.id)}>
+                            Save Changes
                           </Button>
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
+
+                    {/* Card 2: Configure Product */}
+                    <Sheet>
+                      <SheetTrigger asChild>
+                        <div className="group cursor-pointer rounded-xl border border-slate-200 dark:border-slate-700 p-6 hover:border-purple-500 hover:shadow-lg transition-all duration-200 bg-white dark:bg-slate-800">
+                          <div className="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <Settings className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                          </div>
+                          <h3 className="font-semibold text-lg mb-2">
+                            Configure Product
+                          </h3>
+                          <p className="text-sm text-slate-500">
+                            Customize product options, features, and
+                            configurations.
+                          </p>
+                        </div>
+                      </SheetTrigger>
+                      <SheetContent className="backdrop-blur-sm dark:bg-slate-800/50 border border-slate-200/50 dark:border-white/20 mb-6 md:min-w-[85vw] min-w-screen overflow-y-auto">
+                        <SheetHeader>
+                          <SheetTitle className="mb-4 text-lg font-bold">
+                            Configure Products for {deal.name}
+                          </SheetTitle>
+                        </SheetHeader>
+                        {!deal.products || deal.products.length === 0 ? (
+                          <p>This deal has no products assigned.</p>
+                        ) : (
+                          deal.products.map((productName, productIndex) => {
+                            const product = products.find(
+                              (p) => p.name === productName
+                            );
+                            return (
+                              <ProductConfigCard
+                                key={`${deal.id}-${productIndex}`}
+                                product={product}
+                                productIndex={productIndex}
+                                dealIndex={dealsToShow.findIndex(
+                                  (d) => d.id === deal.id
+                                )}
+                                index={productIndex}
+                                dealConfig={dealConfig}
+                                setDealConfig={setDealConfig}
+                              />
+                            );
+                          })
+                        )}
+                        <SheetFooter className="w-full justify-center items-center mt-6">
+                          <Button
+                            type="submit"
+                            className="bg-transparent hover:bg-blue-500/10 text-blue-700 border border-blue-700 w-xl"
+                            onClick={() => {
+                              handleSaveConfiguration(deal.id, dealConfig);
+                            }}
+                          >
+                            Save Configurations
+                          </Button>
+                        </SheetFooter>
+                      </SheetContent>
+                    </Sheet>
+
+                    {/* Card 3: Preview Quote */}
+                    <QuotePreview dealId={deal.id}>
+                      <div className="group cursor-pointer rounded-xl border border-slate-200 dark:border-slate-700 p-6 hover:border-green-500 hover:shadow-lg transition-all duration-200 bg-white dark:bg-slate-800 h-full">
+                        <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                          <FileText className="h-6 w-6 text-green-600 dark:text-green-400" />
+                        </div>
+                        <h3 className="font-semibold text-lg mb-2">
+                          Preview Quote
+                        </h3>
+                        <p className="text-sm text-slate-500">
+                          Generate and preview the final quote PDF for this
+                          deal.
+                        </p>
+                      </div>
+                    </QuotePreview>
                   </div>
+                </CardContent>
+
+                <CardFooter className="bg-slate-50 dark:bg-slate-900/50 p-4 border-t border-slate-100 dark:border-slate-700/50 flex justify-end gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleSave(deal.id)}
+                    disabled={
+                      deal.finalPrice > 0 &&
+                      deal.finalPrice !== null &&
+                      deal.finalPrice !== undefined
+                    }
+                  >
+                    Save Draft
+                  </Button>
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        disabled={
+                          deal.finalPrice > 0 &&
+                          deal.finalPrice !== null &&
+                          deal.finalPrice !== undefined
+                        }
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        Approve Deal
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <div className="p-4">
+                        <h2 className="text-lg font-bold mb-4">
+                          Confirm Approval
+                        </h2>
+                        <p>
+                          Are you sure you want to approve this deal? After you
+                          confirm, the details cannot be changed.
+                        </p>
+                      </div>
+                      <DialogFooter>
+                        <Button
+                          onClick={() => handleApprove(deal.id)}
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          Confirm Approval
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </CardFooter>
               </Card>
             );
           })
         ) : (
-          <div className="text-center py-10">
-            <p className="text-slate-500">
+          <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+            <p className="text-slate-500 text-lg">
               No active deals match your filters.
             </p>
+            <Button
+              variant="link"
+              onClick={() => {
+                setSearchTerm("");
+                setSelectedProduct(null);
+              }}
+            >
+              Clear all filters
+            </Button>
           </div>
         )}
       </div>
