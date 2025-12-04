@@ -473,16 +473,76 @@ export default function TemplateCreator() {
                   {pastTemplates.map((t) => (
                     <div
                       key={t.id}
-                      className="border p-3 rounded cursor-pointer hover:bg-gray-100 flex justify-between items-start"
+                      className="border p-3 rounded cursor-pointer hover:bg-gray-100"
                       onClick={() => handleLoadTemplate(t)}
                     >
-                      <div className="flex-1">
-                        <p className="font-semibold">{t.name}</p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(t.created_at).toLocaleString()}
-                        </p>
-                      </div>
-                      <div className="flex flex-col gap-2">
+                      <div className="flex gap-3">
+                        {/* DEBUG - shows what Supabase returned */}
+                        {/* DEBUG - show DB columns plus embedded template_data.headerImage presence */}
+                        {/* <pre className="text-[10px] break-all bg-gray-50 p-2 rounded mb-2">
+                          {JSON.stringify(
+                            {
+                              id: t.id,
+                              header_image_url: t.header_image_url,
+                              header_image_path: t.header_image_path,
+                              footer_image_url: t.footer_image_url,
+                              footer_image_path: t.footer_image_path,
+                              // safe check for embedded base64 saved inside template_data
+                              template_data_has_headerImage: Boolean(
+                                t.template_data && t.template_data.headerImage
+                              ),
+                              template_data_headerImage_sample:
+                                t.template_data && t.template_data.headerImage
+                                  ? String(t.template_data.headerImage).slice(
+                                      0,
+                                      80
+                                    ) + "..."
+                                  : null,
+                            },
+                            null,
+                            2
+                          )}
+                        </pre> */}
+
+                        {t.header_image_url ? (
+                          <img
+                            src={t.header_image_url}
+                            alt="Header"
+                            className="w-32 h-20 object-cover rounded border"
+                            onError={(e) => {
+                              console.error(
+                                "IMAGE FAILED:",
+                                t.header_image_url
+                              );
+                              e.currentTarget.style.opacity = 0.4;
+                            }}
+                          />
+                        ) : (
+                          <div className="w-32 h-20 bg-gray-100 flex items-center justify-center text-xs text-gray-500">
+                            No header image URL
+                          </div>
+                        )}
+
+                        {t.header_image_url && (
+                          <img
+                            src={t.header_image_url}
+                            alt="Header"
+                            className="w-32 h-20 object-cover rounded border"
+                          />
+                        )}
+                        <div className="flex-1">
+                          <p className="font-semibold">{t.name}</p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(t.created_at).toLocaleString()}
+                          </p>
+                          {t.footer_image_url && (
+                            <img
+                              src={t.footer_image_url}
+                              alt="Footer"
+                              className="w-full h-16 object-cover rounded border mt-2"
+                            />
+                          )}
+                        </div>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -513,19 +573,6 @@ export default function TemplateCreator() {
               onChange={(e) => setTemplateName(e.target.value)}
               className="w-64"
             />
-            <Button
-              className="bg-blue-600 text-white px-6"
-              onClick={handleSaveTemplate}
-              disabled={isSaving}
-            >
-              {isSaving ? "Saving..." : currentTemplateId ? "Update" : "Save"}
-            </Button>
-            <Button className="bg-gray-200 px-4" onClick={handlePreview}>
-              Preview
-            </Button>
-            <Button className="bg-gray-300 px-4" onClick={handlePDFDownload}>
-              Download
-            </Button>
           </div>
         </div>
 
