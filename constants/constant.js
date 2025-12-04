@@ -76,7 +76,7 @@ export const analyticsData = {
     ltv: 260,
     supportTickets: 234,
     resolutionTime: "4.2 hours",
-    
+
     pipeline: [
       { stage: "Prospecting", count: 67, value: 1670000 },
       { stage: "Qualification", count: 45, value: 1125000 },
@@ -280,16 +280,34 @@ export const navigation = [
   {
     key: "revenueengine",
     name: "Revenue Engine",
-    href: "/revenueengine/configureproducts",
+    href: "/revenueengine/pricing",
     icon: <Wrench />,
     subpages: [
+      {
+        name: "Pricing",
+        href: "/revenueengine/pricing",
+        icon: <DollarSign />,
+      },
       {
         name: "Configure Products",
         href: "/revenueengine/configureproducts",
         icon: <Cog />,
       },
-      { name: "Pricing", href: "/revenueengine/pricing", icon: <DollarSign /> },
-      // { name: "Quotes", href: "/revenueengine/quotes", icon: <FileText /> },
+      {
+        name: "Pricing Details",
+        href: "/revenueengine/pricingdetails",
+        icon: <DollarSign />,
+      },
+      {
+        name: "Configure Product 2",
+        href: "/revenueengine/configureproduct2",
+        icon: <Cog />,
+      },
+      {
+        name: "Preview Quote",
+        href: "/revenueengine/previewquote",
+        icon: <FileText />,
+      },
     ],
   },
 ];
