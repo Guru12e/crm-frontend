@@ -106,8 +106,8 @@ export default function Layout({ children }) {
             } px-4`}
           >
             {sidebarOpen && (
-              <span className="text-2xl font-bold bg-gradient-to-r from-teal-500 to-sky-700 dark:from-teal-200 dark:to-sky-300 bg-clip-text text-transparent">
-                GTM Engine
+              <span className="text-3xl pt-8 font-bold bg-gradient-to-r from-teal-600 to-sky-700 dark:from-teal-200 dark:to-sky-300 bg-clip-text text-transparent">
+                Smart Manufacturing
               </span>
             )}
             <Button
@@ -185,27 +185,76 @@ export default function Layout({ children }) {
 
                   {hasSubpages && isExpanded && (
                     <div className="ml-4 space-y-1 max-sm:hidden">
-                      {item.subpages.map((subpage) => (
-                        <Link
-                          key={subpage.href}
-                          href={subpage.href}
-                          className={cn(
-                            "block rounded-md px-1 py-2 text-sm transition-all",
-                            location === subpage.href
-                              ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                              : "text-slate-600 dark:text-slate-400 hover:bg-white/30 dark:hover:bg-slate-800/30"
-                          )}
-                        >
-                          <span className="flex items-center gap-2">
-                            {subpage.icon}
-                            <span
-                              className={`ml-2 ${sidebarOpen ? "" : "hidden"}`}
+                      {item.subpages.map((subpage) => {
+                        const hasNestedSubpages = subpage.subpages && subpage.subpages.length > 0;
+                        const isNestedExpanded = expandedItems.includes(subpage.name);
+                        
+                        return (
+                          <div key={subpage.href}>
+                            <div
+                              className={cn(
+                                "flex items-center cursor-pointer rounded-md px-1 py-2 text-sm transition-all",
+                                location === subpage.href
+                                  ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                                  : "text-slate-600 dark:text-slate-400 hover:bg-white/30 dark:hover:bg-slate-800/30"
+                              )}
+                              onClick={() => {
+                                if (hasNestedSubpages) {
+                                  toggleExpanded(subpage.name);
+                                }
+                              }}
                             >
-                              {subpage.name}
-                            </span>
-                          </span>
-                        </Link>
-                      ))}
+                              <Link
+                                href={subpage.href}
+                                className="flex flex-1 items-center gap-2"
+                                onClick={(e) => {
+                                  if (hasNestedSubpages) {
+                                    e.preventDefault();
+                                  }
+                                }}
+                              >
+                                {subpage.icon}
+                                <span className={`ml-2 ${sidebarOpen ? "" : "hidden"}`}>
+                                  {subpage.name}
+                                </span>
+                              </Link>
+                              {hasNestedSubpages && (
+                                <div className="p-1">
+                                  {isNestedExpanded ? (
+                                    <ChevronDown className="h-3 w-3" />
+                                  ) : (
+                                    <ChevronRight className="h-3 w-3" />
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            
+                            {hasNestedSubpages && isNestedExpanded && (
+                              <div className="ml-6 space-y-1">
+                                {subpage.subpages.map((nestedPage) => (
+                                  <Link
+                                    key={nestedPage.href}
+                                    href={nestedPage.href}
+                                    className={cn(
+                                      "block rounded-md px-1 py-2 text-sm transition-all",
+                                      location === nestedPage.href
+                                        ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                                        : "text-slate-600 dark:text-slate-400 hover:bg-white/30 dark:hover:bg-slate-800/30"
+                                    )}
+                                  >
+                                    <span className="flex items-center gap-2">
+                                      {nestedPage.icon}
+                                      <span className={`ml-2 ${sidebarOpen ? "" : "hidden"}`}>
+                                        {nestedPage.name}
+                                      </span>
+                                    </span>
+                                  </Link>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -291,24 +340,77 @@ export default function Layout({ children }) {
 
                   {hasSubpages && isExpanded && (
                     <div className="ml-2 mt-1 space-y-1">
-                      {item.subpages.map((subpage) => (
-                        <Link
-                          key={subpage.href}
-                          href={subpage.href}
-                          onClick={() => setMobileSidebarOpen(false)}
-                          className={cn(
-                            "block rounded-md px-1 py-2 text-sm transition-all",
-                            location === subpage.href
-                              ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                              : "text-slate-600 dark:text-slate-400 hover:bg-white/30 dark:hover:bg-slate-800/30"
-                          )}
-                        >
-                          <span className="flex items-center gap-2">
-                            {subpage.icon}
-                            {subpage.name}
-                          </span>
-                        </Link>
-                      ))}
+                      {item.subpages.map((subpage) => {
+                        const hasNestedSubpages = subpage.subpages && subpage.subpages.length > 0;
+                        const isNestedExpanded = expandedItems.includes(subpage.name);
+                        
+                        return (
+                          <div key={subpage.href}>
+                            <div
+                              className={cn(
+                                "flex items-center cursor-pointer rounded-md px-1 py-2 text-sm transition-all",
+                                location === subpage.href
+                                  ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                                  : "text-slate-600 dark:text-slate-400 hover:bg-white/30 dark:hover:bg-slate-800/30"
+                              )}
+                              onClick={() => {
+                                if (hasNestedSubpages) {
+                                  toggleExpanded(subpage.name);
+                                } else {
+                                  setMobileSidebarOpen(false);
+                                }
+                              }}
+                            >
+                              <Link
+                                href={subpage.href}
+                                className="flex flex-1 items-center gap-2"
+                                onClick={(e) => {
+                                  if (hasNestedSubpages) {
+                                    e.preventDefault();
+                                  } else {
+                                    setMobileSidebarOpen(false);
+                                  }
+                                }}
+                              >
+                                {subpage.icon}
+                                {subpage.name}
+                              </Link>
+                              {hasNestedSubpages && (
+                                <div className="p-1">
+                                  {isNestedExpanded ? (
+                                    <ChevronDown className="h-3 w-3" />
+                                  ) : (
+                                    <ChevronRight className="h-3 w-3" />
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            
+                            {hasNestedSubpages && isNestedExpanded && (
+                              <div className="ml-4 space-y-1">
+                                {subpage.subpages.map((nestedPage) => (
+                                  <Link
+                                    key={nestedPage.href}
+                                    href={nestedPage.href}
+                                    onClick={() => setMobileSidebarOpen(false)}
+                                    className={cn(
+                                      "block rounded-md px-1 py-2 text-sm transition-all",
+                                      location === nestedPage.href
+                                        ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                                        : "text-slate-600 dark:text-slate-400 hover:bg-white/30 dark:hover:bg-slate-800/30"
+                                    )}
+                                  >
+                                    <span className="flex items-center gap-2">
+                                      {nestedPage.icon}
+                                      {nestedPage.name}
+                                    </span>
+                                  </Link>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
