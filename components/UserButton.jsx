@@ -94,7 +94,7 @@ export default function UserButton() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {type === "admin" && (
+        {/* {type === "admin" && (
           <>
             <DropdownMenuItem asChild>
               <Link
@@ -110,7 +110,7 @@ export default function UserButton() {
               <span>Profile Settings</span>
             </DropdownMenuItem>
           </>
-        )}
+        )} */}
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <LogOut className="mr-2 h-4 w-4" />

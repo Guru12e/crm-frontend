@@ -7,19 +7,30 @@ import {
   Sun,
   Moon,
   HelpCircle,
+  Settings,
   Bot,
   AlertTriangleIcon,
   SquareUser,
   Calendar,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+// import OurProspects from "./prospects/page";
+import TemplateCreator from "@/components/TemplateCreator";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import UserButton from "@/components/UserButton";
 import { Label } from "@/components/ui/label";
+
 import { employeeNavigation, navigation } from "@/constants/constant";
 import Hamburger from "hamburger-react";
+import OurProspects from "./prospects/page";
 
 export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -186,9 +197,12 @@ export default function Layout({ children }) {
                   {hasSubpages && isExpanded && (
                     <div className="ml-4 space-y-1 max-sm:hidden">
                       {item.subpages.map((subpage) => {
-                        const hasNestedSubpages = subpage.subpages && subpage.subpages.length > 0;
-                        const isNestedExpanded = expandedItems.includes(subpage.name);
-                        
+                        const hasNestedSubpages =
+                          subpage.subpages && subpage.subpages.length > 0;
+                        const isNestedExpanded = expandedItems.includes(
+                          subpage.name
+                        );
+
                         return (
                           <div key={subpage.href}>
                             <div
@@ -214,7 +228,11 @@ export default function Layout({ children }) {
                                 }}
                               >
                                 {subpage.icon}
-                                <span className={`ml-2 ${sidebarOpen ? "" : "hidden"}`}>
+                                <span
+                                  className={`ml-2 ${
+                                    sidebarOpen ? "" : "hidden"
+                                  }`}
+                                >
                                   {subpage.name}
                                 </span>
                               </Link>
@@ -228,7 +246,7 @@ export default function Layout({ children }) {
                                 </div>
                               )}
                             </div>
-                            
+
                             {hasNestedSubpages && isNestedExpanded && (
                               <div className="ml-6 space-y-1">
                                 {subpage.subpages.map((nestedPage) => (
@@ -244,7 +262,11 @@ export default function Layout({ children }) {
                                   >
                                     <span className="flex items-center gap-2">
                                       {nestedPage.icon}
-                                      <span className={`ml-2 ${sidebarOpen ? "" : "hidden"}`}>
+                                      <span
+                                        className={`ml-2 ${
+                                          sidebarOpen ? "" : "hidden"
+                                        }`}
+                                      >
                                         {nestedPage.name}
                                       </span>
                                     </span>
@@ -341,9 +363,12 @@ export default function Layout({ children }) {
                   {hasSubpages && isExpanded && (
                     <div className="ml-2 mt-1 space-y-1">
                       {item.subpages.map((subpage) => {
-                        const hasNestedSubpages = subpage.subpages && subpage.subpages.length > 0;
-                        const isNestedExpanded = expandedItems.includes(subpage.name);
-                        
+                        const hasNestedSubpages =
+                          subpage.subpages && subpage.subpages.length > 0;
+                        const isNestedExpanded = expandedItems.includes(
+                          subpage.name
+                        );
+
                         return (
                           <div key={subpage.href}>
                             <div
@@ -385,7 +410,7 @@ export default function Layout({ children }) {
                                 </div>
                               )}
                             </div>
-                            
+
                             {hasNestedSubpages && isNestedExpanded && (
                               <div className="ml-4 space-y-1">
                                 {subpage.subpages.map((nestedPage) => (
@@ -469,6 +494,36 @@ export default function Layout({ children }) {
                 </div>
               )}
             <div className="flex items-center space-x-2 sm:space-x-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="lm"
+                    className="hidden sm:flex items-center space-x-2 whitespace-nowrap"
+                  >
+                    <Settings className="h-4 w-4" />
+                    <span className="hidden md:inline">Settings</span>
+                  </Button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent className="w-48">
+                  <DropdownMenuItem onClick={() => router.push("/prospects")}>
+                    Company Details
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem
+                    onClick={() => router.push("/generate-quote")}
+                  ></DropdownMenuItem>
+                  <TemplateCreator />
+
+                  <DropdownMenuItem
+                    onClick={() => router.push("/configuration")}
+                  >
+                    Configuration Settings
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -479,6 +534,7 @@ export default function Layout({ children }) {
                   Contact Us
                 </span>
               </Button>
+
               <Button
                 variant="ghost"
                 size="sm"
