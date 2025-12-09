@@ -228,7 +228,6 @@ export const leadSources = [
   "Organic",
 ];
 
-
 export const monthFilters = [
   "All time",
   "January",
@@ -255,39 +254,39 @@ export const navigation = [
     href: "",
     icon: <Wrench />,
     subpages: [
-      {
-        name: "Vendor Management",
-        href: "/vendormanagement",
-        icon: <Users />,
-      },
+      // {
+      //   name: "Vendor Management",
+      //   href: "/vendormanagement",
+      //   icon: <Users />,
+      // },
       {
         key: "revenueengine",
         name: "Revenue Engine",
         href: "/revenueengine/pricing",
         icon: <DollarSign />,
         subpages: [
+          // {
+          //   name: "Pricing",
+          //   href: "/revenueengine/pricing",
+          //   icon: <DollarSign />,
+          // },
           {
-            name: "Pricing",
-            href: "/revenueengine/pricing",
-            icon: <DollarSign />,
-          },
-          {
-            name: "Configure Products",
+            name: "Configuration settings",
             href: "/revenueengine/configureproducts",
             icon: <Cog />,
           },
           {
-            name: "Pricing Details",
+            name: "Price",
             href: "/revenueengine/pricingdetails",
             icon: <DollarSign />,
           },
           {
-            name: "Configure Product 2",
+            name: "Configure",
             href: "/revenueengine/configureproduct2",
             icon: <Cog />,
           },
           {
-            name: "Preview Quote",
+            name: "Quote",
             href: "/revenueengine/previewquote",
             icon: <FileText />,
           },
@@ -378,7 +377,6 @@ export const employeeNavigation = [
     href: "/hrms/dashboard",
     icon: <Home />,
   },
-
 
   {
     name: "My Tasks",
