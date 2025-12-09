@@ -465,7 +465,7 @@ export default function TemplateCreator() {
                       Loading templates...
                     </p>
                   )}
-                  {!isLoading && Templates.length === 0 && (
+                  {!isLoading && pastTemplates.length === 0 && (
                     <p className="text-sm text-gray-500">
                       No templates saved yet.
                     </p>
