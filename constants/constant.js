@@ -1,4 +1,6 @@
+import { Arrow } from "@radix-ui/react-dropdown-menu";
 import { healthcare } from "googleapis/build/src/apis/healthcare";
+import { SlActionRedo } from "react-icons/sl";
 import {
   BarChart3,
   Bell,
@@ -76,7 +78,7 @@ export const analyticsData = {
     ltv: 260,
     supportTickets: 234,
     resolutionTime: "4.2 hours",
-    
+
     pipeline: [
       { stage: "Prospecting", count: 67, value: 1670000 },
       { stage: "Qualification", count: 45, value: 1125000 },
@@ -226,6 +228,7 @@ export const leadSources = [
   "Organic",
 ];
 
+
 export const monthFilters = [
   "All time",
   "January",
@@ -244,52 +247,122 @@ export const monthFilters = [
 
 export const navigation = [
   { key: "home", name: "Home", href: "/home", icon: <Home /> },
-  { key: "prospects", name: "Prospects", href: "/prospects", icon: <Users /> },
-  // { name: "Engagement", href: "/engagement", icon: MessageSquare },
-  { key: "crm", name: "CRM", href: "/crm", icon: <Database /> },
-  // { key: "pricing", name: "Pricing", href: "/pricing", icon: <Send /> },
+
+  // Manufacturing Operation Section
   {
-    key: "campaigns",
-    name: "Campaigns",
-    href: "/campaigns",
-    icon: <Megaphone />,
-  },
-  // { name: "Calendar", href: "/calendar", icon: Calendar },
-  { name: "Analytics", href: "/analytics", icon: <BarChart3 /> },
-  // {
-  //   key: "configureproducts",
-  //   name: "Configure Products",
-  //   href: "/revenueengine/configureproducts",
-  //   icon: <Wrench />,
-  // },
-  {
-    name: "HRMS",
-    href: "/hrms",
-    icon: <SquareUser />,
-    subpages: [
-      {
-        name: "Calendar",
-        href: "/hrms/Calendar",
-        icon: <Calendar />,
-      },
-      { name: "Employee", href: "/hrms/Employee", icon: <UserRoundCog /> },
-      { name: "Payroll", href: "/hrms/Payroll", icon: <UserRoundCog /> },
-      { name: "Leave", href: "/hrms/Leave", icon: <Coffee /> },
-    ],
-  },
-  {
-    key: "revenueengine",
-    name: "Revenue Engine",
-    href: "/revenueengine/configureproducts",
+    key: "manufacturing",
+    name: "Manufacturing Operation",
+    href: "",
     icon: <Wrench />,
     subpages: [
       {
-        name: "Configure Products",
-        href: "/revenueengine/configureproducts",
-        icon: <Cog />,
+        name: "Vendor Management",
+        href: "/vendormanagement",
+        icon: <Users />,
       },
-      { name: "Pricing", href: "/revenueengine/pricing", icon: <DollarSign /> },
-      // { name: "Quotes", href: "/revenueengine/quotes", icon: <FileText /> },
+      {
+        key: "revenueengine",
+        name: "Revenue Engine",
+        href: "/revenueengine/pricing",
+        icon: <DollarSign />,
+        subpages: [
+          {
+            name: "Pricing",
+            href: "/revenueengine/pricing",
+            icon: <DollarSign />,
+          },
+          {
+            name: "Configure Products",
+            href: "/revenueengine/configureproducts",
+            icon: <Cog />,
+          },
+          {
+            name: "Pricing Details",
+            href: "/revenueengine/pricingdetails",
+            icon: <DollarSign />,
+          },
+          {
+            name: "Configure Product 2",
+            href: "/revenueengine/configureproduct2",
+            icon: <Cog />,
+          },
+          {
+            name: "Preview Quote",
+            href: "/revenueengine/previewquote",
+            icon: <FileText />,
+          },
+        ],
+      },
+      {
+        name: "Inventory",
+        href: "/inventory",
+        icon: <Database />,
+      },
+      {
+        name: "Invoice",
+        href: "/invoice",
+        icon: <FileText />,
+      },
+      {
+        name: "Quotation",
+        href: "/quotation",
+        icon: <FileText />,
+      },
+      {
+        name: "Sales Order",
+        href: "/salesorder",
+        icon: <FileText />,
+      },
+    ],
+  },
+
+  // Management Section
+  {
+    key: "management",
+    name: "Management",
+    href: "/crm",
+    icon: <Database />,
+    subpages: [
+      {
+        name: "CRM",
+        href: "/crm",
+        icon: <Database />,
+      },
+      {
+        name: "HRMS",
+        href: "/hrms",
+        icon: <SquareUser />,
+      },
+      {
+        name: "Task Management",
+        href: "/tasks",
+        icon: <ListChecks />,
+      },
+      {
+        name: "Analysis",
+        href: "/analytics",
+        icon: <BarChart3 />,
+      },
+    ],
+  },
+
+  // Growth Section
+  {
+    key: "growth",
+    name: "Growth",
+    href: "/campaigns",
+    icon: <Megaphone />,
+    subpages: [
+      {
+        name: "Campaign",
+        href: "/campaigns",
+        icon: <Megaphone />,
+      },
+      {
+        name: "Prospects",
+        href: "/prospects",
+        icon: <Users />,
+      },
     ],
   },
 ];
@@ -305,6 +378,8 @@ export const employeeNavigation = [
     href: "/hrms/dashboard",
     icon: <Home />,
   },
+
+
   {
     name: "My Tasks",
     href: "/hrms/tasks",
